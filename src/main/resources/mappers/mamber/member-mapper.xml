@@ -7,9 +7,12 @@
   
   
   <!-- 오류 방지 예시용 고쳐쓰시오. -->
-  <mapper namespace="Test">
-  	<select id="test9" resultType="com.kedu.project.members.member.MemberDTO">
-  		select * from member
-  	</select>
+  <mapper namespace="Member">
+  	<insert id="insert">
+  		insert into member (email, pw, name, phone, company_code, signup_at) values (#{email}, #{pw}, #{name}, #{phone}, #{company_code}, sysdate)
+  	</insert>
   
+  	<select id="selectByLogin" resultType="Integer"  parameterType="com.kedu.project.members.member.MemberDTO">
+  		select count(*) from member where email = #{email} and pw = #{pw}
+  	</select>
   </mapper>

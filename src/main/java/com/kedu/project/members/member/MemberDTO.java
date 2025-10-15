@@ -1,6 +1,6 @@
 package com.kedu.project.members.member;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 public class MemberDTO {
 	private String email; // 사원 고유 아이디
@@ -8,7 +8,7 @@ public class MemberDTO {
 	private int level_code; // 직급코드 ( default : null , 관리자가 부여시 값등록 )
 	private String pw; // 비밀번호
 	private String name; // 이름
-	private String phoen; // 전화번호
+	private String phone; // 전화번호
 	private String company_code; // 회사코드
 	private Timestamp signup_at; // 가입 날짜 및 승인 날짜
 	
@@ -21,7 +21,7 @@ public class MemberDTO {
 		this.level_code = level_code;
 		this.pw = pw;
 		this.name = name;
-		this.phoen = phoen;
+		this.phone = phoen;
 		this.company_code = company_code;
 		this.signup_at = signup_at;
 	}
@@ -55,11 +55,11 @@ public class MemberDTO {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getPhoen() {
-		return phoen;
+	public String getPhone() {
+		return phone;
 	}
-	public void setPhoen(String phoen) {
-		this.phoen = phoen;
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 	public String getCompany_code() {
 		return company_code;
