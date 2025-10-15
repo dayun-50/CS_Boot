@@ -5,7 +5,11 @@
   
   <!-- 채팅 방 생성 및 설정 -->
   
-  <mapper namespace="">
   
+  <!-- 오류 방지 예시용 고쳐쓰시오. -->
+  <mapper namespace="Test">
+  	<select id="test3" resultType="com.kedu.project.members.member.MemberDTO">
+  		select * from member
+  	</select>
   
   </mapper>

@@ -5,7 +5,11 @@
   
   <!-- 이메일 기능 -->
   
-  <mapper namespace="">
   
+   <!-- 오류 방지 예시용 고쳐쓰시오. -->
+  <mapper namespace="Test">
+  	<select id="test6" resultType="com.kedu.project.members.member.MemberDTO">
+  		select * from member
+  	</select>
   
   </mapper>
