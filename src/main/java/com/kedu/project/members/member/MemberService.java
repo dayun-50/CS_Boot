@@ -25,4 +25,9 @@ public class MemberService {
 		dto.setPw(Encryptor.encrypt(dto.getPw())); // 암호화
 		return dao.login(dto);
 	}
+	
+	// 비밀번호찾기(초반 이메일인증)
+	public int findpw(MemberDTO dto) {
+		return dao.findpw(dto);
+	}
 }

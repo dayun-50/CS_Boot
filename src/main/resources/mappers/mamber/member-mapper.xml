@@ -15,4 +15,8 @@
   	<select id="selectByLogin" resultType="Integer"  parameterType="com.kedu.project.members.member.MemberDTO">
   		select count(*) from member where email = #{email} and pw = #{pw}
   	</select>
+  	
+  	<select id="selectById" resultType="Integer"  parameterType="com.kedu.project.members.member.MemberDTO">
+  		select count(*) from member where email = #{email}
+  	</select>
   </mapper>

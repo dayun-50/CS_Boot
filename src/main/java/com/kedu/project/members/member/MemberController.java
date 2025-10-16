@@ -35,14 +35,22 @@ public class MemberController {
 	@PostMapping("/login")
 	public ResponseEntity<String> login(@RequestBody MemberDTO dto){ 
 		int result = memberService.login(dto);
-		System.out.println(result);
-		System.out.println(dto.getEmail());
-		System.out.println(dto.getPw());
 		if(result > 0) { // 로그인 성공시
 			String token = jwt.createToken(dto.getEmail());
 			return ResponseEntity.ok(token);
 		}else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
 		}	
+	}
+
+	// 비밀번호찾기(초반 이메일인증)
+	@PostMapping("/findpw")
+	public ResponseEntity<String> findpw(@RequestBody MemberDTO dto){
+		int result = memberService.findpw(dto);
+		if(result > 0) {
+			return ResponseEntity.ok().build();
+		}else {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
+		}
 	}
 }
