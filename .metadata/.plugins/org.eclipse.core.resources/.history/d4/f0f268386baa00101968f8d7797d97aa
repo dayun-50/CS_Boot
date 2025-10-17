@@ -1,0 +1,13 @@
+spring.application.name=CS_Project
+
+server.port=80
+spring.datasource.url=jdbc:oracle:thin:@192.168.0.50:1521:xe
+spring.datasource.username =kedu
+spring.datasource.password =kedu
+spring.datasource.driver-class-name =oracle.jdbc.OracleDriver
+
+server.servlet.session.cookie.same-site=none
+
+mybatis.mapper-locations=classpath:mappers/**/*-mapper.xml
+
+spring.servlet.multipart.max-file-size=10MB

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <!-- 공지사항 -->
+  
+ <!-- 오류 방지 예시용 고쳐쓰시오. -->
+<mapper namespace="NoticeMapper">
+
+    <select id="getNoticeList" resultType="com.kedu.project.notice.NoticeDTO">
+        SELECT id, title, content, reg_date
+        FROM notice
+        ORDER BY reg_date DESC
+    </select>
+    
+  </mapper>
