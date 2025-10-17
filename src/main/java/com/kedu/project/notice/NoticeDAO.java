@@ -1,5 +1,7 @@
 package com.kedu.project.notice;
 
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -12,4 +14,24 @@ import org.springframework.stereotype.Repository;
 public class NoticeDAO {
 	@Autowired
 	private SqlSession mybatis;
+
+	public List<NoticeDTO> getNoticeList() {
+		return mybatis.selectList("NoticeMapper.getNoticeList");
+	}
+	
+	public NoticeDTO getNoticeById(int notice_seq) {
+		return mybatis.selectOne("NoticeMapper.getNoticeById", notice_seq);
+	}
+	
+	public int BoardInsert(NoticeDTO dto) {
+	    return mybatis.insert("NoticeMapper.BoardInsert", dto); 
+	}
+
+	public int BoardUpdate(NoticeDTO dto) {
+	    return mybatis.update("NoticeMapper.BoardUpdate", dto); 
+	}
+
+	public int BoardDelete(int notice_seq) {
+	    return mybatis.delete("NoticeMapper.BoardDelete", notice_seq); 
+	}
 }
