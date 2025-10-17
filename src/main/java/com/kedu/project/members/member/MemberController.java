@@ -1,5 +1,7 @@
 package com.kedu.project.members.member;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,5 +65,14 @@ public class MemberController {
 		}else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
 		}
+	}
+	
+	// 마이페이지 출력
+	@PostMapping("/mypage")
+	public ResponseEntity<List<MemberDTO>> mypage(@RequestBody MemberDTO dto){
+		List<MemberDTO> list = memberService.mypage(dto);
+		System.out.println(list);
+		System.out.println(dto.getEmail());
+		return ResponseEntity.ok(list);
 	}
 }

@@ -1,5 +1,7 @@
 package com.kedu.project.members.member;
 
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -31,5 +33,10 @@ public class MemberDAO {
 	// 비밀번호 변경
 	public int gnewpw(MemberDTO dto) {
 		return mybatis.update("Member.updateByGnewpw", dto);
+	}
+	
+	// 마이페이지 출력
+	public List<MemberDTO> mypage(MemberDTO dto){
+		return mybatis.selectList("Member.selectByMypage", dto);
 	}
 }

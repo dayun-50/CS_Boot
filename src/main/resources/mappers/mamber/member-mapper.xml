@@ -23,4 +23,19 @@
   	<update id="updateByGnewpw">
   		update member set pw = #{pw} where email = #{email}
   	</update>
+  	
+  	<select id="selectByMypage" resultType="com.kedu.project.members.member.MemberDTO" parameterType="com.kedu.project.members.member.MemberDTO">
+  		SELECT 
+   			m.email,
+    		m.name,
+    		d.dept_name AS dept_code,
+    		j.level_name AS level_code,
+    		m.phone
+		FROM member m JOIN department d 
+			ON m.dept_code = d.dept_code AND m.company_code = d.company_code
+			JOIN job_level j 
+    		ON m.level_code = j.level_code
+    		AND m.company_code = j.company_code
+		WHERE m.email = #{email}
+  	</select>
   </mapper>

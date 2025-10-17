@@ -1,5 +1,7 @@
 package com.kedu.project.members.member;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,5 +37,10 @@ public class MemberService {
 	public int gnewpw(MemberDTO dto) {
 		dto.setPw(Encryptor.encrypt(dto.getPw())); // 암호화
 		return dao.gnewpw(dto);
+	}
+	
+	// 마이페이지 출력
+	public List<MemberDTO> mypage(MemberDTO dto){
+		return dao.mypage(dto);
 	}
 }
