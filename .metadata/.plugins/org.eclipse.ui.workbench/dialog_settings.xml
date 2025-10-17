@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
+<<<<<<< HEAD
 	<section name="ImportExportAction">
 		<section name="ImportExportWizard.dialogBounds">
 		</section>
 	</section>
+=======
+>>>>>>> d77a0cd81c4083ff44c23c75b2b1867817f84c8e
 </section>

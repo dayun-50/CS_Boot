@@ -1,2 +1,8 @@
+<<<<<<< HEAD
 2025/10/15-12:14:06.760 6d98 Creating DB C:\20250609_KDT\2차 프로젝트\CS\CS_Boot\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\shared_proto_db\metadata since it was missing.
 2025/10/15-12:14:06.766 6d98 Reusing MANIFEST C:\20250609_KDT\2차 프로젝트\CS\CS_Boot\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\shared_proto_db\metadata/MANIFEST-000001
+=======
+2025/10/17-11:03:07.845 6c74 Reusing MANIFEST C:\20250609_KDT\2차 프로젝트\Boot\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\shared_proto_db\metadata/MANIFEST-000001
+2025/10/17-11:03:07.847 6c74 Recovering log #3
+2025/10/17-11:03:07.849 6c74 Reusing old log C:\20250609_KDT\2차 프로젝트\Boot\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\shared_proto_db\metadata/000003.log 
+>>>>>>> d77a0cd81c4083ff44c23c75b2b1867817f84c8e

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <!-- 공지사항 -->
+  
+ <!-- 오류 방지 예시용 고쳐쓰시오. -->
+<mapper namespace="NoticeMapper">
+
+    <select id="getNoticeList" resultType="com.kedu.project.notice.NoticeDTO">
+        SELECT notice_seq, view_count, company_code, title, content, created_at FROM notice ORDER BY created_at DESC
+    </select>
+
+	<select id="getNoticeById" parameterType="int" resultType="com.yourpackage.Notice">
+	  SELECT 
+	    notice_seq,
+	    view_count,
+	    writer_email,
+	    company_code,
+	    title,
+	    content,
+	    create_at AS created_at
+	  FROM notice
+	  WHERE notice_seq = #{notice_seq}
+	</select>
+
+    <insert id="BoardInsert" parameterType="com.yourpackage.Notice">
+	    INSERT INTO notice (
+	        view_count,
+	        writer_email,
+	        company_code,
+	        title,
+	        content
+	    ) VALUES (
+	        #{view_count},
+	        #{writer_email},
+	        #{company_code},
+	        #{title},
+	        #{content}
+	    )
+	</insert>
+    
+    <update id="BoardUpdate">
+    	UPDATE notice  
+    	SET 
+	    	title = #{title},
+	        content = #{content},
+	        view_count = #{view_count}
+	    WHERE
+	    	notice_seq = #{notice_seq}
+    </update>
+    
+	<delete id="BoardDelete" parameterType="int">
+	  DELETE FROM notice
+	  WHERE notice_seq = #{notice_seq}
+	</delete>
+	
+  </mapper>

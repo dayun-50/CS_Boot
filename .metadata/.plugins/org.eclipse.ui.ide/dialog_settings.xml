@@ -25,6 +25,7 @@
 		<item value="org.jboss.tools.m2e.wro4j.feature:1.2.1.202301111328"/>
 		<item value="org.sonatype.m2e.egit.feature:0.17.0.202209271423"/>
 	</list>
+<<<<<<< HEAD
 	<section name="ChooseWorkspaceDialogSettings">
 		<item key="DIALOG_X_ORIGIN" value="175"/>
 		<item key="DIALOG_Y_ORIGIN" value="172"/>
@@ -33,18 +34,29 @@
 		<list key="ENABLED_TRANSFERS">
 		</list>
 	</section>
+=======
+>>>>>>> d77a0cd81c4083ff44c23c75b2b1867817f84c8e
 	<section name="SmartImportWizard">
 		<item key="SmartImportRootWizardPage.STORE_HIDE_ALREADY_OPEN" value="false"/>
 		<item key="SmartImportRootWizardPage.STORE_CLOSE_IMPORTED" value="false"/>
 		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
 		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+<<<<<<< HEAD
 			<item value="C:\20250609_KDT\2차 프로젝트\CS"/>
 			<item value="C:\20250609_KDT\2차 프로젝트\CS\CS_Boot"/>
 		</list>
 		<section name="SmartImportWizard.dialogBounds">
 			<item key="DIALOG_X_ORIGIN" value="68"/>
 			<item key="DIALOG_Y_ORIGIN" value="0"/>
+=======
+			<item value="C:\20250609_KDT\2차 프로젝트\Boot\CS_Boot"/>
+			<item value="C:\20250609_KDT\2차 프로젝트\CS"/>
+		</list>
+		<section name="SmartImportWizard.dialogBounds">
+			<item key="DIALOG_X_ORIGIN" value="68"/>
+			<item key="DIALOG_Y_ORIGIN" value="7"/>
+>>>>>>> d77a0cd81c4083ff44c23c75b2b1867817f84c8e
 			<item key="DIALOG_WIDTH" value="888"/>
 			<item key="DIALOG_HEIGHT" value="633"/>
 			<item key="DIALOG_FONT_NAME" value="1|맑은 고딕|9.0|0|WINDOWS|1|-18|0|0|0|400|0|0|0|1|0|0|0|0|맑은 고딕"/>
