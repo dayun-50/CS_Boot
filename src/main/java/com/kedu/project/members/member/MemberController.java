@@ -53,4 +53,15 @@ public class MemberController {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
 		}
 	}
+	
+	// 비밀번호 변경
+	@PostMapping("/gnewpw")
+	public ResponseEntity<String> gnewpw(@RequestBody MemberDTO dto){
+		int result = memberService.gnewpw(dto);
+		if(result > 0) {
+			return ResponseEntity.ok().build();
+		}else {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
+		}
+	}
 }

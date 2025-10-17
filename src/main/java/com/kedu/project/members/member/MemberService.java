@@ -30,4 +30,10 @@ public class MemberService {
 	public int findpw(MemberDTO dto) {
 		return dao.findpw(dto);
 	}
+	
+	// 비밀번호 변경
+	public int gnewpw(MemberDTO dto) {
+		dto.setPw(Encryptor.encrypt(dto.getPw())); // 암호화
+		return dao.gnewpw(dto);
+	}
 }

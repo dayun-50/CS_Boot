@@ -27,4 +27,9 @@ public class MemberDAO {
 	public int findpw(MemberDTO dto) {
 		return mybatis.selectOne("Member.selectById", dto);
 	}
+	
+	// 비밀번호 변경
+	public int gnewpw(MemberDTO dto) {
+		return mybatis.update("Member.updateByGnewpw", dto);
+	}
 }

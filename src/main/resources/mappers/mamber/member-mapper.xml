@@ -19,4 +19,8 @@
   	<select id="selectById" resultType="Integer"  parameterType="com.kedu.project.members.member.MemberDTO">
   		select count(*) from member where email = #{email}
   	</select>
+  	
+  	<update id="updateByGnewpw">
+  		update member set pw = #{pw} where email = #{email}
+  	</update>
   </mapper>
