@@ -22,15 +22,4 @@ public class NoticeService {
 		return dao.getNoticeById(notice_seq);
 	}
 	
-	public int BoardInsert(NoticeDTO dto) {
-	    return dao.BoardInsert(dto);
-	}
-	
-	public int BoardUpdate(NoticeDTO dto) {
-		return dao.BoardUpdate(dto);
-	}
-	
-	public int BoardDelete(int notice_seq) {
-		return dao.BoardDelete(notice_seq);
-	}
 }

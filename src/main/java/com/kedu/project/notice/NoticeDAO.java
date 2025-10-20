@@ -18,20 +18,9 @@ public class NoticeDAO {
 	public List<NoticeDTO> getNoticeList() {
 		return mybatis.selectList("NoticeMapper.getNoticeList");
 	}
-	
+
 	public NoticeDTO getNoticeById(int notice_seq) {
 		return mybatis.selectOne("NoticeMapper.getNoticeById", notice_seq);
 	}
-	
-	public int BoardInsert(NoticeDTO dto) {
-	    return mybatis.insert("NoticeMapper.BoardInsert", dto); 
-	}
 
-	public int BoardUpdate(NoticeDTO dto) {
-	    return mybatis.update("NoticeMapper.BoardUpdate", dto); 
-	}
-
-	public int BoardDelete(int notice_seq) {
-	    return mybatis.delete("NoticeMapper.BoardDelete", notice_seq); 
-	}
 }

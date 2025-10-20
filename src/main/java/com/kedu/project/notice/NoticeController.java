@@ -43,23 +43,4 @@ public class NoticeController {
 			return ResponseEntity.notFound().build();
 		}
 	}
-
-	// 공지사항 등록
-	@PostMapping("/insert")
-	public ResponseEntity<Integer> insertNotice(@RequestBody NoticeDTO dto) {
-		int noticeInsert = noticeService.BoardInsert(dto);
-		return ResponseEntity.ok(noticeInsert);
-	}
-
-	// 공지사항 수정
-	@PutMapping("/update")
-	public int updateNotice(@RequestBody NoticeDTO dto) {
-		return noticeService.BoardUpdate(dto);
-	}
-
-	// 공지사항 삭제
-	@DeleteMapping("/delete/{notice_seq}")
-	public int deleteNotice(@PathVariable int notice_seq) {
-		return noticeService.BoardDelete(notice_seq);
-	}
 }

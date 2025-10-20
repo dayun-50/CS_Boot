@@ -16,9 +16,9 @@ import com.kedu.project.members.member.MemberDTO;
 
 @RestController
 @RequestMapping("/emailauth")
-public class EmailAuthController {
+public class EamilAuthController {
 	@Autowired
-	private EamilAuthService emailService;
+	private EmailAuthService emailService;
 	
 	@PostMapping
 	public ResponseEntity<String> emailAuth(@RequestBody MemberDTO dto)throws Exception{

@@ -21,7 +21,7 @@ import jakarta.servlet.ServletException;
  * 	회원가입 및 마이페이지 이메일 인증 API 전용 service
  * */
 @Service
-public class EamilAuthService {
+public class EmailAuthService {
 	private static final long serialVersionUID = 1L;
 	
 	// 서버 전용 Naver 계정 (실제 발송용)
