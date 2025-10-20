@@ -1,5 +1,7 @@
 package com.kedu.project.notice;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,4 +13,13 @@ import org.springframework.stereotype.Service;
 public class NoticeService {
 	@Autowired
 	private NoticeDAO dao;
+
+	public List<NoticeDTO> getNoticeList() {
+		return dao.getNoticeList();
+	}
+
+	public NoticeDTO getNoticeById(int notice_seq) {
+		return dao.getNoticeById(notice_seq);
+	}
+
 }
