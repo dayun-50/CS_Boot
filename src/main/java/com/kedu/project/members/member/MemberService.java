@@ -35,12 +35,22 @@ public class MemberService {
 	
 	// 비밀번호 변경
 	public int gnewpw(MemberDTO dto) {
+		dao.gnewpw(dto);
 		dto.setPw(Encryptor.encrypt(dto.getPw())); // 암호화
 		return dao.gnewpw(dto);
 	}
 	
 	// 마이페이지 출력
 	public List<MemberDTO> mypage(MemberDTO dto){
-		return dao.mypage(dto);
+		List<MemberDTO> list = dao.mypage(dto);
+		String phone1 = list.get(0).getPhone().substring(3,7); // 첫번째 전번
+		String phone2 = list.get(0).getPhone().substring(7,11); // 두번째 전번
+		list.get(0).setPhone("010"+"-"+phone1+"-"+phone2);
+		return list;
+	}
+	
+	// 마이페이지 수정
+	public int updateMypage(MemberDTO dto) {
+		return dao.updateMypage(dto);
 	}
 }

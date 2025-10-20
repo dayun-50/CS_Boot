@@ -5,8 +5,6 @@
   
   <!-- 사원 회원가입 등등 -->
   
-  
-  <!-- 오류 방지 예시용 고쳐쓰시오. -->
   <mapper namespace="Member">
   	<insert id="insert">
   		insert into member (email, pw, name, phone, company_code, signup_at) values (#{email}, #{pw}, #{name}, #{phone}, #{company_code}, sysdate)
@@ -38,4 +36,8 @@
     		AND m.company_code = j.company_code
 		WHERE m.email = #{email}
   	</select>
+  	
+  	<update id="updateMypage">
+  		update member set name = #{name}, phone = #{phone} where email = #{email}
+  	</update>
   </mapper>

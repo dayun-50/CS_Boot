@@ -55,7 +55,7 @@ public class MemberController {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
 		}
 	}
-	
+
 	// 비밀번호 변경
 	@PostMapping("/gnewpw")
 	public ResponseEntity<String> gnewpw(@RequestBody MemberDTO dto){
@@ -66,13 +66,22 @@ public class MemberController {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
 		}
 	}
-	
+
 	// 마이페이지 출력
 	@PostMapping("/mypage")
 	public ResponseEntity<List<MemberDTO>> mypage(@RequestBody MemberDTO dto){
 		List<MemberDTO> list = memberService.mypage(dto);
-		System.out.println(list);
-		System.out.println(dto.getEmail());
 		return ResponseEntity.ok(list);
+	}
+
+	// 마이페이지 수정
+	@PostMapping("/updateMypage")
+	public ResponseEntity<String> updateMypage(@RequestBody MemberDTO dto){
+		int result = memberService.updateMypage(dto);
+		if(result > 0) {
+			return ResponseEntity.ok().build();
+		}else {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
+		}
 	}
 }

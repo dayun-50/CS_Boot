@@ -39,4 +39,9 @@ public class MemberDAO {
 	public List<MemberDTO> mypage(MemberDTO dto){
 		return mybatis.selectList("Member.selectByMypage", dto);
 	}
+	
+	// 마이페이지 수정
+	public int updateMypage(MemberDTO dto) {
+		return mybatis.update("Member.updateMypage", dto);
+	}
 }
