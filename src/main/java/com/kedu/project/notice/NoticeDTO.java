@@ -10,11 +10,11 @@ public class NoticeDTO {
 	private int view_count; // 조회수 ( default : 0 )
 	private String title; // 공지 제목
 	private String content; // 공지 내용
-	private int company_code; // 회사 코드
+	private String company_code; // 회사 코드
 	private Timestamp created_at; // 공지 작성일 ( default : sysdate )
 	
 	public NoticeDTO() {}
-	public NoticeDTO(int notice_seq, int view_count, String title, String content, int company_code,
+	public NoticeDTO(int notice_seq, int view_count, String title, String content, String company_code,
 			Timestamp created_at) {
 		super();
 		this.notice_seq = notice_seq;
@@ -48,10 +48,10 @@ public class NoticeDTO {
 	public void setContent(String content) {
 		this.content = content;
 	}
-	public int getCompany_code() {
+	public String getCompany_code() {
 		return company_code;
 	}
-	public void setCompany_code(int company_code) {
+	public void setCompany_code(String company_code) {
 		this.company_code = company_code;
 	}
 	public Timestamp getCreated_at() {
