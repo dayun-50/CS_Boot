@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <!-- 전자결재 -->
+  
+  
+ <!-- 오류 방지 예시용 고쳐쓰시오. -->
+  <mapper namespace="Approval">
+  	<select id="getAll" resultType="com.kedu.project.approval.ApprovalDTO">
+  		select * from approval where member_email =#{member_email} order by approval_at desc
+  	</select>
+  	
+  	<select id="getType" resultType="com.kedu.project.approval.ApprovalDTO">
+  		select * from approval where member_email =#{member_email} and approval_status =#{type} order by approval_at desc
+  	</select>
+  	
+  	<select id="getDetailBySeq" resultType="com.kedu.project.approval.ApprovalDTO">
+  		select * from approval where member_email =#{member_email} and approval_seq =#{seq} 
+  	</select>
+  
+  	<update id="updateDetailBoard">
+  		update approval set approval_title = #{approval_title}, approval_content = #{approval_content} where approval_seq = #{approval_seq} and member_email = #{member_email}
+  	</update>  
+  
+	<delete id="deleteDetailBoard">
+    	delete from approval where approval_seq = #{approval_seq} and member_email = #{member_email}
+	</delete>
+
+	<insert id="upload">
+    	insert into approval (approval_seq, member_email, approval_title, approval_content, approval_at, approval_status)
+    	values (approval_seq.nextval, #{member_email}, #{approval_title}, #{approval_content}, sysdate, default)
+	</insert> 
+  </mapper>
