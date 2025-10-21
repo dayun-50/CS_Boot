@@ -5,10 +5,32 @@
   
   <!-- 채팅 참여자 -->
   
-  <!-- 오류 방지 예시용 고쳐쓰시오. -->
-  <mapper namespace="Test">
-  	<select id="test1" resultType="com.kedu.project.members.member.MemberDTO">
-  		select * from member
-  	</select>
-  
+  <mapper namespace="Chat_member">
+  	
+  	 <select id="checkPrivateChat" resultType="int">
+	    SELECT COALESCE(
+	      (
+	        SELECT chat_seq
+	        FROM (
+	          SELECT chat_seq
+	          FROM chat_member
+	          WHERE member_email IN (#{email1}, #{email2})
+	          GROUP BY chat_seq
+	          HAVING COUNT(DISTINCT member_email) = 2
+	        )
+	        WHERE ROWNUM = 1
+	      ),
+	      0
+	    ) AS chat_seq
+	    FROM dual
+	 </select>
+	 
+	 <insert id="insertChat">
+	 	insert into chat_member values (#{chat_seq}, #{member_email}, #{role})
+	 </insert>
+	 
+	 <select id="existDepartmentRoom" resultType="int">
+	 	select count(*) from chat_member where chat_seq = #{chat_seq} and member_email = #{email}
+	 </select>
+	  	
   </mapper>

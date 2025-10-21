@@ -1,14 +1,131 @@
 package com.kedu.project.chatting.chat_member;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.kedu.project.chatting.chat_room.Chat_roomDAO;
+import com.kedu.project.chatting.chat_room.Chat_roomDTO;
+import com.kedu.project.members.member.MemberDAO;
+import com.kedu.project.members.member.MemberDTO;
 
 
 /*
 	채팅방 참여자 관리 Service
-*/
+ */
 @Service
 public class Chat_memberService {
 	@Autowired
 	private Chat_memberDAO dao;
+	
+	@Autowired
+	private Chat_roomDAO roomDao;
+	
+	@Autowired
+	private MemberDAO memberDao;
+
+	// 팀원간 개인 메세지 목록 출력 및 생성(없을시)
+	public List<Map<String, Object>> privatChatSearch(MemberDTO dto){
+		// 같은 부서의 팀 정보 출력
+		List<MemberDTO> memberList = memberDao.memberSearch(dto);
+		List<Map<String, Object>> list = new ArrayList<>();
+		for(MemberDTO members : memberList) {
+			// 채팅방 존재 여부 및 존재시 채팅방 seq 반환
+			int checkChat = dao.checkPrivateChat(dto, members.getEmail());
+			Map<String, Object> map = new HashMap<>();
+			if(checkChat > 0) { // 채팅방 존재시 map에 기록
+				map.put("chat_seq", checkChat);
+				map.put("level_code", members.getLevel_code());
+				map.put("name", members.getName());
+			}else {
+				// 채팅방 생성 후 seq 뽑아서 방생성 후 정보 반환
+				Chat_memberDTO Chat_memberDTO = new Chat_memberDTO();
+				Chat_memberDTO.setMember_email(dto.getEmail());
+				int chatSeq = roomDao.insertPirvateCahtRoom(Chat_memberDTO);
+				// chat_member 테이블에 사원 insert
+				Chat_memberDTO manager = new Chat_memberDTO();
+				manager.setChat_seq(chatSeq);
+				manager.setMember_email(dto.getEmail());
+				manager.setRole("manager");
+				dao.insertCahtMember(manager);
+				// chat_member 테이블에 같은 부서 직원 insert 
+				Chat_memberDTO member = new Chat_memberDTO();
+				member.setChat_seq(chatSeq);
+				member.setMember_email(members.getEmail());
+				member.setRole("general");
+				dao.insertCahtMember(member);
+				// 정보 포장
+				map.put("chat_seq", chatSeq);
+				map.put("level_code", members.getLevel_code());
+				map.put("name", members.getName());
+			}
+			list.add(map);
+		}
+		return list;
+	}
+	
+	// 채팅방 출력
+	public List<Map<String, Object>> chatRoom(MemberDTO dto){
+		// 내 부서명 출력
+		String department = memberDao.selectDepartment(dto);
+		List<Map<String, Object>> list = new ArrayList<>();
+		Map<String, Object> map = new HashMap<>();
+		// 채팅방 있는지 확인 ( 존재 한다면 room_seq / 존재하지 않는다면 0 )
+		int checkChat = roomDao.searchRoom(dto, department+" 단체 채팅");
+		if(checkChat > 0) {
+			int exist = dao.existDepartmentRoom(dto, checkChat);
+			// 단톡방에 내가 없을시 참여
+			if(exist == 0) {
+				Chat_memberDTO members = new Chat_memberDTO();
+				members.setChat_seq(checkChat);
+				members.setMember_email(dto.getEmail());
+				members.setRole("general");
+				dao.insertCahtMember(members);
+			}
+			map.put("chat_seq", checkChat);
+			map.put("chat_name", department+" 단체 채팅");
+		}else {
+			// 같은 부서의 팀 정보 출력
+			List<MemberDTO> memberList = memberDao.memberSearch(dto);
+			Chat_roomDTO chatRoomDTO = new Chat_roomDTO();
+			chatRoomDTO.setManager_email(dto.getEmail());;
+			chatRoomDTO.setChat_name(department+" 단체 채팅");
+			// 생성한 채팅방 생성 후 시퀀스 값 받기
+			int chatSeq = roomDao.insetDepartmentRoom(chatRoomDTO);
+			// 첫 생성자(해당유저) chat 테이블에 insert
+			Chat_memberDTO manager = new Chat_memberDTO();
+			manager.setChat_seq(chatSeq);
+			manager.setMember_email(dto.getEmail());
+			manager.setRole("manager");
+			dao.insertCahtMember(manager);
+			// 같은 부서 팀도 chat 테이블에 insert
+			for(MemberDTO members : memberList) {
+				Chat_memberDTO member = new Chat_memberDTO();
+				member.setChat_seq(chatSeq);
+				member.setMember_email(members.getEmail());
+				member.setRole("general");
+				dao.insertCahtMember(member);
+			}
+			map.put("chat_seq", chatSeq);
+			map.put("chat_name", department+" 단체 채팅");
+		}
+		list.add(map);
+		// 내가 참여하고있는 단톡방 서치 (같은 부서제외)
+		List<Map<String, Object>> myChats = roomDao.selectChatRoom(dto, department);
+		// 회사 단체 채팅은 제외하고 위에서 했으니까
+		for(Map<String, Object> chat : myChats) {
+	        if(!chat.get("CHAT_NAME").equals(department + " 단체 채팅")) {
+	            list.add(chat);
+	        }
+	        chat.put("chat_seq", chat.get("CHAT_SEQ"));
+	        chat.put("chat_name", chat.get("CHAT_NAME"));
+	        chat.remove("CHAT_NAME");chat.remove("CHAT_SEQ");
+	    }
+		return list;
+	}
+	
 }
