@@ -6,13 +6,14 @@
   <!-- 연락처 -->
  <!-- 오류 방지 예시용 고쳐쓰시오. -->
  <mapper namespace="Contact">
+ 
 	<!--  연락처 목록 조회  -->
 	<select id="getMyContacts" resultType="com.kedu.project.contact.ContactDTO"> 
-		SELECT contact_seq, owner_email, name, email, phone, contact_group, company_code, IS_SHARE AS share
-    	FROM contact
-    	ORDER BY contact_seq DESC
+	    SELECT contact_seq, owner_email, name, email, phone, contact_group, company_code, IS_SHARE AS "share"
+	    FROM contact
+	    ORDER BY contact_seq DESC
 	</select>
-	
+
 	<!--  연락처 등록  -->
 	<insert id="insertContact" parameterType="com.kedu.project.contact.ContactDTO"> 
 		INSERT INTO contact ( owner_email, name, email, phone, contact_group, company_code, share ) 
