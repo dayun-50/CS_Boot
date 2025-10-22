@@ -15,14 +15,24 @@ public class ApprovalDAO {
 	@Autowired
 	private SqlSession mybatis;
 	
-	// 특정 사람의 전체 리스트
-	public List<ApprovalDTO> getAll(String member_email){
-		return mybatis.selectList("Approval.getAll", member_email);
+	// 전체 타입의 데이터 개수
+	public int getCount(String member_email) {
+		return mybatis.selectOne("Approval.getCount", member_email);
 	}
 	
-	// 특정 사람 + 특정 타입 리스트
-	public List<ApprovalDTO> getType(Map<String, Object> param){
-		return mybatis.selectList("Approval.getType", param);
+	// 특정 타입의 데이터 개수
+	public int getTypeCount(Map<String, Object> param) {
+		return mybatis.selectOne("Approval.getTypeCount", param);
+	}
+	
+	// 특정 사람의 모든 타입 페이지에 따른 리스트
+	public List<ApprovalDTO> selectFromTo(Map<String, Object> param){
+		return mybatis.selectList("Approval.selectfromto", param);
+	}
+	
+	// 특정 사람의 특정 타입 페이지에 따른 리스트
+	public List<ApprovalDTO> selectTypeFromTo(Map<String, Object> param){
+		return mybatis.selectList("Approval.selectTypeFromTo", param);
 	}
 	
 	// 특정사람+시퀀스 번호로 DTO 가져오기

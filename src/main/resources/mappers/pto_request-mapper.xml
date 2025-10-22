@@ -5,10 +5,62 @@
   
   <!-- 연차 신청 -->
   
- <!-- 오류 방지 예시용 고쳐쓰시오. -->
-  <mapper namespace="Test">
-  	<select id="test14" resultType="com.kedu.project.members.member.MemberDTO">
-  		select * from member
+
+  <mapper namespace="PtoRequest">
+    <!-- 모든타입의 데이터 페이지에 맞게 가져오기 -->
+  	<select id="selectfromto" resultType="com.kedu.project.pto_request.Pto_requestDTO">
+  		  	select * 
+  			from (select pto_request.*, row_number() over (order by pto_seq desc) as rn from pto_request) sub 
+  			where rn between #{start} and #{end} 
+  			order by rn
   	</select>
+    <!-- 특정 데이터 페이지에 맞게 가져오기 -->
+	<select id="selectTypeFromTo" resultType="com.kedu.project.pto_request.Pto_requestDTO">
+	    select * 
+	    from (
+	        select pto_request.*, row_number() over (order by pto_seq desc) as rn 
+	        from pto_request 
+	        where pto_status = #{pto_status}
+	    ) sub 
+	    where rn between #{start} and #{end} 
+	    order by rn
+	</select>
+
+  	
+  	
+  	
+  	 <!-- 모든타입의 총 개수 가져오기 -->
+  	<select id="getCount" resultType="int">
+  		select count(*) from pto_request where member_email = #{email}
+  	</select>
+  	 <!-- 특정 타입의 총 개수 가져오기 -->
+  	<select id="getTypeCount" resultType="int">
+  		select count(*) from pto_request where member_email = #{member_email} and pto_status =#{pto_status}
+  	</select> 	
+  	
+  	
+
+  	
+  	<select id="getType" resultType="com.kedu.project.pto_request.Pto_requestDTO">
+  		select * from pto_request where member_email =#{member_email} and pto_status =#{type} order by approval_at desc
+  	</select>
+  	
+  	<select id="getDetailBySeq" resultType="com.kedu.project.pto_request.Pto_requestDTO">
+  		select * from pto_request where member_email =#{member_email} and pto_seq =#{seq} 
+  	</select>
+  
+  	<update id="updateDetailBoard">
+  		update pto_request set pto_content = #{pto_content}, pto_start_at = #{pto_start_at}, pto_end_at = #{pto_end_at}
+  		where pto_seq = #{pto_seq} and member_email = #{member_email}
+  	</update>
+  
+	<delete id="deleteDetailBoard">
+    	delete from pto_request where pto_seq = #{pto_seq} and member_email = #{member_email}
+	</delete>
+
+	<insert id="upload">
+    	insert into pto_request (pto_seq, member_email, pto_start_at, pto_end_at, pto_used, pto_content, pto_status)
+    	values (pto_request_seq.nextval, #{member_email}, #{pto_start_at}, #{pto_end_at}, #{pto_used}, #{pto_content}, default)
+	</insert> 
   
   </mapper>

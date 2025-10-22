@@ -4,13 +4,41 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
   <!-- 전자결재 -->
-  
-  
- <!-- 오류 방지 예시용 고쳐쓰시오. -->
+
   <mapper namespace="Approval">
-  	<select id="getAll" resultType="com.kedu.project.approval.ApprovalDTO">
-  		select * from approval where member_email =#{member_email} order by approval_at desc
+    <!-- 모든타입의 데이터 페이지에 맞게 가져오기 -->
+  	<select id="selectfromto" resultType="com.kedu.project.approval.ApprovalDTO">
+  		  	select * 
+  			from (select approval.*, row_number() over (order by approval_seq desc) as rn from approval) sub 
+  			where rn between #{start} and #{end} 
+  			order by rn
   	</select>
+    <!-- 특정 데이터 페이지에 맞게 가져오기 -->
+	<select id="selectTypeFromTo" resultType="com.kedu.project.approval.ApprovalDTO">
+	    select * 
+	    from (
+	        select approval.*, row_number() over (order by approval_seq desc) as rn 
+	        from approval 
+	        where approval_status = #{approval_status}
+	    ) sub 
+	    where rn between #{start} and #{end} 
+	    order by rn
+	</select>
+
+  	
+  	
+  	
+  	 <!-- 모든타입의 총 개수 가져오기 -->
+  	<select id="getCount" resultType="int">
+  		select count(*) from approval where member_email = #{email}
+  	</select>
+  	 <!-- 특정 타입의 총 개수 가져오기 -->
+  	<select id="getTypeCount" resultType="int">
+  		select count(*) from approval where member_email = #{member_email} and approval_status =#{approval_status}
+  	</select> 	
+  	
+  	
+
   	
   	<select id="getType" resultType="com.kedu.project.approval.ApprovalDTO">
   		select * from approval where member_email =#{member_email} and approval_status =#{type} order by approval_at desc

@@ -1,7 +1,8 @@
 package com.kedu.project.approval;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kedu.project.config.PageNaviConfig;
 import com.kedu.project.interceptor.JwtInterceptors;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 
 /*
@@ -28,7 +32,7 @@ import com.kedu.project.interceptor.JwtInterceptors;
 
 public class ApprovalController {
 
-    private final JwtInterceptors jwtInterceptors;
+   private final JwtInterceptors jwtInterceptors;
    @Autowired
    private ApprovalService approvalService;
 
@@ -37,33 +41,55 @@ public class ApprovalController {
         this.jwtInterceptors = jwtInterceptors;
     }
 
-   
-	
-   //멤버지정해서 전체 리스트 가져오기
-   @GetMapping()
-    public ResponseEntity<List<ApprovalDTO>> test() {
-	   String member_email = "cs@naver.com";// 토큰으로 변경되면 토큰에서 꺼낸 작성자로 가져와야함
-	   List<ApprovalDTO> temp =approvalService.getAll(member_email);
-	   
-	   if (temp == null || temp.isEmpty()) {// 데이터가 없으면 204 No Content
-	        return ResponseEntity.noContent().build();
-	    }
-	   return ResponseEntity.ok(temp);
-    }
-   
-   
-   //멤버지정 + 특정 처리 과정 리스트 전체 가져오기
-   @GetMapping(params = "type")
-   public ResponseEntity<List<ApprovalDTO>> getFilteredList(@RequestParam String type) {
-	   String member_email = "cs@naver.com";// 토큰으로 변경되면 토큰에서 꺼낸 작성자로 가져와야함
-	   List<ApprovalDTO> temp =approvalService.getType(member_email, type);
+    
+    //특정 아이디에 대하여, 타입과 페이지에 따라 해당하는 값만 꺼내오기
+    @GetMapping
+    public ResponseEntity<Map<String, Object>> getPagedApprovals(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) String type,
+            HttpServletRequest request) {
 
-	   if (temp == null || temp.isEmpty()) {// 데이터가 없으면 204 No Content
-	        return ResponseEntity.noContent().build();
-	    }
-	   return ResponseEntity.ok(temp);
-   }
-   
+        System.out.println("페이지"+page);
+        System.out.println("타입"+type);
+        String member_email = "cs@naver.com"; // 이후 토큰에서 꺼내도록 변경 예정
+
+        int pageSize = PageNaviConfig.RECORD_COUNT_PER_PAGE;
+        int cpage = page;
+        int start = cpage * pageSize - (pageSize - 1);
+        int end = cpage * pageSize;
+
+        // 총 데이터 개수 조회
+        int totalCount = (type == null || type.isBlank())
+                ? approvalService.getCount(member_email)
+                : approvalService.getTypeCount(member_email, type);
+
+        if (totalCount == 0) {
+            return ResponseEntity.noContent().build();
+        }
+        
+        //토탈 페이지 조회
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+
+        // 현재 페이지에 해당하는 데이터 조회
+        List<ApprovalDTO> pagedList = (type == null || type.isBlank())
+                ? approvalService.selectFromTo(member_email, start, end)
+                : approvalService.selectTypeFromTo(member_email, type, start, end);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("list", pagedList);
+        response.put("currentPage", page);
+        response.put("totalPages", totalPages);
+        
+        
+        System.out.println(pagedList.get(0).getApproval_title());
+        System.out.println(totalPages);
+        System.out.println(page);
+        
+
+        return ResponseEntity.ok(response);
+    }
+
+
    
    //디테일 전자결재 디테일 가져오기
    @GetMapping("/{seq}")

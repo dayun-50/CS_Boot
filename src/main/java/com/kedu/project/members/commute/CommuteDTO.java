@@ -1,6 +1,7 @@
 package com.kedu.project.members.commute;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
+import java.time.LocalDate;
 
 /*
  	근태 관리용 DTO
@@ -14,11 +15,11 @@ public class CommuteDTO {
 	private String absence; // 결근여부 ( default : 출근, 연차, 결근 )
 	private Timestamp work_at; // 출근시간
 	private Timestamp leave_at; // 퇴근시간
-	private Timestamp commute_at; // 오늘 날짜 ( default : sysdate )
+	private LocalDate  commute_at; // 오늘 날짜 ( default : sysdate )
 	
 	public CommuteDTO () {}
 	public CommuteDTO(String member_email, String lateness, String leave_early, String absence, Timestamp work_at,
-			Timestamp leave_at, Timestamp commute_at) {
+			Timestamp leave_at, LocalDate commute_at) {
 		super();
 		this.member_email = member_email;
 		this.lateness = lateness;
@@ -64,10 +65,10 @@ public class CommuteDTO {
 	public void setLeave_at(Timestamp leave_at) {
 		this.leave_at = leave_at;
 	}
-	public Timestamp getCommute_at() {
+	public LocalDate getCommute_at() {
 		return commute_at;
 	}
-	public void setCommute_at(Timestamp commute_at) {
+	public void setCommute_at(LocalDate commute_at) {
 		this.commute_at = commute_at;
 	}
 	

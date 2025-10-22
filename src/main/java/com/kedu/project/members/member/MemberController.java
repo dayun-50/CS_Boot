@@ -34,11 +34,16 @@ public class MemberController {
 	// 로그인
 	@PostMapping("/login")
 	public ResponseEntity<String> login(@RequestBody MemberDTO dto){ 
+		System.out.println("로그인 도달");
+		System.out.println(dto.getEmail());
+		System.out.println(dto.getPw());
 		int result = memberService.login(dto);
 		if(result > 0) { // 로그인 성공시
 			String token = jwt.createToken(dto.getEmail());
+			System.out.println(result);
 			return ResponseEntity.ok(token);
 		}else {
+			System.out.println(result);
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
 		}	
 	}

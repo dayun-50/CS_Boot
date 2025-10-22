@@ -5,10 +5,59 @@
   
   <!-- 근태관리 -->
   
- <!-- 오류 방지 예시용 고쳐쓰시오. -->
-  <mapper namespace="Test">
-  	<select id="test7" resultType="com.kedu.project.members.member.MemberDTO">
-  		select * from member
+
+  <mapper namespace="Commute">
+  	 <!--오늘 날짜로 데이터 조회 -->
+  	<select id="getCommuteByDate" resultType="com.kedu.project.members.commute.CommuteDTO">
+  		select * from commute where member_email=#{member_email} and commute_at=#{commute_at}
   	</select>
+  	
+ 	 <!--최신 날짜로 데이터 조회 -->
+  	<select id="getLatestCommute" resultType="com.kedu.project.members.commute.CommuteDTO">
+  		select * from (select * from commute where member_email=#{member_email} order by commute_at desc)
+  		where rownum = 1
+	</select>
+
+	<!--출근시간 입력-->
+	<insert id="insertCommute">
+		insert into commute (member_email, lateness, work_at, commute_at)
+		values (#{member_email}, #{lateness}, #{work_at}, #{commute_at} )
+	</insert>
+	
+	<!--퇴근시간 입력-->
+	<update id="inputEnd">
+		update commute set leave_at =#{leave_at}, leave_early= #{leave_early}
+		where member_email=#{member_email} and trunc(commute_at) = trunc(#{commute_at})
+	</update>	
+	
+	<!--입력받은 날짜에 해당하는 주의 총 근무시간 뽑아오기-->	
+	<select id="getWeeklyTotalMin" resultType="int">
+	  select 
+	    sum(
+	      case 
+	        when leave_at is not null and work_at is not null 
+	        then 
+	          extract(hour from (leave_at - work_at)) * 60 +
+	          extract(minute from (leave_at - work_at))
+	        else 0
+	      end
+	    ) as total_minutes
+	  from commute
+	  where member_email = #{member_email}
+	  and commute_at between #{start_date} and #{end_date}
+	</select>
+
+
+	<select id="getMonthlyIssue" resultType="map">
+	  select
+	    sum(case when lateness = 'y' then 1 else 0 end) as lateness,
+	    sum(case when leave_early = 'y' then 1 else 0 end) as leave_early,
+	    sum(case when absence = '결근' then 1 else 0 end) as absence
+	  from commute
+	  where member_email = #{member_email}
+	    and commute_at between #{start_date} and #{end_date}
+	</select>
+
+
   
   </mapper>
