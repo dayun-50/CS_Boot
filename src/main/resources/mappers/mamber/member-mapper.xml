@@ -5,8 +5,6 @@
   
   <!-- 사원 회원가입 등등 -->
   
-  
-  <!-- 오류 방지 예시용 고쳐쓰시오. -->
   <mapper namespace="Member">
   	<insert id="insert">
   		insert into member (email, pw, name, phone, company_code, signup_at) values (#{email}, #{pw}, #{name}, #{phone}, #{company_code}, sysdate)
@@ -19,9 +17,33 @@
   	<select id="selectById" resultType="Integer"  parameterType="com.kedu.project.members.member.MemberDTO">
   		select count(*) from member where email = #{email}
   	</select>
+
+  	<update id="updateByGnewpw">
+  		update member set pw = #{pw} where email = #{email}
+  	</update>
   	
+  	<select id="selectByMypage" resultType="com.kedu.project.members.member.MemberDTO" parameterType="com.kedu.project.members.member.MemberDTO">
+  		SELECT 
+   			m.email,
+    		m.name,
+    		d.dept_name AS dept_code,
+    		j.level_name AS level_code,
+    		m.phone
+		FROM member m JOIN department d 
+			ON m.dept_code = d.dept_code AND m.company_code = d.company_code
+			JOIN job_level j 
+    		ON m.level_code = j.level_code
+    		AND m.company_code = j.company_code
+		WHERE m.email = #{email}
+  	</select>
   	
-  	  <!-- 아래는 지원 사용 -->
+  	<update id="updateMypage">
+  		update member set name = #{name}, phone = #{phone} where email = #{email}
+  	</update>
+	
+	
+	
+	<!-- 아래는 지원 사용 -->
   	<select id="selectAll" resultType="com.kedu.project.members.member.MemberDTO">
   		select * from member
   	</select>

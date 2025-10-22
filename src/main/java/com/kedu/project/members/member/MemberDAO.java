@@ -29,7 +29,24 @@ public class MemberDAO {
 	public int findpw(MemberDTO dto) {
 		return mybatis.selectOne("Member.selectById", dto);
 	}
+
+	// 비밀번호 변경
+	public int gnewpw(MemberDTO dto) {
+		return mybatis.update("Member.updateByGnewpw", dto);
+	}
 	
+	// 마이페이지 출력
+	public List<MemberDTO> mypage(MemberDTO dto){
+		return mybatis.selectList("Member.selectByMypage", dto);
+	}
+	
+	// 마이페이지 수정
+	public int updateMypage(MemberDTO dto) {
+		return mybatis.update("Member.updateMypage", dto);
+	}
+
+	
+	//---------------------------------------------------------------------
 	//전체 리스트 뽑아오기 : 입사일 기준 연차 지급 로딩용으로 필요함 -- 지원
 	public List<MemberDTO> findAll(){
 		return mybatis.selectList("Member.selectAll");
@@ -39,5 +56,4 @@ public class MemberDAO {
 	public MemberDTO findByEmail(String email) {
 		return mybatis.selectOne("Member.findByEmail", email);		
 	}
-	
 }
