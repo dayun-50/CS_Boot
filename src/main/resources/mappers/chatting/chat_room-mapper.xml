@@ -13,7 +13,7 @@
 	    </selectKey>
 	
 	    INSERT INTO chat_room (chat_seq, chat_name, manager_email)
-	    VALUES (#{chat_seq}, 'Chat_' || #{chat_seq}, #{member_email})
+	    VALUES (#{chat_seq}, #{chat_name}, #{manager_email})
   	</insert>
   	
   	<select id="searchRoom" resultType="int">
@@ -35,7 +35,7 @@
   		values (#{chat_seq}, #{chat_name}, #{manager_email})
   	</insert>
   	
-  	<select id="selectChatRoom" resultType="map">
+  	<select id="selectChatRoomList" resultType="map">
 		 <![CDATA[
 			SELECT r.chat_seq, r.chat_name
 			FROM chat_room r
@@ -65,6 +65,34 @@
 			  )
 			  AND m.member_email = #{email}
 			]]>
+  	</select>
+  	
+  	<select id="completedList" resultType="com.kedu.project.chatting.chat_room.Chat_roomDTO">
+  		SELECT 
+	        r.chat_seq,
+	        r.chat_name
+	    FROM chat_room r
+	    JOIN chat_member m 
+	        ON r.chat_seq = m.chat_seq
+	    WHERE m.member_email = #{email}
+	      AND r.project_progress = 'n'
+  	</select>
+  	
+  	<select id="selectChatRoom" resultType="map">
+  		  SELECT 
+			    r.chat_seq,
+			    r.chat_name,
+			    COUNT(cm_all.member_email) AS member_count
+			FROM chat_room r
+			JOIN chat_member cm_all ON r.chat_seq = cm_all.chat_seq
+			WHERE r.chat_seq = #{chat_seq}
+			  AND EXISTS (
+			      SELECT 1 
+			      FROM chat_member cm_user
+			      WHERE cm_user.chat_seq = r.chat_seq
+			        AND cm_user.member_email = #{member_email}
+			  )
+			GROUP BY r.chat_seq, r.chat_name
   	</select>
   
   </mapper>

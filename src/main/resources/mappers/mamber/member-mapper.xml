@@ -64,4 +64,8 @@
 		    ON m.dept_code = d.dept_code
 		WHERE m.email = #{email}
   	</select>
+  	
+  	<select id="selectMemberName" resultType="String">
+  		select name from member where email = #{member_email}
+  	</select>
   </mapper>

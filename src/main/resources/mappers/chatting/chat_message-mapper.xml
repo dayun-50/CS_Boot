@@ -5,11 +5,20 @@
   
   <!-- 채팅 메세지 -->
   
-  
-  <!-- 오류 방지 예시용 고쳐쓰시오. -->
-  <mapper namespace="Test">
-  	<select id="test2" resultType="com.kedu.project.members.member.MemberDTO">
-  		select * from member
+  <mapper namespace="Chat_message">
+  	<insert id="messageInsert">
+  		insert into chat_message values (message_seq.nextval, #{chat_seq}, #{member_email}, #{message}, sysdate)
+  	</insert>
+  	
+  	<select id="getMessageBySeq" resultType="com.kedu.project.chatting.chat_message.Chat_messageDTO">
+  		<![CDATA[
+	  		SELECT *
+			FROM chat_message
+			WHERE chat_seq = #{chat_seq}
+			AND message_at >= TRUNC(SYSDATE) - 1      
+			AND message_at < TRUNC(SYSDATE) + 1
+			ORDER BY message_at ASC
+	    ]]> 
   	</select>
   
   </mapper>

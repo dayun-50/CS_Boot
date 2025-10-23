@@ -32,5 +32,9 @@
 	 <select id="existDepartmentRoom" resultType="int">
 	 	select count(*) from chat_member where chat_seq = #{chat_seq} and member_email = #{email}
 	 </select>
+	 
+	 <select id="countMember" resultType="int">
+	 	select count(*) from chat_member where chat_seq = #{chat_seq}
+	 </select>
 	  	
   </mapper>

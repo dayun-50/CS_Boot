@@ -1,5 +1,6 @@
 package com.kedu.project.chatting.chat_member;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,10 +22,10 @@ import com.kedu.project.members.member.MemberDTO;
 public class Chat_memberService {
 	@Autowired
 	private Chat_memberDAO dao;
-	
+
 	@Autowired
 	private Chat_roomDAO roomDao;
-	
+
 	@Autowired
 	private MemberDAO memberDao;
 
@@ -43,9 +44,12 @@ public class Chat_memberService {
 				map.put("name", members.getName());
 			}else {
 				// 채팅방 생성 후 seq 뽑아서 방생성 후 정보 반환
-				Chat_memberDTO Chat_memberDTO = new Chat_memberDTO();
-				Chat_memberDTO.setMember_email(dto.getEmail());
-				int chatSeq = roomDao.insertPirvateCahtRoom(Chat_memberDTO);
+				Chat_roomDTO Chat_roomDTO = new Chat_roomDTO();
+				Chat_roomDTO.setManager_email(dto.getEmail());
+				String name = memberDao.selectMemberName(dto.getEmail());
+				String memberName = memberDao.selectMemberName(members.getEmail());
+				Chat_roomDTO.setChat_name(name+memberName);
+				int chatSeq = roomDao.insertPirvateCahtRoom(Chat_roomDTO);
 				// chat_member 테이블에 사원 insert
 				Chat_memberDTO manager = new Chat_memberDTO();
 				manager.setChat_seq(chatSeq);
@@ -67,14 +71,14 @@ public class Chat_memberService {
 		}
 		return list;
 	}
-	
-	// 채팅방 출력
-	public List<Map<String, Object>> chatRoom(MemberDTO dto){
+
+	// 단체 톡방 및 팀원 제외 개인톡방 출력
+	public List<Map<String, Object>> chatRoomList(MemberDTO dto){
 		// 내 부서명 출력
 		String department = memberDao.selectDepartment(dto);
 		List<Map<String, Object>> list = new ArrayList<>();
 		Map<String, Object> map = new HashMap<>();
-		// 채팅방 있는지 확인 ( 존재 한다면 room_seq / 존재하지 않는다면 0 )
+		// 팀 채팅방 있는지 확인 ( 존재 한다면 room_seq / 존재하지 않는다면 0 )
 		int checkChat = roomDao.searchRoom(dto, department+" 단체 채팅");
 		if(checkChat > 0) {
 			int exist = dao.existDepartmentRoom(dto, checkChat);
@@ -118,14 +122,45 @@ public class Chat_memberService {
 		List<Map<String, Object>> myChats = roomDao.selectChatRoom(dto, department);
 		// 회사 단체 채팅은 제외하고 위에서 했으니까
 		for(Map<String, Object> chat : myChats) {
-	        if(!chat.get("CHAT_NAME").equals(department + " 단체 채팅")) {
-	            list.add(chat);
-	        }
-	        chat.put("chat_seq", chat.get("CHAT_SEQ"));
-	        chat.put("chat_name", chat.get("CHAT_NAME"));
-	        chat.remove("CHAT_NAME");chat.remove("CHAT_SEQ");
-	    }
+			if(!chat.get("CHAT_NAME").equals(department + " 단체 채팅")) {
+				list.add(chat);
+			}
+			chat.put("chat_seq", chat.get("CHAT_SEQ"));
+			chat.put("chat_name", chat.get("CHAT_NAME"));
+			chat.remove("CHAT_NAME");chat.remove("CHAT_SEQ");
+		}
 		return list;
 	}
-	
+
+	// 종료된 프로젝트 채팅방 출력
+	public List<Map<String, Object>> completedList(MemberDTO dto){
+		List<Chat_roomDTO> chatList = roomDao.completedList(dto);
+		List<Map<String, Object>> list = new ArrayList<>();
+		for(Chat_roomDTO chatroom : chatList) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("chat_seq", chatroom.getChat_seq());
+			map.put("chat_name", chatroom.getChat_name());
+			list.add(map);
+		}
+		return list;
+	}
+
+	// 채팅방 정보 출력
+	public Map<String, Object> ChatRoom(Chat_memberDTO dto) {
+		// 채팅방 정보 출력
+		Map<String, Object> list = roomDao.chatRoom(dto);
+		// 디비에서 데이터 자체를 타입안정하고 끄내와서 이거해줘야한데 몰라 
+		BigDecimal memberCount = (BigDecimal) list.get("MEMBER_COUNT");
+		// 만약 개인톡방이라면
+		if(memberCount.intValue() == 2) {
+	        String chatName = (String) list.get("CHAT_NAME");
+			// 사원 이름 출력
+			String username = memberDao.selectMemberName(dto.getMember_email());
+			// 채팅방 이름에서 사원 이름을 제거후 저장
+			String cleanedName = chatName.replaceAll(username, "");
+			list.put("CHAT_NAME", cleanedName);
+		}
+		return list;
+	}
+
 }

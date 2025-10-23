@@ -34,4 +34,5 @@ public class Chat_memberDAO {
 				"email", dto.getEmail(),
 				"chat_seq", seq));
 	}
+	
 }

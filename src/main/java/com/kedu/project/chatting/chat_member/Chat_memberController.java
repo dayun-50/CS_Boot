@@ -29,9 +29,23 @@ public class Chat_memberController {
 		return ResponseEntity.ok(list);
 	}
 	
-	@PostMapping("/chatRoom")
-	public ResponseEntity<List<Map<String, Object>>> chatRoom(@RequestBody MemberDTO dto){
-		List<Map<String, Object>> list = Chat_memberService.chatRoom(dto);
+	// 단체 톡방 및 팀원 제외 개인톡방 출력
+	@PostMapping("/chatRoomList")
+	public ResponseEntity<List<Map<String, Object>>> chatRoomList(@RequestBody MemberDTO dto){
+		List<Map<String, Object>> list = Chat_memberService.chatRoomList(dto);
 		return ResponseEntity.ok(list);
+	}
+	
+	// 종된 프로젝트 채팅방 출력
+	@PostMapping("/completedList")
+	public ResponseEntity<List<Map<String, Object>>> completedList(@RequestBody MemberDTO dto){
+		List<Map<String, Object>> list = Chat_memberService.completedList(dto);
+		return ResponseEntity.ok(list);
+	}
+	
+	@PostMapping("/chatRoom")
+	public ResponseEntity<Map<String, Object>> chatRoom(@RequestBody Chat_memberDTO dto){
+		Map<String, Object> chatRoom = Chat_memberService.ChatRoom(dto);
+		return ResponseEntity.ok(chatRoom);
 	}
 }

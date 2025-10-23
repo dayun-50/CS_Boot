@@ -19,7 +19,7 @@ public class Chat_roomDAO {
 	private SqlSession mybatis;
 
 	// 개인 채팅방 생성 후 seq 뽑아서 보내기
-	public int insertPirvateCahtRoom (Chat_memberDTO dto) {
+	public int insertPirvateCahtRoom (Chat_roomDTO dto) {
 		mybatis.insert("Chat_room.insertPirvateCahtRoom", dto);
 		return dto.getChat_seq();
 	}
@@ -39,9 +39,19 @@ public class Chat_roomDAO {
 	
 	// 본인이 참여 되어있는 채팅방 출력
 	public List<Map<String, Object>> selectChatRoom(MemberDTO dto, String department){
-		return mybatis.selectList("Chat_room.selectChatRoom", Map.of(
+		return mybatis.selectList("Chat_room.selectChatRoomList", Map.of(
 				"email", dto.getEmail(),
 				"department", department));
+	}
+	
+	// 본인이 참여 되었던 종료된 채팅방 출력
+	public List<Chat_roomDTO> completedList(MemberDTO dto){
+		return mybatis.selectList("Chat_room.completedList", dto);
+	}
+	
+	// 채팅방 정보 출력
+	public Map<String, Object> chatRoom(Chat_memberDTO dto){
+		return mybatis.selectOne("Chat_room.selectChatRoom", dto);
 	}
 
 }
