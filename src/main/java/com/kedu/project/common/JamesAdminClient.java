@@ -56,4 +56,40 @@ public class JamesAdminClient {
             throw new RuntimeException("James 서버와 통신 중 오류 발생", e);
         }
     }
+    
+    
+    /**
+     * James 서버에 등록된 계정인지 확인하고 비밀번호를 검증합니다.
+     * POST /users/{username}/verify 엔드포인트 사용
+     * @param jamesUsername James 서버 계정 (예: user@localhost.com)
+     * @param rawPassword 암호화되지 않은 비밀번호
+     * @return 인증 성공 시 true, 실패 시 false
+     */
+    public boolean authenticateUser(String jamesUsername, String rawPassword) {
+        
+        String requestBody = String.format("{\"password\": \"%s\"}", rawPassword);
+
+        try {
+            this.webClient.post()
+                .uri("/users/{username}/verify", jamesUsername)
+                .bodyValue(requestBody)
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), 
+                          response -> response.createException())
+                .toBodilessEntity()
+                .block(); 
+            
+            // 204 No Content 또는 200 OK 응답이 오면 성공으로 간주
+            return true; 
+            
+        } catch (WebClientResponseException.NotFound | WebClientResponseException.BadRequest e) {
+            // 404 (유저 없음) 또는 400 (인증 실패) 응답 시
+            return false;
+        } catch (Exception e) {
+            // 기타 통신 오류 처리
+            throw new RuntimeException("James 서버 인증 중 오류 발생", e);
+        }
+    }
+    
+    
 }
