@@ -91,4 +91,9 @@ public class MemberService {
 	public int updateMypage(MemberDTO dto) {
 		return dao.updateMypage(dto);
 	}
+	
+//	회사코드 연락처연동할 코드
+	public String getCompanyCodeByEmail(String email) {
+		return dao.getCompanyCodeByEmail(email);
+	}
 }
