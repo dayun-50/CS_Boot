@@ -40,7 +40,7 @@
   	<update id="updateMypage">
   		update member set name = #{name}, phone = #{phone} where email = #{email}
   	</update>
-  	
+
   	<select id="memberSearch" resultType="com.kedu.project.members.member.MemberDTO">
   		SELECT 
   			m.email,
@@ -68,4 +68,10 @@
   	<select id="selectMemberName" resultType="String">
   		select name from member where email = #{member_email}
   	</select>
+
+  	<!-- 회사코드 - 연락처에 전달용  -->
+  	<select id="getCompanyCodeByEmail" parameterType="String" resultType="String">
+  		SELECT company_code FROM member WHERE email = #{email}
+	</select>
+  	
   </mapper>

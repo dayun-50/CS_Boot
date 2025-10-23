@@ -18,7 +18,7 @@ public class MemberDAO {
 	private SqlSession mybatis;
 
 	// 회원가입
-	public int signup(MemberDTO dto) { 
+	public int signup(MemberDTO dto) {
 		return mybatis.insert("Member.insert", dto);
 	}
 
@@ -38,7 +38,7 @@ public class MemberDAO {
 	}
 
 	// 마이페이지 출력
-	public List<MemberDTO> mypage(MemberDTO dto){
+	public List<MemberDTO> mypage(MemberDTO dto) {
 		return mybatis.selectList("Member.selectByMypage", dto);
 	}
 
@@ -60,5 +60,10 @@ public class MemberDAO {
 	// 사원 이름 출력
 	public String selectMemberName(String email) {
 		return mybatis.selectOne("Member.selectMemberName", email);
+	}
+
+	//	회사코드 - 연락처에 전달용
+	public String getCompanyCodeByEmail(String email) {
+		return mybatis.selectOne("Member.getCompanyCodeByEmail", email);
 	}
 }
