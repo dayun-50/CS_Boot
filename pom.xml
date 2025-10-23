@@ -53,7 +53,11 @@
         <artifactId>jakarta.mail-api</artifactId>
         <version>2.1.2</version>
     </dependency>
-
+	<!--webClient Rest API-->
+	<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-webflux</artifactId>
+</dependency>
     <!-- Jakarta Activation API -->
     <dependency>
         <groupId>jakarta.activation</groupId>
