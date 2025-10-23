@@ -13,6 +13,8 @@ target/
 .springBeans
 .sts4-cache
 
+.metadata/
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
@@ -34,7 +36,4 @@ build/
 
 ### Spring Boot / Spring Legacy 설정 파일 ###
 src/main/resources/application.properties
-<<<<<<< HEAD
-=======
 
->>>>>>> b72232735315ee1a11540382f88f11d1ef944cf0

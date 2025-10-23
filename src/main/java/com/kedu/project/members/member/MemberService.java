@@ -16,9 +16,13 @@ import com.kedu.project.common.JamesAdminClient;
 
 @Service
 public class MemberService {
-    @Autowired
-    private MemberDAO dao;
-    // JamesAdminClient 주입
+
+	@Autowired
+	private MemberDAO dao;
+	// JamesAdminClient 주입
+	
+
+	
 
     @Value("${james.local.domain}")
     private String localDomain;
@@ -34,6 +38,7 @@ public class MemberService {
         String rawPassword = dto.getPw();
         System.out.println("DEBUG: 1. 로그인 시도 이메일: " + dto.getEmail());
         // 1. James 계정 이름 생성 (헬퍼 메서드 호출)
+
         String jamesUsername = getJamesUsername(dto.getEmail());
 
         // 2. DB 저장을 위해 비밀번호 암호화 및 저장 (member 테이블)
@@ -48,15 +53,6 @@ public class MemberService {
 
         return dbResult;
     }
-
-    public boolean authenticateMailServerUser(String email, String rawPassword) {
-        // 헬퍼 메서드를 통해 James 계정 형식 (예: user@localhost)으로 변환
-        String jamesUsername = getJamesUsername(email);
-
-        // JamesAdminClient를 사용하여 James 서버에 직접 인증 요청
-        return jamesAdminClient.authenticateUser(jamesUsername, rawPassword);
-    }
-
     // 헬퍼 메서드: 이메일에서 ID를 추출하고 James 도메인 결합
     private String getJamesUsername(String fullEmail) {
 
@@ -66,6 +62,9 @@ public class MemberService {
         // 최종 James 계정 이름 반환
         return userId + "@" + localDomain;
     }
+
+
+ 
 
     // 로그인
     public int login(MemberDTO dto) {
@@ -89,6 +88,7 @@ public class MemberService {
         // 5. James 서버 인증 (확보된 원본 비밀번호 사용)
         System.out.println("DEBUG: 4. James 계정: " + jamesUsername + ", 평문 비밀번호 사용"); // 💡 추가
         boolean jamesAuthSuccess = jamesAdminClient.authenticateUser(jamesUsername, rawPassword);
+
 
         if (!jamesAuthSuccess) {
             // James 서버 인증 실패: DB에는 있지만 메일 서버 계정이 유효하지 않음
@@ -125,8 +125,15 @@ public class MemberService {
         return list;
     }
 
-    // 마이페이지 수정
-    public int updateMypage(MemberDTO dto) {
-        return dao.updateMypage(dto);
-    }
+   
+	// 마이페이지 수정
+	public int updateMypage(MemberDTO dto) {
+		return dao.updateMypage(dto);
+	}
+	
+//	회사코드 연락처연동할 코드
+	public String getCompanyCodeByEmail(String email) {
+		return dao.getCompanyCodeByEmail(email);
+	}
+
 }
