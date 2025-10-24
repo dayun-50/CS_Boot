@@ -25,10 +25,8 @@ public class Chat_roomDAO {
 	}
 
 	// 부서 단체 톡방 있는지 검사
-	public int searchRoom(MemberDTO dto, String departmentChatRoom) {
-		return mybatis.selectOne("Chat_room.searchRoom", Map.of(
-				"manager_email", dto.getEmail(),
-				"departmentChatRoom", departmentChatRoom));
+	public int searchRoom(String departmentChatRoom) {
+		return mybatis.selectOne("Chat_room.searchRoom",departmentChatRoom );
 	}
 	
 	// 부서 단톡이 없을시 생성
