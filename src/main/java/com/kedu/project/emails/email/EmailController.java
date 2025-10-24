@@ -1,15 +1,21 @@
 package com.kedu.project.emails.email;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kedu.project.emails.MailSendRequestDTO;
+import com.kedu.project.members.member.MemberService;
 import com.kedu.project.security.JwtUtil;
 
 import jakarta.mail.AuthenticationFailedException;
@@ -25,69 +31,119 @@ public class EmailController {
 
     @Autowired
     private JwtUtil jwtUtil;
+    
+    
+    @Autowired
+    private MemberService memberService; // ID 변환용
 
-    private static final String TEST_RECEIVER = "quickly3899@localhost.com";
-    private static final String TEST_PASSWORD = "test1234";
+    // --- 💡 헬퍼 메서드 (JWT 파싱) ---------------------------------------------------
 
-    @GetMapping("/test-inbox")
-    public ResponseEntity<Map<String, Object>> testReceiveInbox(HttpServletRequest request) {
+    private String getLoggedInDbId(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            // 일반 웹 인증 토큰에서 Subject (DB ID) 추출
+            return jwtUtil.verifyToken(token).getSubject(); 
+        }
+        throw new RuntimeException("인증 토큰이 누락되었습니다.");
+    }
+    
+    private String getRawJamesPassword(HttpServletRequest request) {
+        // James 전용 토큰은 일반적으로 커스텀 헤더로 받지만, 
+        // 여기서는 편의를 위해 Authorization 헤더의 JWT를 사용한다고 가정합니다.
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            // JWT 클레임에서 Base64 인코딩된 평문 비밀번호 복호화
+            return jwtUtil.getRawJamesPassword(token); 
+        }
+        throw new RuntimeException("James 접근 토큰이 누락되었습니다.");
+    }
+    
+ // --- 💡 /send (메일 발송) ---------------------------------------------------------
 
-        // 1. JWT를 통해 현재 사용자의 이메일(ID)을 획득해야 합니다.
-        // (JwtAuthenticationFilter에서 이 정보를 request 속성에 저장했다고 가정하거나,
-        // 테스트를 위해 JWT 페이로드에서 직접 추출한다고 가정합니다.)
-        String userEmail = TEST_RECEIVER; // 임시: 실제로는 JWT에서 추출해야 함
-
-        // 2. 💡 James 서버 접속에 필요한 '평문 비밀번호'를 획득해야 합니다.
-        // (로그인 시 세션에 저장했거나, JWT 페이로드에 포함되어 있다고 가정합니다.)
-        // 현재 구조로는 획득이 불가능하므로, 아래 코드는 **임시 테스트용**으로만 사용하세요.
-
-        Map<String, Object> response = new HashMap<>();
-
+    /**
+     * [POST] 메일 발송 - 로그인 사용자 본인이 다른 수신자에게 메일 발송
+     */
+    @PostMapping("/send")
+    public ResponseEntity<?> sendEmail(
+        HttpServletRequest request, 
+        @RequestBody MailSendRequestDTO mailSendRequestDTO 
+    ) {
         try {
-            // 3. 송신 테스트 (보내는 사람은 임시로 다른 계정 사용)
-            emailService.sendTestEmail("user04@localhost.com", TEST_PASSWORD, TEST_RECEIVER,
-                    "JWT 기반 송수신 테스트", "테스트 성공 시 이 메일이 도착합니다.");
+            // 1. 발신자 (로그인 사용자) 정보 획득
+            String senderDbId = getLoggedInDbId(request); 
+            String senderRawPassword = getRawJamesPassword(request);
+            String senderJamesId = memberService.getJamesUsername(senderDbId); // @localhost.com 형식
+            
+            // 2. 수신자 목록 파싱: 쉼표를 기준으로 분리하고 공백 제거
+            List<String> recipients = Arrays.stream(mailSendRequestDTO.getReceiverEmails().split(","))
+                                            .map(String::trim)
+                                            .toList();
+            
+            // 3. 발송 서비스 호출 (발신자 본인의 계정으로 발송)
+            for (String recipient : recipients) {
+                 // 💡 EmailService.sendEmail 메서드는 한 번에 한 명의 수신자에게 보내도록 구현되었다고 가정합니다.
+                 emailService.sendEmail(
+                     senderJamesId, senderRawPassword, recipient, 
+                     mailSendRequestDTO.getSubject(), mailSendRequestDTO.getContent()
+                 );
+            }
 
-            // 4. 수신 테스트 (방금 보낸 메일 조회)
-            // 💡 EmailService의 메서드를 평문 비밀번호를 받는 형식으로 변경하면 더 좋습니다.
-            // 현재는 MemberService에 의존하므로, 그대로 진행합니다.
-
-            Message[] receivedMessages = emailService.receiveTestEmails(userEmail, TEST_PASSWORD);
-
-            // ... (메일 목록 처리 로직은 생략) ...
-
-            response.put("status", "SUCCESS");
-            response.put("message", "송수신 테스트 완료. 메일 발송 및 수신 성공.");
-            response.put("received_count", receivedMessages.length);
-
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(Map.of("message", "메일 발송에 성공했습니다.", 
+                                           "recipients", recipients.size() + "명"));
 
         } catch (AuthenticationFailedException e) {
-            response.put("status", "AUTH_FAILED");
-            response.put("error", "메일 서버 인증 실패: James 계정 ID/PW 불일치. **현재 하드코딩된 비밀번호를 확인하세요.**");
-            // ... (로그 출력) ...
-            return ResponseEntity.status(401).body(response);
+            return ResponseEntity.status(401).body(Map.of("error", "메일 서버 인증 실패: James 계정 ID/PW 불일치"));
         } catch (Exception e) {
-            response.put("status", "ERROR");
-            response.put("error", "시스템 오류: " + e.getMessage());
-            // ... (로그 출력) ...
-            return ResponseEntity.status(500).body(response);
+            return ResponseEntity.status(500).body(Map.of("error", "메일 발송 중 오류가 발생했습니다: " + e.getMessage()));
         }
     }
     
-    @DeleteMapping("/delete-all-emails") // DELETE 메서드 사용 권장
-    public ResponseEntity<Map<String, Object>> deleteAllEmailsApi() {
+    
+ // --- 💡 /inbox (메일 수신) --------------------------------------------------------
+
+    /**
+     * [GET] 메일함 조회 (수신) - 로그인 사용자 본인의 메일함 조회
+     */
+    @GetMapping("/inbox") 
+    public ResponseEntity<Map<String, Object>> getInboxMessages(HttpServletRequest request) {
+
+        // 1. JWT에서 본인 정보 (수신자) 획득
+        String loggedInDbId = getLoggedInDbId(request);
+        String receiverRawPassword = getRawJamesPassword(request); 
+        String receiverJamesId = memberService.getJamesUsername(loggedInDbId);
+
         try {
-            // 💡 삭제할 계정과 비밀번호를 전달합니다.
-            emailService.deleteAllEmails(TEST_RECEIVER, TEST_PASSWORD);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("status", "SUCCESS");
-            response.put("message", "메일함 정리가 완료되었습니다.");
-            
-            return ResponseEntity.ok(response);
+            // 2. 수신 테스트 (로그인 사용자 본인 메일함 조회)
+            Message[] receivedMessages = emailService.receiveTestEmails(receiverJamesId, receiverRawPassword);
+
+            // 💡 여기서는 메일 목록을 DTO로 변환하는 로직이 필요합니다. (생략)
+
+            return ResponseEntity.ok(Map.of("status", "SUCCESS",
+                                           "message", "메일함 조회 성공.",
+                                           "received_count", receivedMessages.length));
+
         } catch (Exception e) {
-            // ... (오류 처리) ...
+            return ResponseEntity.status(500).body(Map.of("error", "메일함 조회 오류: " + e.getMessage()));
+        }
+    }
+    
+    
+    
+    @DeleteMapping("/delete-all-emails") 
+    public ResponseEntity<Map<String, Object>> deleteAllEmailsApi(HttpServletRequest request) {
+        try {
+            // 1. JWT에서 본인 정보 획득 (삭제할 메일함의 주인)
+            String deleterDbId = getLoggedInDbId(request);
+            String deleterRawPassword = getRawJamesPassword(request);
+            String deleterJamesId = memberService.getJamesUsername(deleterDbId);
+            
+            // 2. 삭제 서비스 호출
+            emailService.deleteAllEmails(deleterJamesId, deleterRawPassword);
+            
+            return ResponseEntity.ok(Map.of("message", "메일함 정리가 완료되었습니다.", "status", "SUCCESS"));
+        } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", "메일 삭제 중 오류 발생"));
         }
     }

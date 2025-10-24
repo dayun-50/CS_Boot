@@ -1,14 +1,24 @@
 package com.kedu.project.emails.email;
 
-import com.kedu.project.members.member.MemberService;
+import java.util.Properties;
 
-import jakarta.mail.*;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Properties;
+import com.kedu.project.members.member.MemberService;
+
+import jakarta.mail.Authenticator;
+import jakarta.mail.Flags;
+import jakarta.mail.Folder;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Store;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class EmailService {
@@ -19,25 +29,29 @@ public class EmailService {
     // ----------------------------------------------------
     // 메일 서버 접속 정보 (James 서버 설정에 따라 조정 필요)
     // ----------------------------------------------------
-    private static final String IMAP_HOST = "localhost"; // Docker 환경에 따라 James 컨테이너 이름일 수도 있음
-    private static final int IMAPS_PORT = 993;
-    private static final String SMTP_HOST = "localhost"; // Docker 환경에 따라 James 컨테이너 이름일 수도 있음
-    private static final int SMTPS_PORT = 465;
+ // EmailService.java (수정된 @Value)
+    @Value("${james.host}")
+    private String mailHost;
 
+    @Value("${james.smtp.port}")
+    private int smtpsPort; 
+
+    @Value("${james.imap.port}")
+    private int imapsPort;
     // EmailService.java에 추가
     public void deleteAllEmails(String email, String password) throws MessagingException {
 
         // 💡 993 포트를 사용하여 IMAPS 연결
         Properties props = new Properties();
         props.put("mail.store.protocol", "imaps");
-        props.put("mail.imaps.host", IMAP_HOST);
-        props.put("mail.imaps.port", IMAPS_PORT);
+        props.put("mail.imaps.host", this.mailHost);
+        props.put("mail.imaps.port", imapsPort);
         props.put("mail.imaps.ssl.enable", "true");
-        props.put("mail.imaps.ssl.trust", IMAP_HOST);
+        props.put("mail.imaps.ssl.trust", mailHost);
 
         Session session = Session.getDefaultInstance(props, null);
         Store store = session.getStore("imaps");
-        store.connect(IMAP_HOST, IMAPS_PORT, email, password);
+        store.connect(this.mailHost, this.imapsPort, email, password);
 
         Folder inbox = store.getFolder("INBOX");
         inbox.open(Folder.READ_WRITE); // 💡 Read-Write 모드로 열어 삭제 권한 확보
@@ -64,15 +78,15 @@ public class EmailService {
     /**
      * 특정 계정 정보로 James 서버에 접속하여 메일을 발송합니다.
      */
-    public void sendTestEmail(String fromEmail, String rawPassword, String toEmail, String subject, String content)
+    public void sendEmail(String fromEmail, String rawPassword, String toEmail, String subject, String content)
             throws MessagingException {
 
         Properties props = new Properties();
         props.put("mail.transport.protocol", "smtps");
         props.put("mail.smtps.auth", "true");
-        props.put("mail.smtps.host", SMTP_HOST);
-        props.put("mail.smtps.port", SMTPS_PORT);
-        props.put("mail.smtps.ssl.trust", SMTP_HOST);
+        props.put("mail.smtps.host", this.mailHost);
+        props.put("mail.smtps.port", this.smtpsPort);
+        props.put("mail.smtps.ssl.trust", this.smtpsPort);
         props.put("mail.debug", "true");
         Session session = Session.getInstance(props, new Authenticator() {
             @Override
@@ -90,7 +104,7 @@ public class EmailService {
 
         // 💡 1. Transport 객체를 얻어와 연결하고 전송하는 코드를 직접 사용합니다.
         Transport transport = session.getTransport("smtps");
-        transport.connect(SMTP_HOST, SMTPS_PORT, fromEmail, rawPassword);
+        transport.connect(this.mailHost, this.smtpsPort, fromEmail, rawPassword);
         transport.sendMessage(message, message.getAllRecipients());
         transport.close();
     }
@@ -103,17 +117,17 @@ public class EmailService {
 
         Properties props = new Properties();
         props.put("mail.store.protocol", "imaps");
-        props.put("mail.imaps.host", IMAP_HOST);
-        props.put("mail.imaps.port", IMAPS_PORT);
+        props.put("mail.imaps.host", this.mailHost);
+        props.put("mail.imaps.port", this.imapsPort);
         props.put("mail.imaps.ssl.enable", "true"); // SSL 비활성화 (imap.xml 설정 따름)
         props.put("mail.debug", "true");
 
-        props.put("mail.imaps.ssl.trust", IMAP_HOST);
+        props.put("mail.imaps.ssl.trust", this.mailHost);
 
         Session session = Session.getDefaultInstance(props, null);
         Store store = session.getStore("imaps");
         // 2. James 서버 인증을 위해 메일 계정 ID/PW 사용
-        store.connect(IMAP_HOST, IMAPS_PORT, email, rawPassword);
+        store.connect(this.mailHost, this.imapsPort, email, rawPassword);
 
         Folder inbox = store.getFolder("INBOX");
         inbox.open(Folder.READ_ONLY);

@@ -54,7 +54,7 @@ public class MemberService {
         return dbResult;
     }
     // 헬퍼 메서드: 이메일에서 ID를 추출하고 James 도메인 결합
-    private String getJamesUsername(String fullEmail) {
+    public String getJamesUsername(String fullEmail) {
 
         // 유효성 검사를 React에서 완료했다고 가정하고, @ 앞부분(ID)만 추출
         String userId = fullEmail.substring(0, fullEmail.indexOf('@'));
