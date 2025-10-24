@@ -24,21 +24,13 @@ public class ContactDAO {
 		return mybatis.insert("Contact.insertContact", dto);
 	}
 
-	public int updateContact(ContactDTO dto) {
-		return mybatis.update("Contact.updateContact", dto);
-	}
-
 	public int deleteContact(int contact_seq) {
 		return mybatis.delete("Contact.deleteContact", contact_seq);
 	}
 
-	// 분류 보튼 조회
-	public int updateContactGroup(int contact_seq, String share) {
-		Map<String, Object> param = new HashMap<>();
-		param.put("contact_seq", contact_seq);
-		param.put("share", share); // "y" 또는 "n"
-
-		return mybatis.update("Contact.updateContactGroup", param);
+	// 분류 버튼 적용시 - 업데이트일 시에도 적용
+	public int updateContact(ContactDTO dto) {
+	    return mybatis.update("Contact.updateContact", dto);
 	}
 
 }

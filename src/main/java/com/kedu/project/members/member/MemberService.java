@@ -19,27 +19,26 @@ public class MemberService {
 	@Autowired
 	private MemberDAO dao;
 	// JamesAdminClient 주입
-	
+
 //	@Value("${james.local.domain}") 
 //    private String localDomain;
+
 	@Autowired
 	private JamesAdminClient jamesAdminClient;
-	
 
 	// ----------------------------------------------------
-    // 회원가입 (DB 저장 + James 계정 생성)
-    // ----------------------------------------------------
-    @Transactional
+	// 회원가입 (DB 저장 + James 계정 생성)
+	// ----------------------------------------------------
+	@Transactional
 	public int signup(MemberDTO dto) {
-        
-        String rawPassword = dto.getPw(); 
-        
-        // 1. James 계정 이름 생성 (헬퍼 메서드 호출)
+		String rawPassword = dto.getPw();
+
+		// 1. James 계정 이름 생성 (헬퍼 메서드 호출)
 //        String jamesUsername = getJamesUsername(dto.getEmail()); 
-        
-        // 2. DB 저장을 위해 비밀번호 암호화 및 저장 (member 테이블)
-		dto.setPw(Encryptor.encrypt(dto.getPw())); 
-		return dao.signup(dto); 
+
+		// 2. DB 저장을 위해 비밀번호 암호화 및 저장 (member 테이블)
+		dto.setPw(Encryptor.encrypt(dto.getPw()));
+		return dao.signup(dto);
 //		int dbResult = dao.signup(dto); 
 //        
 //        // 3. DB 저장이 성공하면, James 서버에 메일 계정 생성
@@ -50,7 +49,7 @@ public class MemberService {
 //        
 //		return dbResult; 
 	}
-    
+
 //    // 헬퍼 메서드: 이메일에서 ID를 추출하고 James 도메인 결합
 //    private String getJamesUsername(String fullEmail) {
 //        
@@ -92,9 +91,5 @@ public class MemberService {
 	public int updateMypage(MemberDTO dto) {
 		return dao.updateMypage(dto);
 	}
-	
-//	회사코드 연락처연동할 코드
-	public String getCompanyCodeByEmail(String email) {
-		return dao.getCompanyCodeByEmail(email);
-	}
+
 }
