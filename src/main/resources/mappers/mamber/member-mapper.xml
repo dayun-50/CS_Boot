@@ -41,9 +41,4 @@
   		update member set name = #{name}, phone = #{phone} where email = #{email}
   	</update>
   	
-  	<!-- 회사코드 - 연락처에 전달용  -->
-  	<select id="getCompanyCodeByEmail" parameterType="String" resultType="String">
-  		SELECT company_code FROM member WHERE email = #{email}
-	</select>
-  	
   </mapper>

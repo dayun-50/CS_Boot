@@ -44,9 +44,4 @@ public class MemberDAO {
 	public int updateMypage(MemberDTO dto) {
 		return mybatis.update("Member.updateMypage", dto);
 	}
-
-	//	회사코드 - 연락처에 전달용
-	public String getCompanyCodeByEmail(String email) {
-		return mybatis.selectOne("Member.getCompanyCodeByEmail", email);
-	}
 }
