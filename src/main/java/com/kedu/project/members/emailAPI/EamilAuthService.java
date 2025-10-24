@@ -68,7 +68,7 @@ public class EamilAuthService {
         });
         
         String htmlContent = String.format("""
-        		<p>회원가입 페이지로 다시 이동하여 아래에 받으신 인증번호를 입력해 주세요.</p>
+        		<p>이전 페이지로 이동하여 아래에 받으신 인증번호를 입력해 주세요.</p>
         		<p>%s</p>
         		<p>* 이메일 수정시 다시 인증해야합니다. *</p>
         		""", authCode);
@@ -77,7 +77,7 @@ public class EamilAuthService {
         MimeMessage message = new MimeMessage(session);
         message.setFrom(new InternetAddress(fromEmail));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
-        message.setSubject("CS 그룹웨어 회원가입 인증 확인", "UTF-8");
+        message.setSubject("CS 그룹웨어 이메일 인증 확인", "UTF-8");
         message.setContent(htmlContent, "text/html; charset=UTF-8");
 
         // 메일 발송

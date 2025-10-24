@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kedu.project.security.JwtUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 
 /*
  * 		사원 회원가입 및 마이페이지 구현 Controller
@@ -35,9 +38,12 @@ public class MemberController {
 
 	// 로그인
 	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody MemberDTO dto) {
+	public ResponseEntity<String> login(@RequestBody MemberDTO dto, HttpServletRequest request){ 
 		int result = memberService.login(dto);
-		if (result > 0) { // 로그인 성공시
+		if(result > 0) { // 로그인 성공시
+			 // 세션에 ID 저장
+	        HttpSession session = request.getSession();
+	        session.setAttribute("id", dto.getEmail());
 			String token = jwt.createToken(dto.getEmail());
 			return ResponseEntity.ok(token);
 		} else {

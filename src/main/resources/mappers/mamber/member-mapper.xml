@@ -40,5 +40,33 @@
   	<update id="updateMypage">
   		update member set name = #{name}, phone = #{phone} where email = #{email}
   	</update>
+
+  	<select id="memberSearch" resultType="com.kedu.project.members.member.MemberDTO">
+  		SELECT 
+  			m.email,
+		    m.name,
+		    j.level_name as level_code
+		FROM member m
+		JOIN job_level j
+		    ON m.level_code = j.level_code
+		WHERE m.dept_code = (
+		    SELECT dept_code
+		    FROM member
+		    WHERE email = #{email}
+		)
+		AND m.email != #{email}
+  	</select>
   	
+  	<select id="selectDepartment" resultType="String">
+  		SELECT d.dept_name as dept_code
+		FROM member m
+		JOIN department d
+		    ON m.dept_code = d.dept_code
+		WHERE m.email = #{email}
+  	</select>
+  	
+  	<select id="selectMemberName" resultType="String">
+  		select name from member where email = #{member_email}
+  	</select>
+
   </mapper>

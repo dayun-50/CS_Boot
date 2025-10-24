@@ -9,6 +9,6 @@ public class SpringProvider implements ApplicationContextAware{
 	   
 	 @Override
 	   public void setApplicationContext(ApplicationContext applicationContext) throws BeansException{
-	      this.ctx = applicationContext;
+		 SpringProvider.ctx = applicationContext;
 	   }
 }

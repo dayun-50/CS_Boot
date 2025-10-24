@@ -6,6 +6,8 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.kedu.project.chatting.chat_member.Chat_memberDTO;
+
 /*
  * 		사원 회원가입 및 마이페이지 구현 DAO
  * */
@@ -44,4 +46,20 @@ public class MemberDAO {
 	public int updateMypage(MemberDTO dto) {
 		return mybatis.update("Member.updateMypage", dto);
 	}
+
+	// 부서원 정보 출력
+	public List<MemberDTO> memberSearch(MemberDTO dto) {
+		return mybatis.selectList("Member.memberSearch", dto);
+	}
+
+	// 부서명 출력
+	public String selectDepartment(MemberDTO dto) {
+		return mybatis.selectOne("Member.selectDepartment", dto);
+	}
+
+	// 사원 이름 출력
+	public String selectMemberName(String email) {
+		return mybatis.selectOne("Member.selectMemberName", email);
+	}
+
 }
