@@ -8,10 +8,15 @@
   <mapper namespace="Approval">
     <!-- 모든타입의 데이터 페이지에 맞게 가져오기 -->
   	<select id="selectfromto" resultType="com.kedu.project.approval.ApprovalDTO">
-  		  	select * 
-  			from (select approval.*, row_number() over (order by approval_seq desc) as rn from approval) sub 
-  			where rn between #{start} and #{end} 
-  			order by rn
+  	select *  
+    		from (
+        		select approval.*, row_number() over (order by approval_seq desc) as rn 
+        		from approval
+        		where member_email = #{member_email}
+    		) sub  
+    	where rn between #{start} and #{end}
+    	order by rn
+
   	</select>
     <!-- 특정 데이터 페이지에 맞게 가져오기 -->
 	<select id="selectTypeFromTo" resultType="com.kedu.project.approval.ApprovalDTO">
@@ -19,7 +24,7 @@
 	    from (
 	        select approval.*, row_number() over (order by approval_seq desc) as rn 
 	        from approval 
-	        where approval_status = #{approval_status}
+	        where approval_status = #{approval_status} and member_email=#{member_email}
 	    ) sub 
 	    where rn between #{start} and #{end} 
 	    order by rn
@@ -56,8 +61,15 @@
     	delete from approval where approval_seq = #{approval_seq} and member_email = #{member_email}
 	</delete>
 
+	
 	<insert id="upload">
-    	insert into approval (approval_seq, member_email, approval_title, approval_content, approval_at, approval_status)
-    	values (approval_seq.nextval, #{member_email}, #{approval_title}, #{approval_content}, sysdate, default)
-	</insert> 
+	    <selectKey keyProperty="approval_seq" resultType="int" order="BEFORE">
+	        SELECT approval_seq.nextval FROM dual
+	    </selectKey>
+	    insert into approval (
+	        approval_seq, member_email, approval_title, approval_content, approval_at, approval_status
+	    )
+	    values (#{approval_seq}, #{member_email}, #{approval_title}, #{approval_content}, sysdate, default)
+	</insert>
+
   </mapper>

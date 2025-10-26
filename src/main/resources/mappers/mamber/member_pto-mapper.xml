@@ -23,6 +23,7 @@
 	<update id="updatePto">
 	  update member_pto set remaining_pto =#{remaining_pto} where member_email=#{member_email}
 	</update>
+	
 
   
   </mapper>

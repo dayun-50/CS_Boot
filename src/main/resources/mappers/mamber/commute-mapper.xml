@@ -30,8 +30,23 @@
 		where member_email=#{member_email} and trunc(commute_at) = trunc(#{commute_at})
 	</update>	
 	
-	<!--입력받은 날짜에 해당하는 주의 총 근무시간 뽑아오기-->	
-	<select id="getWeeklyTotalMin" resultType="int">
+	<!--입력받은 날짜에 해당하는 주의 총 근무시간 뽑아오기-->
+		<select id="getWeeklyTotalMin" resultType="int">
+		  select 
+		    sum(
+		      case 
+		        when leave_at is not null and work_at is not null then
+		          (extract(day from (leave_at - work_at)) * 24 * 60) +
+		          (extract(hour from (leave_at - work_at)) * 60) +
+		          extract(minute from (leave_at - work_at))
+		        else 0
+		      end
+		    ) as total_minutes
+		  from commute
+		  where member_email = #{member_email}
+		  and commute_at between #{start_date} and #{end_date}
+		</select>
+<!--	<select id="getWeeklyTotalMin" resultType="int">
 	  select 
 	    sum(
 	      case 
@@ -45,7 +60,7 @@
 	  from commute
 	  where member_email = #{member_email}
 	  and commute_at between #{start_date} and #{end_date}
-	</select>
+	</select>-->
 
 
 	<select id="getMonthlyIssue" resultType="map">
@@ -58,6 +73,31 @@
 	    and commute_at between #{start_date} and #{end_date}
 	</select>
 
-
+	
+	
+	<!--출근기록 없는 직원 조회-->
+		<select id="findMembersWithoutCommute" resultType="string">
+		    select m.email 
+		    from member m 
+		    where m.email not in (
+		        select c.member_email 
+		        from commute c 
+		        where c.commute_at = #{today}
+		    )
+		</select>
+		
+		<!--결근자 업데이트-->
+		<insert id="insertAbsences" parameterType="map">
+		  insert into commute (member_email, commute_at, work_at, absence)
+		  <foreach collection="absentList" item="email" separator="union all">
+		    select #{email}, #{today}, null, '결근'
+		    from dual
+		    where not exists (
+		      select 1 from commute
+		      where member_email = #{email}
+		      and commute_at = #{today}
+		    )
+		  </foreach>
+		</insert>
   
   </mapper>

@@ -1,5 +1,6 @@
 package com.kedu.project.pto_request;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -60,7 +61,10 @@ public class Pto_requestDAO {
 	}
 	
 	
-	
+	//오늘 연차인 직원 목록 조회
+	public List<String> findMembersOnPto(LocalDate today) {
+		return mybatis.selectList("PtoRequest.findMembersOnPto", today);
+	}
 	
 	
 	

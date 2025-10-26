@@ -6,10 +6,14 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.kedu.project.pto_request.Pto_requestDAO;
 
 
 /*
@@ -20,6 +24,8 @@ import org.springframework.stereotype.Service;
 public class CommuteService {
 	@Autowired
 	private CommuteDAO dao;
+	@Autowired
+	private Pto_requestDAO prdao;
 	
 	// ISO 문자열 → LocalDateTime
 	private LocalDateTime toLocalDateTime(String isoString) {
@@ -109,8 +115,27 @@ public class CommuteService {
 		param.put("start_date", startOfMonth);		
 		
 		return dao.getMonthlyIssue(param);
-		
-		
+	}
+	
+	@Transactional
+	public int updateAbsenceForToday(LocalDate today) {
+	    // 1. 오늘 연차중인 사람 제외
+	    List<String> ptoList = prdao.findMembersOnPto(today);
+	    
+	    // 2. 출근 기록 없는 사람 전체 조회
+	    List<String> allAbsent = dao.findMembersWithoutCommute(today);
+
+	    // 3. PTO 중이 아닌 사람만 진짜 결근 처리
+	    List<String> trueAbsent = allAbsent.stream()
+	        .filter(email -> !ptoList.contains(email))
+	        .toList();
+
+	    if (trueAbsent.isEmpty()) return 0;
+
+	    Map<String, Object> param = new HashMap<>();
+	    param.put("absentList", trueAbsent);
+	    param.put("today", today);
+	    return dao.insertAbsences(param);
 	}
 	
 }

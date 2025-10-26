@@ -115,7 +115,8 @@ public class ApprovalService {
     
     //보드 작성
     public int upload(ApprovalDTO dto) {
-    	return dao.upload(dto);
+        dao.upload(dto);
+        return dto.getApproval_seq(); 
     }
     
     

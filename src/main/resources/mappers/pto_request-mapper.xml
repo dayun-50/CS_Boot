@@ -61,6 +61,15 @@
 	<insert id="upload">
     	insert into pto_request (pto_seq, member_email, pto_start_at, pto_end_at, pto_used, pto_content, pto_status)
     	values (pto_request_seq.nextval, #{member_email}, #{pto_start_at}, #{pto_end_at}, #{pto_used}, #{pto_content}, default)
-	</insert> 
+	</insert>
+	
+	<!--오늘 연차인 직원 목록가져오기-->
+	<select id="findMembersOnPto" parameterType="java.time.LocalDate" resultType="string">
+	  select member_email
+	  from pto_request
+	  where pto_status = 'y'
+	    and trunc(pto_start_at) &lt;= #{today}
+	    and trunc(pto_end_at) &gt;= #{today}
+	</select>
   
   </mapper>

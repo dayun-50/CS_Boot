@@ -1,5 +1,7 @@
 package com.kedu.project.members.commute;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
@@ -48,7 +50,17 @@ public class CommuteDAO {
 	public Map<String, Object> getMonthlyIssue(Map<String, Object> param) {
 	    return mybatis.selectOne("Commute.getMonthlyIssue", param);
 	}
-
 	
+	
+	
+	// 출근기록 없는 직원 목록 조회
+	public List<String> findMembersWithoutCommute(LocalDate today) {
+        return mybatis.selectList("Commute.findMembersWithoutCommute", today);
+    }
+	
+	//출근기록 없는 직원 결근 처리
+	public int insertAbsences(Map<String, Object> param) {
+	    return mybatis.insert("Commute.insertAbsences", param);
+	}
 	
 }
