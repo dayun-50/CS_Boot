@@ -10,10 +10,10 @@ public class Chat_messageDTO {
 	private int chat_seq; // 채팅방 고유번호( 부모 시퀀스 )
 	private String member_email; // 사원 고유 아이디
 	private String message; // 메세지 내용
-	private Timestamp message_at; // 보낸 시간 ( default: sysdate )
+	private String message_at; // 보낸 시간 ( default: sysdate )
 	
 	public Chat_messageDTO() {}
-	public Chat_messageDTO(int message_seq, int chat_seq, String member_email, String message, Timestamp message_at) {
+	public Chat_messageDTO(int message_seq, int chat_seq, String member_email, String message, String message_at) {
 		super();
 		this.message_seq = message_seq;
 		this.chat_seq = chat_seq;
@@ -45,10 +45,10 @@ public class Chat_messageDTO {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-	public Timestamp getMessage_at() {
+	public String getMessage_at() {
 		return message_at;
 	}
-	public void setMessage_at(Timestamp message_at) {
+	public void setMessage_at(String message_at) {
 		this.message_at = message_at;
 	}
 	

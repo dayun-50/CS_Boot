@@ -46,7 +46,6 @@ public class CommuteService {
 	private boolean isLate(LocalDateTime workAt) {
 	    return workAt.toLocalTime().isAfter(LocalTime.of(9, 0)); // 9:00 초과면 지각
 	}
-
 	
 	//오늘 날짜로 데이터 조회
 	public CommuteDTO getCommuteByDate(String member_email, LocalDate today) {
@@ -117,6 +116,10 @@ public class CommuteService {
 		return dao.getMonthlyIssue(param);
 	}
 	
+	
+	// 결근 처리: 
+	// 1. 오늘 연차인사람 제외 -> 2. 출근 기록 없는 사람 조회 -> 3.pto 중이 아닌사람만 찐 결근처리
+	// 해당 서비스를 commuteScheduler에서 매일 밤 11시 59분에 실행한다 (여기서 주말에는 리턴시킴)
 	@Transactional
 	public int updateAbsenceForToday(LocalDate today) {
 	    // 1. 오늘 연차중인 사람 제외

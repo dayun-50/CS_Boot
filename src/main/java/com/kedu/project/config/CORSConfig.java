@@ -11,8 +11,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class CORSConfig implements WebMvcConfigurer{
 	 @Override
 	   public void addCorsMappings(CorsRegistry registry) {
-	      registry.addMapping("/**") 
-	            .allowedOrigins("http://192.168.0.27:3000") // 모든 출처 -> 나중에 서버맞춰지면 설정
+	      registry.addMapping("/**")
+	            .allowedOrigins("*") // 모든 출처 -> 나중에 서버맞춰지면 설정
 	            .allowedMethods("*") 
 	            .allowedHeaders("*")
 	            .allowCredentials(true); 

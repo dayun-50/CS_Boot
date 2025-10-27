@@ -1,7 +1,11 @@
 package com.kedu.project.chatting.chat_room;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.kedu.project.members.member.MemberDTO;
 
 
 /*
@@ -11,4 +15,6 @@ import org.springframework.stereotype.Service;
 public class Chat_roomService {
 	@Autowired
 	private Chat_roomDAO dao;
+	
+	
 }

@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kedu.project.security.JwtUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 
 /*
  * 		사원 회원가입 및 마이페이지 구현 Controller
@@ -27,7 +30,7 @@ public class MemberController {
 
 	// 회원가입
 	@PostMapping
-	public ResponseEntity<Void> signup(@RequestBody MemberDTO dto){
+	public ResponseEntity<Void> signup(@RequestBody MemberDTO dto) {
 		System.out.println(dto);
 		memberService.signup(dto);
 		return ResponseEntity.ok().build();
@@ -35,57 +38,55 @@ public class MemberController {
 
 	// 로그인
 	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody MemberDTO dto){ 
-		System.out.println("로그인 도달");
-		System.out.println(dto.getEmail());
-		System.out.println(dto.getPw());
+	public ResponseEntity<String> login(@RequestBody MemberDTO dto, HttpServletRequest request){ 
 		int result = memberService.login(dto);
 		if(result > 0) { // 로그인 성공시
+			 // 세션에 ID 저장
+	        HttpSession session = request.getSession();
+	        session.setAttribute("id", dto.getEmail());
 			String token = jwt.createToken(dto.getEmail());
-			System.out.println(result);
 			return ResponseEntity.ok(token);
-		}else {
-			System.out.println(result);
+		} else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
-		}	
+		}
 	}
-
+	
 	// 비밀번호찾기(초반 이메일인증)
 	@PostMapping("/findpw")
-	public ResponseEntity<String> findpw(@RequestBody MemberDTO dto){
+	public ResponseEntity<String> findpw(@RequestBody MemberDTO dto) {
 		int result = memberService.findpw(dto);
-		if(result > 0) {
+		if (result > 0) {
 			return ResponseEntity.ok().build();
-		}else {
+		} else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
 		}
 	}
 
 	// 비밀번호 변경
 	@PostMapping("/gnewpw")
-	public ResponseEntity<String> gnewpw(@RequestBody MemberDTO dto){
+	public ResponseEntity<String> gnewpw(@RequestBody MemberDTO dto) {
 		int result = memberService.gnewpw(dto);
-		if(result > 0) {
+		if (result > 0) {
 			return ResponseEntity.ok().build();
-		}else {
+		} else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
 		}
 	}
 
 	// 마이페이지 출력
 	@PostMapping("/mypage")
-	public ResponseEntity<List<MemberDTO>> mypage(@RequestBody MemberDTO dto){
+	public ResponseEntity<List<MemberDTO>> mypage(@RequestBody MemberDTO dto) {
 		List<MemberDTO> list = memberService.mypage(dto);
 		return ResponseEntity.ok(list);
 	}
 
 	// 마이페이지 수정
 	@PostMapping("/updateMypage")
-	public ResponseEntity<String> updateMypage(@RequestBody MemberDTO dto){
+	public ResponseEntity<String> updateMypage(@RequestBody MemberDTO dto) {
 		int result = memberService.updateMypage(dto);
-		if(result > 0) {
+		if (result > 0) {
 			return ResponseEntity.ok().build();
-		}else {
+		} else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
 		}
 	}

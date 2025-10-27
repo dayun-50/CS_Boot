@@ -63,7 +63,7 @@ public class CommuteController {
 	    String member_email = "test@test.com";// 토큰으로 변경되면 토큰에서 꺼낸 작성자로 가져와야함
 	    String workAtStr = param.get("work_at");
 	    String leavAtStr = param.get("leave_at");
-	    System.out.println(leavAtStr);
+
 	    if (workAtStr == null || leavAtStr==null) {//빈 파라미터 방지용
 	        return ResponseEntity.badRequest().build();
 	    }

@@ -87,8 +87,6 @@ public class Pto_requestService {
         List<Pto_requestDTO> result = dao.selectTypeFromTo(param);
         convertStatusForUI(result);
         
-        System.out.println("요청 type: " + type);
-        System.out.println("매핑된 symbolType: " + symbolType);
         return result;    	
     }
 

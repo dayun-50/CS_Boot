@@ -1,8 +1,10 @@
 package com.kedu.project.contact;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus; // HttpStatus import 추가
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,40 +15,48 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/*
- *  연락처 기능 구현 Controller
- */
-
 @RequestMapping("/contact")
 @RestController
 public class ContactController {
 	@Autowired
 	private ContactService contactService;
-	// 알아 고쳐쓸려면 알아서 고쳐쓰소
 
-	// 주소록 리스트
+	// 연락처 목록 조회
 	@GetMapping("/list")
 	public ResponseEntity<List<ContactDTO>> getMyContacts() {
-		List<ContactDTO> contactList = contactService.getMyContacts(); // 실제 DB 조회
-		return ResponseEntity.ok(contactList);
+		return ResponseEntity.ok(contactService.getMyContacts());
 	}
 
-	// 주소록 등록
+	// 연락처 등록
 	@PostMapping("/insert")
 	public ResponseEntity<Integer> insertContact(@RequestBody ContactDTO dto) {
-		int noticeInsert = contactService.insertContact(dto);
-		return ResponseEntity.ok(noticeInsert);
+		int rowsInserted = contactService.insertContact(dto);
+		if (rowsInserted > 0) {
+			return ResponseEntity.status(HttpStatus.CREATED).body(rowsInserted);
+		} else {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(0);
+		}
 	}
 
-	// 주소록 수정
+	// 연락처 수정 (share 포함) - 분류 버튼 클릭 시에도 적용
 	@PutMapping("/update")
-	public int updateContact(@RequestBody ContactDTO dto) {
-		return contactService.updateContact(dto);
+	public ResponseEntity<Integer> updateContact(@RequestBody ContactDTO dto) {
+		boolean updated = contactService.updateContact(dto);
+		if (updated) {
+			return ResponseEntity.ok(1);
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
+		}
 	}
 
-	// 주소록 삭제
-	@DeleteMapping("/delete/{notice_seq}")
-	public int deleteContact(@PathVariable int contact_seq) {
-		return contactService.deleteContact(contact_seq);
+	// 연락처 삭제
+	@DeleteMapping("/delete/{contact_seq}")
+	public ResponseEntity<Integer> deleteContact(@PathVariable int contact_seq) {
+		int rowsDeleted = contactService.deleteContact(contact_seq);
+		if (rowsDeleted > 0) {
+			return ResponseEntity.ok(rowsDeleted);
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
+		}
 	}
 }

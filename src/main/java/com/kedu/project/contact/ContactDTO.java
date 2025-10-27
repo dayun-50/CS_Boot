@@ -9,15 +9,16 @@ public class ContactDTO {
 	private String name; // 추가 연락처 이름
 	private String email; // 추가 연락처 이메일
 	private String phone; // 추가 연락처 전화번호
-	private String contact_group; // 연락처 그룹명
+	private String contact_group; // 연락처 회사명
 	private String company_code; // 회사 고유 코드
+	private String memo; // 메모 내용
 	private String share; // 팀 공유 여부 (default: n, 공유 설정 시: y)
 
 	public ContactDTO() {
 	}
 
 	public ContactDTO(int contact_seq, String owner_email, String name, String email, String phone,
-			String contact_group, String company_code, String share) {
+			String contact_group, String company_code, String memo, String share) {
 		super();
 		this.contact_seq = contact_seq;
 		this.owner_email = owner_email;
@@ -26,6 +27,7 @@ public class ContactDTO {
 		this.phone = phone;
 		this.contact_group = contact_group;
 		this.company_code = company_code;
+		this.memo = memo;
 		this.share = share;
 	}
 
@@ -83,6 +85,14 @@ public class ContactDTO {
 
 	public void setCompany_code(String company_code) {
 		this.company_code = company_code;
+	}
+
+	public String getMemo() {
+		return memo;
+	}
+
+	public void setMemo(String memo) {
+		this.memo = memo;
 	}
 
 	public String getShare() {

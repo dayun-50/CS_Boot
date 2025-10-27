@@ -5,11 +5,93 @@
   
   <!-- 채팅 방 생성 및 설정 -->
   
+  <mapper namespace="Chat_room">
   
-  <!-- 오류 방지 예시용 고쳐쓰시오. -->
-  <mapper namespace="Test">
-  	<select id="test3" resultType="com.kedu.project.members.member.MemberDTO">
-  		select * from member
+  	<insert id="insertPirvateCahtRoom" parameterType="com.kedu.project.chatting.chat_member.Chat_memberDTO">
+  		 <selectKey keyProperty="chat_seq" resultType="int" order="BEFORE">
+	        SELECT chat_seq.NEXTVAL AS seq FROM dual
+	    </selectKey>
+	
+	    INSERT INTO chat_room (chat_seq, chat_name, manager_email)
+	    VALUES (#{chat_seq}, #{chat_name}, #{manager_email})
+  	</insert>
+  	
+  	<select id="searchRoom" resultType="int">
+  		SELECT NVL((
+  		SELECT chat_seq
+  		FROM chat_room
+  		WHERE chat_name = #{departmentChatRoom}
+	  	), 0)
+	  	FROM dual
+  	</select>
+  	
+  	<insert id="insetDepartmentRoom">
+  		<selectKey keyProperty="chat_seq" resultType="int" order="BEFORE">
+	        SELECT chat_seq.NEXTVAL AS seq FROM dual
+	    </selectKey>
+	
+  		insert into chat_room (chat_seq, chat_name, manager_email) 
+  		values (#{chat_seq}, #{chat_name}, #{manager_email})
+  	</insert>
+  	
+  	<select id="selectChatRoomList" resultType="map">
+		 <![CDATA[
+			SELECT r.chat_seq, r.chat_name
+			FROM chat_room r
+			JOIN chat_member m ON r.chat_seq = m.chat_seq
+			WHERE r.project_progress = 'y'
+			  AND r.chat_seq IN (
+			      SELECT sub.chat_seq
+			      FROM (
+			          SELECT cm.chat_seq,
+			                 COUNT(*) AS member_count,
+			                 SUM(
+			                   CASE 
+			                     WHEN mb.dept_code = (
+			                       SELECT MIN(d.dept_code) 
+			                       FROM department d 
+			                       WHERE d.dept_name = #{department}
+			                     ) THEN 1 
+			                     ELSE 0 
+			                   END
+			                 ) AS dept_count
+			          FROM chat_member cm
+			          JOIN member mb ON cm.member_email = mb.email
+			          GROUP BY cm.chat_seq
+			      ) sub
+			      WHERE sub.member_count >= 3
+			         OR (sub.member_count = 2 AND sub.dept_count < 2)
+			  )
+			  AND m.member_email = #{email}
+			]]>
+  	</select>
+  	
+  	<select id="completedList" resultType="com.kedu.project.chatting.chat_room.Chat_roomDTO">
+  		SELECT 
+	        r.chat_seq,
+	        r.chat_name
+	    FROM chat_room r
+	    JOIN chat_member m 
+	        ON r.chat_seq = m.chat_seq
+	    WHERE m.member_email = #{email}
+	      AND r.project_progress = 'n'
+  	</select>
+  	
+  	<select id="selectChatRoom" resultType="map">
+  		  SELECT 
+			    r.chat_seq,
+			    r.chat_name,
+			    COUNT(cm_all.member_email) AS member_count
+			FROM chat_room r
+			JOIN chat_member cm_all ON r.chat_seq = cm_all.chat_seq
+			WHERE r.chat_seq = #{chat_seq}
+			  AND EXISTS (
+			      SELECT 1 
+			      FROM chat_member cm_user
+			      WHERE cm_user.chat_seq = r.chat_seq
+			        AND cm_user.member_email = #{member_email}
+			  )
+			GROUP BY r.chat_seq, r.chat_name
   	</select>
   
   </mapper>

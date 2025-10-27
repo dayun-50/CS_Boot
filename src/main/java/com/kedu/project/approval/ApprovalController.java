@@ -49,8 +49,6 @@ public class ApprovalController {
             @RequestParam(required = false) String type,
             HttpServletRequest request) {
 
-        System.out.println("페이지"+page);
-        System.out.println("타입"+type);
         String member_email = "test@test.com"; // 이후 토큰에서 꺼내도록 변경 예정
 
         int pageSize = PageNaviConfig.RECORD_COUNT_PER_PAGE;
@@ -79,12 +77,6 @@ public class ApprovalController {
         response.put("list", pagedList);
         response.put("currentPage", page);
         response.put("totalPages", totalPages);
-        
-        
-        System.out.println(pagedList.get(0).getApproval_title());
-        System.out.println(totalPages);
-        System.out.println(page);
-        
 
         return ResponseEntity.ok(response);
     }
@@ -95,9 +87,8 @@ public class ApprovalController {
    @GetMapping("/{seq}")
    public ResponseEntity<Map<String, Object>> getDetailBoard(@PathVariable int seq){
 	   String member_email = "test@test.com";// 토큰으로 변경되면 토큰에서 꺼낸 작성자로 가져와야함
-	   Map<String, Object> result =approvalFService.getDetailBySeq(seq,member_email);// 파사드 레이어에서 처리
-
 	   
+	   Map<String, Object> result =approvalFService.getDetailBySeq(seq,member_email);// 파사드 레이어에서 처리
 	   if (result == null) {//204 No Content
 	        return ResponseEntity.noContent().build(); //해당 전자결재에 권한없는 사람이 접근한것
 	    }

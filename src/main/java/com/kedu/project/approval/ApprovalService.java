@@ -40,11 +40,11 @@ public class ApprovalService {
     } 
     
     
-    //모든타입의 데이터 개수 뽑아오기
+    //1. 모든타입의 데이터 개수 뽑아오기
     public int getCount(String email) {
         return dao.getCount(email);
     }
-    //특정 타입의 데이터 개수 뽑아오기
+    //2. 특정 타입의 데이터 개수 뽑아오기
     public int getTypeCount(String email, String type) {
     	String symbolType = typeMap.get(type);
     	
@@ -56,8 +56,7 @@ public class ApprovalService {
     }
     
     
-    
-   //모든 타입에 대하여 멤버 지정 페이지에 따른 데이터 조회 
+   //3. 모든 타입에 대하여 멤버 지정 페이지에 따른 데이터 조회 
     public List<ApprovalDTO> selectFromTo(String member_email, int start, int end) {
     	Map<String, Object> param = new HashMap<>();
     	param.put("member_email", member_email);
@@ -69,7 +68,7 @@ public class ApprovalService {
         return result;
     }
 
-    //특정 타입에 대하여 맴버 지정 페이지에 따른 데이터 조회
+    //4. 특정 타입에 대하여 맴버 지정 페이지에 따른 데이터 조회
     public List<ApprovalDTO> selectTypeFromTo(String member_email, String type, int start, int end){
         String symbolType = typeMap.get(type);
         
@@ -87,7 +86,7 @@ public class ApprovalService {
         return result;    	
     }
 
-    //디테일 보드
+    //5. 디테일 보드
     public ApprovalDTO getDetailBySeq(String member_email, int seq) {
     	Map<String,Object> param = new HashMap<>();
     	param.put("member_email", member_email);
@@ -100,12 +99,12 @@ public class ApprovalService {
     	return result;
     }
     
-    //디테일 보드 수정 (업데이트)
+    //6. 디테일 보드 수정 (업데이트)
     public int updateDetailBoard(ApprovalDTO dto) {
     	return dao.updateDetailBoard(dto);
     }
     
-    //디테일 보드 삭제
+    //7. 디테일 보드 삭제
     public int deleteDetailBoard(int approval_seq, String member_email) {
     	Map<String, Object> param= new HashMap<>();
     	param.put("approval_seq", approval_seq);
@@ -113,7 +112,7 @@ public class ApprovalService {
     	return dao.deleteDetailBoard(param);
     }
     
-    //보드 작성
+    //8. 보드 작성
     public int upload(ApprovalDTO dto) {
         dao.upload(dto);
         return dto.getApproval_seq(); 

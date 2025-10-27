@@ -17,7 +17,9 @@ public class CommuteScheduler {
 
     @Autowired private CommuteService commuteService;
     @Autowired private HolidayService holidayService;
-
+    
+    
+    //매일 12시 59분 실행
     @Scheduled(cron = "59 59 23 * * *")
     public void updateAbsenceForMissingCommute() {
         LocalDate today = LocalDate.now();

@@ -23,14 +23,25 @@ public class ApprovalFacadeService {
 	@Autowired
 	private FileService fileService;
 	
+	// 0. GCS 업로드중 실패시 정리용 (부모시퀀스로 올라간 파일 전부 정리)
+    private void cleanupUploadedFiles(ApprovalDTO dto) {
+        try {
+            fileService.deleteFilesByParent(dto.getApproval_seq(), FileConstants.FA);
+        } catch (Exception ignore) {}
+    }
+
 	//1. 업로드
 	public void upload(ApprovalDTO dto, MultipartFile[] files) {
-		System.out.println("🚀 FileService.upload() 진입 전");
-		//1. 게시글 저장
-		int parentseq= approvalService.upload(dto);
-		//2. 파일 저장
-		if(files != null) {// 파일이 존재한다면
-			fileService.upload(files, parentseq,FileConstants.FA, dto.getMember_email());
+		try {
+			//1. 게시글 저장
+			int parentseq= approvalService.upload(dto);
+			//2. 파일 저장
+			if(files != null) {// 파일이 존재한다면
+				fileService.upload(files, parentseq,FileConstants.FA, dto.getMember_email());
+			}
+		}catch(Exception e) {//gcs업로드 중 실패시, 삭제후 롤백유도
+			cleanupUploadedFiles(dto);
+            throw e; // 롤백 유도	
 		}
 	}
 	
@@ -46,12 +57,10 @@ public class ApprovalFacadeService {
         // 3. 합쳐서 리턴
         result.put("approval", approval);
         result.put("files", fileNames);
-
         return result;
     }
     
     //3. 글번호 따라서 삭제하기
-    // 전자결재 + 관련 파일 통합 삭제
     public int deleteApprovalWithFiles(int seq, String member_email) {
         // 1. Approval 삭제 (권한 검사 포함)
         int result = approvalService.deleteDetailBoard(seq, member_email);

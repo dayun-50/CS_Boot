@@ -55,7 +55,11 @@
         <artifactId>jakarta.mail-api</artifactId>
         <version>2.1.2</version>
     </dependency>
-
+	<!--webClient Rest API-->
+	<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-webflux</artifactId>
+</dependency>
     <!-- Jakarta Activation API -->
     <dependency>
         <groupId>jakarta.activation</groupId>
@@ -82,6 +86,20 @@
     <artifactId>java-jwt</artifactId>
     <version>4.4.0</version>
 </dependency>
+		
+		
+<!-- 웹소켓 라이브러리 -->
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-websocket</artifactId>
+</dependency>
+
+
+<dependency>
+ <groupId>org.springframework.boot</groupId>
+ <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+
 		
 		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>

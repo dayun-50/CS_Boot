@@ -38,8 +38,6 @@ public class Pto_requestController {
             @RequestParam(required = false) String type,
             HttpServletRequest request) {
 
-        System.out.println("페이지"+page);
-        System.out.println("타입"+type);
         String member_email = "test01@test.com"; // 이후 토큰에서 꺼내도록 변경 예정
 
         int pageSize = 5;
@@ -68,11 +66,6 @@ public class Pto_requestController {
         response.put("list", pagedList);
         response.put("currentPage", page);
         response.put("totalPages", totalPages);
-        
-        
-        System.out.println(totalPages);
-        System.out.println(page);
-        
 
         return ResponseEntity.ok(response);
     }
@@ -86,7 +79,7 @@ public class Pto_requestController {
 	   Pto_requestDTO temp =pto_requestService.getDetailBySeq(member_email,seq);
 
 	   if (temp == null) {//204 No Content
-	        return ResponseEntity.noContent().build(); //해당 전자결재에 권한없는 사람이 접근한것
+	        return ResponseEntity.noContent().build(); //해당결재에 권한없는 사람이 접근한것
 	    }
 	   return ResponseEntity.ok(temp);
    }
@@ -96,12 +89,11 @@ public class Pto_requestController {
    @PutMapping("/{seq}")
    public ResponseEntity<Void> updateDetailBoard(@PathVariable int seq, @RequestBody Pto_requestDTO dto){
 	   String member_email = "test01@test.com"; // 이후 토큰에서 꺼내도록 변경 예정
-	   System.out.println("연차수정");
+
 	   dto.setMember_email(member_email);
 	   int result =pto_requestService.updateDetailBoard(dto);
-	   
 	    if (result == 0) {
-	    	return ResponseEntity.noContent().build(); //해당 전자결재에 권한없는 사람이 접근한것
+	    	return ResponseEntity.noContent().build(); //해당결재에 권한없는 사람이 접근한것
 	    }
 	   return ResponseEntity.ok().build();
    }
@@ -114,7 +106,7 @@ public class Pto_requestController {
 	   int result =pto_requestService.deleteDetailBoard(seq, member_email);
 	   
 	    if (result == 0) {
-	    	return ResponseEntity.noContent().build(); //해당 전자결재에 권한없는 사람이 접근한것
+	    	return ResponseEntity.noContent().build(); //해당결재에 권한없는 사람이 접근한것
 	    }
 	   return ResponseEntity.ok().build();
    }

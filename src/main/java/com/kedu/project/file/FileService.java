@@ -31,21 +31,19 @@ public class FileService {
     private FileDAO fileDao;
 
     @Autowired
-    private Storage storage;  // ✅ Starter가 자동 주입함
+    private Storage storage; 
 
     @Value("${spring.cloud.gcp.storage.bucket:hwi_study}")  
-    private String bucketName; // ✅ properties에 정의된 버킷명 사용 (없으면 기본값 hwi_study)
+    private String bucketName; // application.properties에서 가져옴
 
     // 1. 파일 업로드
     public void upload(MultipartFile[] files, int parent_seq, String file_type, String member_email) {
-    	System.out.println("storage is null? " + (storage == null));
     	if (files == null || files.length == 0) return;
 
         for (MultipartFile file : files) {
             if (!file.isEmpty()) {
                 try {
                     String oriName = file.getOriginalFilename();
-                    System.out.println("오리네임"+oriName);
                     String sysName = UUID.randomUUID() + "_" + oriName;
 
                     // 폴더 구조 흉내내기 (approval/uuid_filename)
