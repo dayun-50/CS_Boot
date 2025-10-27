@@ -5,11 +5,28 @@
   
   <!-- 일정표 -->
   
+  <mapper namespace="Schedule">
+  	<select id="selectMember" resultType="com.kedu.project.members.member.MemberDTO">
+  		SELECT 
+  			m.email,
+		    m.name,
+		    j.level_name AS level_code
+		FROM chat_member cm
+		JOIN member m 
+		    ON cm.member_email = m.email
+		LEFT JOIN job_level j 
+		    ON m.level_code = j.level_code
+		WHERE cm.chat_seq = #{chat_seq}
+		  AND cm.member_email != #{member_email}
+  	</select>
   
- <!-- 오류 방지 예시용 고쳐쓰시오. -->
-  <mapper namespace="Test">
-  	<select id="test15" resultType="com.kedu.project.members.member.MemberDTO">
-  		select * from member
+  	<insert id="savaEvent">
+  		insert into schedule values(schedule_seq.nextval, #{member_email},
+  		#{title}, #{all_day}, #{color}, #{start_at}, #{end_at}, sysdate, #{chat_seq})
+  	</insert>
+  	
+  	<select id="eventsList" resultType="com.kedu.project.schedule.ScheduleDTO">
+  		select * from schedule where chat_seq = #{chat_seq}
   	</select>
   
   </mapper>

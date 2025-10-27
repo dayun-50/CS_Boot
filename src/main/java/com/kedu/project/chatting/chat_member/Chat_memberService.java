@@ -73,7 +73,7 @@ public class Chat_memberService {
 		return list;
 	}
 
-	// 단체 톡방 및 팀원 제외 개인톡방 출력
+	// 부서 단체 톡방 생성 및 단체 톡방 출력
 	public List<Map<String, Object>> chatRoomList(MemberDTO dto){
 		// 내 부서명 출력
 		String department = memberDao.selectDepartment(dto);
@@ -146,7 +146,7 @@ public class Chat_memberService {
 		return list;
 	}
 
-	// 채팅방 정보 출력
+	// 부서원 제외 개인 채팅방 정보 출력
 	public Map<String, Object> ChatRoom(Chat_memberDTO dto) {
 		// 채팅방 정보 출력
 		Map<String, Object> list = roomDao.chatRoom(dto);
