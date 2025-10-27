@@ -16,7 +16,7 @@ public class JwtUtil {
 	@Value("${jwt.expiration}")
 	private Long exp;
 
-	private Algorithm algorithm; 
+	private Algorithm algorithm;
 	private JWTVerifier jwt;
 
 	// 생성자
@@ -24,15 +24,16 @@ public class JwtUtil {
 		this.algorithm = Algorithm.HMAC256(secret);
 		this.jwt = JWT.require(algorithm).build();
 	}
-	
-	// 일반 웹 토큰 설정
+
+
+	// 토큰설정
+
 	public String createToken(String id) {
-		return JWT.create()
-				.withSubject(id) // 이메일을 대표로 넣어둠
-				.withIssuedAt(new Date(System.currentTimeMillis()))         
-				.withExpiresAt(new Date(System.currentTimeMillis() + exp)) 
-				.sign(this.algorithm);
+		return JWT.create().withSubject(id) // 이메일을 대표로 넣어둠
+				.withIssuedAt(new Date(System.currentTimeMillis()))
+				.withExpiresAt(new Date(System.currentTimeMillis() + exp)).sign(this.algorithm);
 	}
+
 	
 	//james 서버 전용 토큰
 	public String createJamesToken(String email, String rawPassword) {
@@ -57,6 +58,7 @@ public class JwtUtil {
     }
 	
 	
+
 	public DecodedJWT verifyToken(String token) {
 		return jwt.verify(token);
 	}

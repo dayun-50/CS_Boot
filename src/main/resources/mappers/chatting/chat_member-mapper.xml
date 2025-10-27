@@ -8,21 +8,28 @@
   <mapper namespace="Chat_member">
   	
   	 <select id="checkPrivateChat" resultType="int">
-	    SELECT COALESCE(
-	      (
-	        SELECT chat_seq
-	        FROM (
-	          SELECT chat_seq
-	          FROM chat_member
-	          WHERE member_email IN (#{email1}, #{email2})
-	          GROUP BY chat_seq
-	          HAVING COUNT(DISTINCT member_email) = 2
-	        )
-	        WHERE ROWNUM = 1
-	      ),
-	      0
-	    ) AS chat_seq
-	    FROM dual
+	      SELECT COALESCE(
+        (
+            SELECT chat_seq
+            FROM (
+                SELECT chat_seq
+                FROM chat_member
+                WHERE chat_seq IN (
+                    SELECT chat_seq
+                    FROM chat_member
+                    GROUP BY chat_seq
+                    HAVING COUNT(DISTINCT member_email) = 2
+                )
+                GROUP BY chat_seq
+                HAVING COUNT(DISTINCT member_email) = 2
+                   AND SUM(CASE WHEN member_email = #{email1} THEN 1 ELSE 0 END) = 1
+                   AND SUM(CASE WHEN member_email = #{email2} THEN 1 ELSE 0 END) = 1
+            )
+            WHERE ROWNUM = 1
+        ),
+        0
+    ) AS chat_seq
+    FROM dual
 	 </select>
 	 
 	 <insert id="insertChat">

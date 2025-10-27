@@ -21,32 +21,15 @@ public class ContactController {
 	@Autowired
 	private ContactService contactService;
 
-	// 주소록 리스트
+	// 연락처 목록 조회
 	@GetMapping("/list")
 	public ResponseEntity<List<ContactDTO>> getMyContacts() {
-		List<ContactDTO> contactList = contactService.getMyContacts();
-		return ResponseEntity.ok(contactList);
+		return ResponseEntity.ok(contactService.getMyContacts());
 	}
 
-	// 분류 버튼 값 수정
-	@PostMapping("/share/{contact_seq}")
-	public ResponseEntity<String> updateContactGroup(@PathVariable int contact_seq,
-			@RequestBody Map<String, String> body) {
-
-		String share = body.get("share");
-		boolean updated = contactService.updateContactGroup(contact_seq, share);
-
-		if (updated) {
-			return ResponseEntity.ok("변경 성공");
-		} else {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("변경 실패");
-		}
-	}
-
-	// 주소록 등록
+	// 연락처 등록
 	@PostMapping("/insert")
 	public ResponseEntity<Integer> insertContact(@RequestBody ContactDTO dto) {
-		System.out.println("Received ContactDTO: " + dto); // 디버깅용 출력
 		int rowsInserted = contactService.insertContact(dto);
 		if (rowsInserted > 0) {
 			return ResponseEntity.status(HttpStatus.CREATED).body(rowsInserted);
@@ -55,25 +38,25 @@ public class ContactController {
 		}
 	}
 
-	// 주소록 수정 (ResponseEntity 사용하도록 수정)
+	// 연락처 수정 (share 포함) - 분류 버튼 클릭 시에도 적용
 	@PutMapping("/update")
 	public ResponseEntity<Integer> updateContact(@RequestBody ContactDTO dto) {
-		int rowsUpdated = contactService.updateContact(dto);
-		if (rowsUpdated > 0) {
-			return ResponseEntity.ok(rowsUpdated); // 200 OK
+		boolean updated = contactService.updateContact(dto);
+		if (updated) {
+			return ResponseEntity.ok(1);
 		} else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0); // 404 Not Found
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
 		}
 	}
 
-	// 주소록 삭제 (ResponseEntity 사용하도록 수정)
+	// 연락처 삭제
 	@DeleteMapping("/delete/{contact_seq}")
 	public ResponseEntity<Integer> deleteContact(@PathVariable int contact_seq) {
 		int rowsDeleted = contactService.deleteContact(contact_seq);
 		if (rowsDeleted > 0) {
-			return ResponseEntity.ok(rowsDeleted); // 200 OK
+			return ResponseEntity.ok(rowsDeleted);
 		} else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0); // 404 Not Found
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
 		}
 	}
 }

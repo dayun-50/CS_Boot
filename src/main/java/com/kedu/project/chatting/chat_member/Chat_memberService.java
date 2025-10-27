@@ -37,6 +37,7 @@ public class Chat_memberService {
 		for(MemberDTO members : memberList) {
 			// 채팅방 존재 여부 및 존재시 채팅방 seq 반환
 			int checkChat = dao.checkPrivateChat(dto, members.getEmail());
+			System.out.println(checkChat);
 			Map<String, Object> map = new HashMap<>();
 			if(checkChat > 0) { // 채팅방 존재시 map에 기록
 				map.put("chat_seq", checkChat);
@@ -79,7 +80,7 @@ public class Chat_memberService {
 		List<Map<String, Object>> list = new ArrayList<>();
 		Map<String, Object> map = new HashMap<>();
 		// 팀 채팅방 있는지 확인 ( 존재 한다면 room_seq / 존재하지 않는다면 0 )
-		int checkChat = roomDao.searchRoom(dto, department+" 단체 채팅");
+		int checkChat = roomDao.searchRoom(department+" 단체 채팅");
 		if(checkChat > 0) {
 			int exist = dao.existDepartmentRoom(dto, checkChat);
 			// 단톡방에 내가 없을시 참여
@@ -153,7 +154,7 @@ public class Chat_memberService {
 		BigDecimal memberCount = (BigDecimal) list.get("MEMBER_COUNT");
 		// 만약 개인톡방이라면
 		if(memberCount.intValue() == 2) {
-	        String chatName = (String) list.get("CHAT_NAME");
+			String chatName = (String) list.get("CHAT_NAME");
 			// 사원 이름 출력
 			String username = memberDao.selectMemberName(dto.getMember_email());
 			// 채팅방 이름에서 사원 이름을 제거후 저장

@@ -1,10 +1,10 @@
 package com.kedu.project.chatting.endpoint;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
@@ -33,7 +33,7 @@ public class ChatEndpoint {
 	private int chat_seq;
 	private static ObjectMapper mapper = new ObjectMapper();
 	//	public static Set<Session> clients = Collections.synchronizedSet(new HashSet<>());
-	public static Map<Session,String> users = Collections.synchronizedMap(new HashMap<>());
+	private static Map<Integer, Set<Session>> roomSessions = Collections.synchronizedMap(new HashMap<>());
 	private Chat_messageService cServ ;
 
 	@OnOpen
@@ -43,9 +43,11 @@ public class ChatEndpoint {
 		}
 
 		this.token = (String) config.getUserProperties().get("token");
+		session.getUserProperties().put("token", token);
 		String chatseq = (String) config.getUserProperties().get("chat_seq");
 		this.chat_seq = Integer.parseInt(chatseq);
-		users.put(session, token);
+		roomSessions.computeIfAbsent(chat_seq, k -> Collections.synchronizedSet(new java.util.HashSet<>())).add(session);
+
 		System.out.println("클라이언트 접속: " + session.getId());
 
 		// 지난 메세지 출력
@@ -64,22 +66,29 @@ public class ChatEndpoint {
 
 
 	@OnMessage
-	public void onMessage(String messageData) {
+	public void onMessage(String messageData, Session session) {
 		try {
 			Chat_messageDTO dto = mapper.readValue(messageData, Chat_messageDTO.class);
 			// 토큰에서 id값 추출
-			String member_eamil = JWT.decode(this.token).getSubject();
+			String token = (String) session.getUserProperties().get("token");
+			String member_eamil = JWT.decode(token).getSubject();
+			System.out.println(member_eamil);
 			dto.setMember_email(member_eamil);
 			// DB에 저장
 			cServ.messageInsert(dto);
-			synchronized (token) {
-				// 클라이언트가 현재 있는 방 seq와 같은 방의 메세지만 출력하게끔
-				for (Session client : users.keySet()) {
-					if(dto.getChat_seq() == chat_seq) {
-						client.getBasicRemote().sendText(mapper.writeValueAsString(dto));
-					}
-				}
-			}
+			 // 방별 세션에만 메시지 전송
+            Set<Session> clients = roomSessions.get(dto.getChat_seq());
+            if (clients != null) {
+                Map<String, Object> sendMap = new HashMap<>();
+                sendMap.put("type", "chat");
+                sendMap.put("data", dto);
+
+                synchronized (clients) {
+                    for (Session client : clients) {
+                        client.getBasicRemote().sendText(mapper.writeValueAsString(sendMap));
+                    }
+                }
+            }
 		}catch(Exception e) {
 			e.printStackTrace();
 			System.out.println("오류요 ㅋㅋ");
@@ -88,13 +97,18 @@ public class ChatEndpoint {
 
 	@OnClose
 	public void onClose(Session session) {
-		users.remove(session);
+		// 방별 세션에서 제거
+        for (Set<Session> sessions : roomSessions.values()) {
+            sessions.remove(session);
+        }
 		System.out.println("클라이언트 종료: " + session.getId());
 	}
 
 	@OnError
 	public void onError(Session session, Throwable t) {
-		users.remove(session);
+		 for (Set<Session> sessions : roomSessions.values()) {
+	            sessions.remove(session);
+	        }
 		t.printStackTrace();
 	}
 }

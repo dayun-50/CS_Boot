@@ -21,7 +21,6 @@
   		SELECT chat_seq
   		FROM chat_room
   		WHERE chat_name = #{departmentChatRoom}
-	  		AND manager_email = #{manager_email}
 	  	), 0)
 	  	FROM dual
   	</select>

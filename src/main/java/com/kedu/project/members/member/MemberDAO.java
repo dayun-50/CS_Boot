@@ -39,7 +39,7 @@ public class MemberDAO {
 
 	// 마이페이지 출력
 	public List<MemberDTO> mypage(MemberDTO dto) {
-		return mybatis.selectList("Member.selectByMypage", dto);
+		 return mybatis.selectList("Member.selectByMypage", dto);
 	}
 
 	// 마이페이지 수정
@@ -48,22 +48,18 @@ public class MemberDAO {
 	}
 
 	// 부서원 정보 출력
-	public List<MemberDTO> memberSearch(MemberDTO dto){
+	public List<MemberDTO> memberSearch(MemberDTO dto) {
 		return mybatis.selectList("Member.memberSearch", dto);
 	}
-	
+
 	// 부서명 출력
 	public String selectDepartment(MemberDTO dto) {
 		return mybatis.selectOne("Member.selectDepartment", dto);
 	}
-	
+
 	// 사원 이름 출력
 	public String selectMemberName(String email) {
 		return mybatis.selectOne("Member.selectMemberName", email);
 	}
 
-	//	회사코드 - 연락처에 전달용
-	public String getCompanyCodeByEmail(String email) {
-		return mybatis.selectOne("Member.getCompanyCodeByEmail", email);
-	}
 }

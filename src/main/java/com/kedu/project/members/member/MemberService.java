@@ -20,9 +20,6 @@ public class MemberService {
 	@Autowired
 	private MemberDAO dao;
 	// JamesAdminClient 주입
-	
-
-	
 
     @Value("${james.local.domain}")
     private String localDomain;
@@ -45,24 +42,25 @@ public class MemberService {
         dto.setPw(Encryptor.encrypt(dto.getPw()));
         int dbResult = dao.signup(dto);
 
+        
         // 3. DB 저장이 성공하면, James 서버에 메일 계정 생성
         if (dbResult > 0) {
             // James Admin Client 호출 (실패 시 RuntimeException 발생 -> DB 자동 롤백)
-            jamesAdminClient.createMailAccount(jamesUsername, rawPassword);
+			jamesAdminClient.createMailAccount(jamesUsername, rawPassword);
         }
+        
+		return dbResult; 
+	}
 
-        return dbResult;
-    }
     // 헬퍼 메서드: 이메일에서 ID를 추출하고 James 도메인 결합
     public String getJamesUsername(String fullEmail) {
-
+        
         // 유효성 검사를 React에서 완료했다고 가정하고, @ 앞부분(ID)만 추출
         String userId = fullEmail.substring(0, fullEmail.indexOf('@'));
-
+        
         // 최종 James 계정 이름 반환
         return userId + "@" + localDomain;
     }
-
 
  
 
@@ -130,10 +128,12 @@ public class MemberService {
 	public int updateMypage(MemberDTO dto) {
 		return dao.updateMypage(dto);
 	}
+
 	
-//	회사코드 연락처연동할 코드
-	public String getCompanyCodeByEmail(String email) {
-		return dao.getCompanyCodeByEmail(email);
-	}
+////	회사코드 연락처연동할 코드
+//	public String getCompanyCodeByEmail(String email) {
+//		return dao.getCompanyCodeByEmail(email);
+//	}
+
 
 }
