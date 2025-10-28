@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kedu.project.common.Encryptor;
+import com.kedu.project.members.member_pto.Member_ptoDAO;
 import com.kedu.project.common.JamesAdminClient;
+
 
 /*
  * 		사원 회원가입 및 마이페이지 구현 Service
@@ -18,7 +20,12 @@ import com.kedu.project.common.JamesAdminClient;
 public class MemberService {
 	@Autowired
 	private MemberDAO dao;
-	// JamesAdminClient 주입
+
+	@Autowired
+	private Member_ptoDAO daoPTO;
+	
+
+// JamesAdminClient 주입
 
 //	@Value("${james.local.domain}") 
 //    private String localDomain;
@@ -31,8 +38,13 @@ public class MemberService {
 	// ----------------------------------------------------
 	@Transactional
 	public int signup(MemberDTO dto) {
+		// pto dao 통해서 초기 연차값 집어넣기--- 지원 필요 로직 지우지마세요
+		daoPTO.insertInitPto(dto.getEmail()); 
+		
+		
+		
 		String rawPassword = dto.getPw();
-
+		
 		// 1. James 계정 이름 생성 (헬퍼 메서드 호출)
 //        String jamesUsername = getJamesUsername(dto.getEmail()); 
 
@@ -62,7 +74,7 @@ public class MemberService {
 
 	// 로그인
 	public int login(MemberDTO dto) {
-		dto.setPw(Encryptor.encrypt(dto.getPw())); // 암호화
+		dto.setPw(Encryptor.encrypt(dto.getPw()));  //암호화
 		return dao.login(dto);
 	}
 

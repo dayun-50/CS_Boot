@@ -91,6 +91,6 @@ public class MemberDTO {
 		this.signup_at = signup_at;
 	}
 	
-	
-	
+
 }
+
