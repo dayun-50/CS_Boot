@@ -61,5 +61,16 @@ public class MemberDAO {
 	public String selectMemberName(String email) {
 		return mybatis.selectOne("Member.selectMemberName", email);
 	}
+	
+	//---------------------------------------------------------------------
+	//전체 리스트 뽑아오기 : 입사일 기준 연차 지급 로딩용으로 필요함 -- 지원
+	public List<MemberDTO> findAll(){
+		return mybatis.selectList("Member.selectAll");
+	}
+	
+	//아이디로 dto 하나 뽑아오기 : 가입일자 별 연차 계산용-- 지원
+	public MemberDTO findByEmail(String email) {
+		return mybatis.selectOne("Member.findByEmail", email);		
+	}
 
 }

@@ -6,10 +6,24 @@
   <!-- 남은 연차 -->
   
   
- <!-- 오류 방지 예시용 고쳐쓰시오. -->
-  <mapper namespace="Test">
-  	<select id="test8" resultType="com.kedu.project.members.member.MemberDTO">
-  		select * from member
+
+  <mapper namespace="Member_pto">
+   <!-- 이메일 받아서 남은 연차 가져오기. -->
+  	<select id="getLeftPto" resultType="com.kedu.project.members.member_pto.Member_ptoDTO">
+  		select * from member_pto where member_email =#{member_email}
   	</select>
+  	
+   <!-- 연차 초기값 집어넣기 -->	
+	<insert id="insertInitPto">
+	  insert into member_pto (member_email, remaining_pto)
+	  values (#{member_email}, 11)
+	</insert>
+
+   <!-- 연차별로 연차 업데이트 -->	
+	<update id="updatePto">
+	  update member_pto set remaining_pto =#{remaining_pto} where member_email=#{member_email}
+	</update>
+	
+
   
   </mapper>
