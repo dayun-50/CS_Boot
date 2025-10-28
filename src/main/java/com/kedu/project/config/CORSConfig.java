@@ -13,6 +13,7 @@ public class CORSConfig implements WebMvcConfigurer{
 	   public void addCorsMappings(CorsRegistry registry) {
 	      registry.addMapping("/**")
 
+
 	            .allowedOrigins("http://10.5.5.5:3000") // 모든 출처 -> 나중에 서버맞춰지면 설정
 	            .allowedMethods("*") 
 	            .allowedHeaders("*")
