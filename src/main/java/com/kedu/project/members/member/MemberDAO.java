@@ -16,12 +16,18 @@ import com.kedu.project.chatting.chat_member.Chat_memberDTO;
 public class MemberDAO {
 	@Autowired
 	private SqlSession mybatis;
+	
+	
+	public String getDomainByEmail(String email) {
+	    // MyBatis 매퍼 ID는 예를 들어 "Member.getDomainByEmail" 입니다.
+	    return mybatis.selectOne("Member.getDomainByEmail", email);
+	}
 
 	// 회원가입
 	public int signup(MemberDTO dto) {
 		return mybatis.insert("Member.insert", dto);
 	}
-
+	
 	// 로그인
 	public int login(MemberDTO dto) {
 		return mybatis.selectOne("Member.selectByLogin", dto);

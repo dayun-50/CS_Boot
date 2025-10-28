@@ -9,6 +9,15 @@
   	<insert id="insert">
   		insert into member (email, pw, name, phone, company_code, signup_at) values (#{email}, #{pw}, #{name}, #{phone}, #{company_code}, sysdate)
   	</insert>
+  	<select id="getDomainByEmail" parameterType="String" resultType="String">
+    select c.domain_name from member m join company c on m.company_code = c.company_code 
+	where m.email = #{email}
+	</select>
+  	<select id="getDomainByCompanyCode" parameterType="String" resultType="String">
+    SELECT domain_name
+    FROM company
+    WHERE company_code = #{companyCode}
+	</select>
   
   	<select id="selectByLogin" resultType="Integer"  parameterType="com.kedu.project.members.member.MemberDTO">
   		select count(*) from member where email = #{email} and pw = #{pw}

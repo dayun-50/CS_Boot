@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kedu.project.external.james.JamesAccountService;
 import com.kedu.project.security.JwtUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ public class MemberController {
 	@Autowired
 	private JwtUtil jwt;
 
+
 	// 회원가입
 	@PostMapping
 	public ResponseEntity<Void> signup(@RequestBody MemberDTO dto) {
@@ -38,14 +40,22 @@ public class MemberController {
 
 	// 로그인
 	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody MemberDTO dto, HttpServletRequest request){ 
+	public ResponseEntity<String> login(@RequestBody MemberDTO dto, HttpServletRequest request){
+		String rawPassword = dto.getPw();
 		int result = memberService.login(dto);
 		if(result > 0) { // 로그인 성공시
 			 // 세션에 ID 저장
 	        HttpSession session = request.getSession();
 	        session.setAttribute("id", dto.getEmail());
-			String token = jwt.createToken(dto.getEmail());
-			return ResponseEntity.ok(token);
+			String generalToken = jwt.createToken(dto.getEmail());
+			String jamesAccessToken = jwt.createJamesToken(
+		             dto.getEmail(),    
+		             rawPassword // DTO에서 평문 비밀번호를 사용하여 토큰 B 생성
+		         );
+			// 3. 💡 [핵심 수정] 두 토큰을 특정 구분자("|||")로 결합하여 하나의 String으로 반환
+	         String combinedToken = generalToken + "|||" + jamesAccessToken;
+			
+			return ResponseEntity.ok(combinedToken);
 		} else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
 		}

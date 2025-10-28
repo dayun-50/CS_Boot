@@ -1,4 +1,4 @@
-package com.kedu.project.common;
+package com.kedu.project.external.james;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
