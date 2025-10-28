@@ -28,5 +28,20 @@
   	<select id="eventsList" resultType="com.kedu.project.schedule.ScheduleDTO">
   		select * from schedule where chat_seq = #{chat_seq}
   	</select>
-  
+  		
+  	<select id="eventsListByEmail" resultType="com.kedu.project.schedule.ScheduleDTO">
+  		  SELECT *
+		  FROM schedule
+		  WHERE chat_seq = #{chat_seq}
+		    <if test="excludeEmails != null and excludeEmails.size() > 0">
+		      AND member_email NOT IN
+		      <foreach item="email" collection="excludeEmails" open="(" separator="," close=")">
+		        #{email}
+		      </foreach>
+		    </if>
+  	</select>
+  	
+  	<delete id="deleteEvent">
+  		delete from schedule where schedule_seq = #{schedule_seq}
+  	</delete>
   </mapper>

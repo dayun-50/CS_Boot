@@ -77,44 +77,41 @@ public class ChatEndpoint {
 			Chat_messageDTO dto = mapper.readValue(messageData, Chat_messageDTO.class);
 			// 토큰에서 id값 추출
 			String token = (String) session.getUserProperties().get("token");
-			String member_eamil = JWT.decode(token).getSubject();
-			dto.setMember_email(member_eamil);
+			String member_email = JWT.decode(token).getSubject();
+			dto.setMember_email(member_email);
 			// DB에 저장
 			cServ.messageInsert(dto);
-			 // 방별 세션에만 메시지 전송
-            Set<Session> clients = roomSessions.get(dto.getChat_seq());
-            if (clients != null) {
-                Map<String, Object> sendMap = new HashMap<>();
-                sendMap.put("type", "chat");
-                sendMap.put("data", dto);
+			// 방별 세션에만 메시지 전송
+			Set<Session> clients = roomSessions.get(dto.getChat_seq());
+			if (clients != null) {
+				Map<String, Object> sendMap = new HashMap<>();
+				sendMap.put("type", "chat");
+				sendMap.put("data", dto);
 
-                synchronized (clients) {
-                    for (Session client : clients) {
-                        client.getBasicRemote().sendText(mapper.writeValueAsString(sendMap));
-                    }
-                }
-            }
-            
-            // 현재 안보고있는 방에 새로운 데이터(채팅) 발생시 알람 기능
-            for(Map.Entry<Integer, Set<Session>> entry : roomSessions.entrySet()) {
-            	// 방 번호 뽑아오기
-            	int chatseq = entry.getKey();
-            	// 현재 그 해당 채팅방에 존재하지 않을시
-            	if(chatseq != dto.getChat_seq()) {
-            		// 채팅방에 존재하지 않는 클라이언트 정복값
-            		Set<Session> otherClients  = entry.getValue();
-            		synchronized (otherClients) {
-            			// 새로운 데이터(채팅)가 들어온 채팅방에 알람타입 send
-						for(Session otherClient : otherClients) {
-							Map<String, Object> map = new HashMap<>();
-							map.put("type", "alert");
-							map.put("chat_seq", chatseq);
-							otherClient.getBasicRemote().sendText(mapper.writeValueAsString(map));
+				synchronized (clients) {
+					for (Session client : clients) {
+						client.getBasicRemote().sendText(mapper.writeValueAsString(sendMap));
+					}
+				}
+			}
+
+			// 다른 방에 있는 클라이언트들에게 새 메시지 알림 전송
+			for (Map.Entry<Integer, Set<Session>> entry : roomSessions.entrySet()) {
+				int roomSeq = entry.getKey();
+				if (roomSeq != dto.getChat_seq()) { // 현재 메시지 방이 아니라면
+					Set<Session> otherClients = entry.getValue();
+					synchronized (otherClients) {
+						int lastSeq = cServ.lastMessageSeq(roomSeq); // 각 방의 마지막 메시지 seq 조회
+						for (Session otherClient : otherClients) {
+							Map<String, Object> alert = new HashMap<>();
+							alert.put("type", "alert");
+							alert.put("chat_seq", roomSeq);
+							otherClient.getBasicRemote().sendText(mapper.writeValueAsString(alert));
 						}
 					}
-            	}
-            }
-            
+				}
+			}
+
 		}catch(Exception e) {
 			e.printStackTrace();
 			System.out.println("오류요 ㅋㅋ");
@@ -123,10 +120,20 @@ public class ChatEndpoint {
 
 	@OnClose
 	public void onClose(Session session) {
-		// 모든 채팅방 반복문을 실행하며 현제 끊어진 세션을 찾아 제거
-        for (Set<Session> sessions : roomSessions.values()) {
-            sessions.remove(session);
-        }
+		synchronized (roomSessions) {
+			for (Map.Entry<Integer, Set<Session>> entry : roomSessions.entrySet()) {
+				int chatSeq = entry.getKey();       // 현재 방의 chat_seq
+				Set<Session> sessions = entry.getValue();
+				if (sessions.contains(session)) {      // 세션이 이 방에 속해있다면
+					String token = (String) session.getUserProperties().get("token");
+					String member_eamil = JWT.decode(token).getSubject();
+					int lastMessageSeq = cServ.lastMessageSeq(chatSeq);
+					cServ.updateLastMessageSeq(member_eamil, lastMessageSeq, chatSeq);
+					// 세션 제거
+					sessions.remove(session);
+				}
+			}
+		}
 		System.out.println("클라이언트 종료: " + session.getId());
 	}
 
@@ -135,9 +142,9 @@ public class ChatEndpoint {
 		// Throwable 사용하는 이유는 웹소캣 표준 명세에 따르면 온에러에서는 두번째 파라미터가 반드시 Throwable 을 써야한데요...
 		// Exception 써도 컴파일러는 통과하는데 정상적으로 호출되지 않거나 핸들러가 작동하지 않을수도있데용
 		// 정상적인 채팅방 종료가 아닌 오류로 인한 사용종료 처리
-		 for (Set<Session> sessions : roomSessions.values()) {
-	            sessions.remove(session);
-	        }
+		for (Set<Session> sessions : roomSessions.values()) {
+			sessions.remove(session);
+		}
 		t.printStackTrace();
 	}
 }

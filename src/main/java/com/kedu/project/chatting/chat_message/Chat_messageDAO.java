@@ -23,4 +23,9 @@ public class Chat_messageDAO {
 	public List<Chat_messageDTO> getMessageBySeq(int chat_seq){
 		return mybatis.selectList("Chat_message.getMessageBySeq", chat_seq);
 	}
+	
+	// 채팅방 마지막 메세지 seq 출력
+	public int lastMessageSeq(int chat_seq) {
+		return mybatis.selectOne("Chat_message.lastMessageSeq", chat_seq);
+	}
 }

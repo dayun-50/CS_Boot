@@ -20,5 +20,11 @@
 			ORDER BY message_at ASC
 	    ]]> 
   	</select>
-  
+  	
+  	<select id="lastMessageSeq" resultType="int">
+  		SELECT NVL(MAX(message_seq), 0) as message_seq
+		FROM chat_message
+		WHERE chat_seq = #{chat_seq}
+  	</select>
+  	
   </mapper>
