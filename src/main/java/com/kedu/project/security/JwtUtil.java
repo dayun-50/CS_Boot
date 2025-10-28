@@ -44,7 +44,7 @@ public class JwtUtil {
             .withSubject(email) 
             .withClaim("james_pw", encodedPassword) // Base64 인코딩된 비밀번호 저장
             .withIssuedAt(new Date(System.currentTimeMillis()))
-            // 💡 James 접근 티켓은 일반 JWT보다 짧은 만료 시간(예: 10분)을 갖는 것이 보안상 권장되지만,
+            //  James 접근 티켓은 일반 JWT보다 짧은 만료 시간(예: 10분)을 갖는 것이 보안상 권장되지만,
             // 여기서는 기존 exp 설정을 사용하겠습니다.
             .withExpiresAt(new Date(System.currentTimeMillis() + exp))
             .sign(this.algorithm);

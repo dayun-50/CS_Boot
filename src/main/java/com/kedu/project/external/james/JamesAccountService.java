@@ -23,6 +23,7 @@ public class JamesAccountService {
      */
     public String getDomain(String email) {
         // DAO의 JOIN 쿼리를 호출하여 도메인 이름을 가져옵니다.
+    	// member company join 회사코드 => 회사 도메인
         String domain = dao.getDomainByEmail(email); 
         
         // 조회 실패 시 (NULL일 경우) 기본 도메인 사용
@@ -30,19 +31,19 @@ public class JamesAccountService {
     }
     
     /**
-     * 💡 2. DB ID와 동적 도메인을 결합하여 James 서버 계정 ID를 생성합니다. (ID 변환)
+     *  2. DB ID와 동적 도메인을 결합하여 James 서버 계정 ID를 생성합니다. (ID 변환)
      */
     public String getJamesUsername(String fullEmail) {
-        String domain = getDomain(fullEmail); // 💡 본인의 도메인 조회
+        String domain = getDomain(fullEmail); //  본인의 도메인 조회
         String userId = fullEmail.substring(0, fullEmail.indexOf('@'));
-        return userId + "@" + domain;
+        return userId + "@" + domain; // 회사 도메인으로 메일 교체
     }
 
     // --- 3. James 서버 API 호출 (CRUD) -----------------------------------------
 
     public void createMailAccount(String email, String rawPassword) {
-        String jamesUsername = getJamesUsername(email); // 💡 ID 변환까지 내부에서 처리
-        jamesAdminClient.createMailAccount(jamesUsername, rawPassword);
+        String jamesUsername = getJamesUsername(email); //  기존 이메일 -> 회사 이메일 변환
+        jamesAdminClient.createMailAccount(jamesUsername, rawPassword); // 회사 이메일 + 평문 암호
     }
 
     public boolean authenticateUser(String email, String rawPassword) {

@@ -41,13 +41,16 @@ public class MemberController {
 	// 로그인
 	@PostMapping("/login")
 	public ResponseEntity<String> login(@RequestBody MemberDTO dto, HttpServletRequest request){
+		//바로 james 서버에 사용할 평문 비밀번호 만들어두기
 		String rawPassword = dto.getPw();
 		int result = memberService.login(dto);
 		if(result > 0) { // 로그인 성공시
 			 // 세션에 ID 저장
 	        HttpSession session = request.getSession();
 	        session.setAttribute("id", dto.getEmail());
+	        //웹 인증 토큰
 			String generalToken = jwt.createToken(dto.getEmail());
+			//james 서버 인증 토큰
 			String jamesAccessToken = jwt.createJamesToken(
 		             dto.getEmail(),    
 		             rawPassword // DTO에서 평문 비밀번호를 사용하여 토큰 B 생성

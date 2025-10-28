@@ -48,7 +48,7 @@ public class MemberService {
     	dto.setPw(Encryptor.encrypt(dto.getPw()));
         int dbResult = dao.signup(dto);
     	
-        // 4. DB 저장이 성공하면, James 서버에 메일 계정 생성
+        //  James 서버에 메일 계정 생성
         if (dbResult > 0) {
         	jamesAccountService.createMailAccount(dto.getEmail(), rawPassword);
         }

@@ -27,7 +27,7 @@ public class JamesAdminClient {
 	/**
 	 * James 서버에 새로운 메일 계정을 생성합니다.
 	 * 
-	 * @param email       생성할 이메일 주소 (member.email)
+	 * @param email       생성할 이메일 주소 (id + 회사도메인)
 	 * @param rawPassword 계정 비밀번호 (암호화되지 않은 원본)
 	 * @throws RuntimeException James 서버 통신 오류 또는 계정 생성 실패 시 발생
 	 */
@@ -37,11 +37,12 @@ public class JamesAdminClient {
 		String requestBody = String.format("{\"password\": \"%s\"}", rawPassword);
 
 		try {
-			this.webClient.put().uri("/users/{email}", email) // PUT /users/user@example.com 호출
-					.bodyValue(requestBody).retrieve()
+			this.webClient.put().uri("/users/{email}", email) // PUT /users/'id@domain.com' 호출
+					.bodyValue(requestBody).retrieve() // 비밀번호 json 전달 및 응답대기
 					.onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
-							response -> response.createException())
-					.toBodilessEntity().block();
+							response -> response.createException()) 
+					//400~ 500 에러가 발생하면 예외처리, 이문장을 넣지 않으면 webClient가 예외가 발생해도 성공으로 간주
+					.toBodilessEntity().block(); //상태코드 대기 및 동기 통신으로 전환 - 트랜젝션 완료 
 
 		} catch (WebClientResponseException e) {
 			// 4xx/5xx 응답 에러 처리
