@@ -1,6 +1,6 @@
 package com.kedu.project.pto_request;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 /*
   	연차 신청용 DTO	

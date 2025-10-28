@@ -60,7 +60,7 @@ public class MemberController {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
 		}
 	}
-
+	
 	// 비밀번호찾기(초반 이메일인증)
 	@PostMapping("/findpw")
 	public ResponseEntity<String> findpw(@RequestBody MemberDTO dto) {

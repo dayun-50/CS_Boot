@@ -8,7 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kedu.project.common.Encryptor;
+
 import com.kedu.project.external.james.JamesAccountService;
+import com.kedu.project.members.member_pto.Member_ptoDAO;
+
 
 
 
@@ -21,7 +24,12 @@ public class MemberService {
 
 	@Autowired
 	private MemberDAO dao;
-	// JamesAdminClient 주입
+
+	@Autowired
+	private Member_ptoDAO daoPTO;
+	
+
+// JamesAdminClient 주입
 
   
 	@Autowired
@@ -45,6 +53,7 @@ public class MemberService {
         	jamesAccountService.createMailAccount(dto.getEmail(), rawPassword);
         }
         return dbResult;
+
 	}
     
     
@@ -52,12 +61,14 @@ public class MemberService {
     // 로그인
     public int login(MemberDTO dto) {
 
+
         // 1. 원본 비밀번호 확보 (IMAP/SMTP 사용을 위해 필요)
         String rawPassword = dto.getPw();
        
         // 2. DB 인증을 위한 비밀번호 암호화 및 DAO 호출
         dto.setPw(Encryptor.encrypt(rawPassword)); // DB 비교를 위해 비밀번호 암호화
         int dbResult = dao.login(dto);
+
 
         // 3. DB 인증 실패 시 null 반환
         if (dbResult <= 0) {

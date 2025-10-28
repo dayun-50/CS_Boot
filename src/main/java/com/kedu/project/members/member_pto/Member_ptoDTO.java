@@ -14,6 +14,8 @@ public class Member_ptoDTO {
 		this.member_email = member_email;
 		this.remaining_pto = remaining_pto;
 	}
+	
+	
 	public String getMember_email() {
 		return member_email;
 	}

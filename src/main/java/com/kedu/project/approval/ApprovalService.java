@@ -39,28 +39,54 @@ public class ApprovalService {
         }
     } 
     
-
-   //멤버 지정 전체 리스트 조회
-    public List<ApprovalDTO> getAll(String member_email) {
-        List<ApprovalDTO> result = dao.getAll(member_email);
-        convertStatusForUI(result);
-        return result;
+    
+    //1. 모든타입의 데이터 개수 뽑아오기
+    public int getCount(String email) {
+        return dao.getCount(email);
     }
-
-    //멤버 지정 + 특정 타입 리스트 조회
-    public List<ApprovalDTO> getType(String member_email, String type) {
-        String symbolType = typeMap.get(type);
-
-        Map<String, Object> param = new HashMap<>();
-        param.put("member_email", member_email);
-        param.put("type", symbolType);
-
-        List<ApprovalDTO> result = dao.getType(param);
-        convertStatusForUI(result);
-        return result;
+    //2. 특정 타입의 데이터 개수 뽑아오기
+    public int getTypeCount(String email, String type) {
+    	String symbolType = typeMap.get(type);
+    	
+    	Map<String, Object> param = new HashMap<>();
+    	param.put("member_email", email);
+    	param.put("approval_status", symbolType);
+    	
+    	return dao.getTypeCount(param);
     }
     
-    //디테일 보드
+    
+   //3. 모든 타입에 대하여 멤버 지정 페이지에 따른 데이터 조회 
+    public List<ApprovalDTO> selectFromTo(String member_email, int start, int end) {
+    	Map<String, Object> param = new HashMap<>();
+    	param.put("member_email", member_email);
+    	param.put("start", start);
+    	param.put("end", end);
+    	
+        List<ApprovalDTO> result = dao.selectFromTo(param);
+        convertStatusForUI(result);
+        return result;
+    }
+
+    //4. 특정 타입에 대하여 맴버 지정 페이지에 따른 데이터 조회
+    public List<ApprovalDTO> selectTypeFromTo(String member_email, String type, int start, int end){
+        String symbolType = typeMap.get(type);
+        
+    	Map<String, Object> param = new HashMap<>();
+    	param.put("member_email", member_email);
+        param.put("approval_status", symbolType);    	
+    	param.put("start", start);
+    	param.put("end", end);
+    	
+        List<ApprovalDTO> result = dao.selectTypeFromTo(param);
+        convertStatusForUI(result);
+        
+        System.out.println("요청 type: " + type);
+        System.out.println("매핑된 symbolType: " + symbolType);
+        return result;    	
+    }
+
+    //5. 디테일 보드
     public ApprovalDTO getDetailBySeq(String member_email, int seq) {
     	Map<String,Object> param = new HashMap<>();
     	param.put("member_email", member_email);
@@ -73,12 +99,12 @@ public class ApprovalService {
     	return result;
     }
     
-    //디테일 보드 수정 (업데이트)
+    //6. 디테일 보드 수정 (업데이트)
     public int updateDetailBoard(ApprovalDTO dto) {
     	return dao.updateDetailBoard(dto);
     }
     
-    //디테일 보드 삭제
+    //7. 디테일 보드 삭제
     public int deleteDetailBoard(int approval_seq, String member_email) {
     	Map<String, Object> param= new HashMap<>();
     	param.put("approval_seq", approval_seq);
@@ -86,9 +112,10 @@ public class ApprovalService {
     	return dao.deleteDetailBoard(param);
     }
     
-    //보드 작성
+    //8. 보드 작성
     public int upload(ApprovalDTO dto) {
-    	return dao.upload(dto);
+        dao.upload(dto);
+        return dto.getApproval_seq(); 
     }
     
     

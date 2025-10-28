@@ -40,10 +40,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<!--<dependency>
+		
+		<!--구글 클라우드 업로드용-->
+		<dependency>
 			<groupId>com.google.cloud</groupId>
 			<artifactId>spring-cloud-gcp-starter-storage</artifactId>
-		</dependency>-->
+		</dependency>
 		
 	<!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->
 	
