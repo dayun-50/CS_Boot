@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import com.kedu.project.chatting.chat_message.Chat_messageDAO;
 import com.kedu.project.chatting.chat_room.Chat_roomDAO;
 import com.kedu.project.chatting.chat_room.Chat_roomDTO;
+import com.kedu.project.contact.ContactDAO;
+import com.kedu.project.contact.ContactDTO;
 import com.kedu.project.members.member.MemberDAO;
 import com.kedu.project.members.member.MemberDTO;
 
@@ -26,12 +28,15 @@ public class Chat_memberService {
 
 	@Autowired
 	private Chat_roomDAO roomDao;
-	
+
 	@Autowired
 	private Chat_messageDAO cMDao;
 
 	@Autowired
 	private MemberDAO memberDao;
+
+	@Autowired
+	private ContactDAO ContactDAO;
 
 	// 팀원간 개인 메세지 목록 출력 및 생성(없을시)
 	public List<Map<String, Object>> privatChatSearch(MemberDTO dto){
@@ -177,6 +182,19 @@ public class Chat_memberService {
 			list.put("CHAT_NAME", cleanedName);
 		}
 		return list;
+	}
+
+	// 채널 추가 주소록 출력 
+	public List<ContactDTO> contactList(Chat_memberDTO dto){
+		String eamil = dto.getMember_email();
+		List<ContactDTO> list = ContactDAO.contactList(eamil);
+		list.removeIf(l -> memberDao.checkMember(l.getEmail()) == 0);
+		return list;
+	}
+
+	// 채널 추가
+	public int newCaht(ContactDTO dto) {
+		String memberName =  ContactDAO.selectName(dto.getContact_seq());
 	}
 
 }

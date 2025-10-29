@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kedu.project.contact.ContactDTO;
 import com.kedu.project.members.member.MemberDTO;
 
 
@@ -48,5 +49,19 @@ public class Chat_memberController {
 	public ResponseEntity<Map<String, Object>> chatRoom(@RequestBody Chat_memberDTO dto){
 		Map<String, Object> chatRoom = Chat_memberService.ChatRoom(dto);
 		return ResponseEntity.ok(chatRoom);
+	}
+	
+	// 채널 추가 주소록 출력
+	@PostMapping("/contactList")
+	public ResponseEntity<List<ContactDTO>> contactList(@RequestBody Chat_memberDTO dto){
+		List<ContactDTO> list = Chat_memberService.contactList(dto);
+		System.out.println(dto.getMember_email());
+		return ResponseEntity.ok(list);
+	}
+	
+	// 채널 추가
+	@PostMapping("/newCaht")
+	public ResponseEntity<?> newCaht(@RequestBody ContactDTO dto){
+		
 	}
 }
