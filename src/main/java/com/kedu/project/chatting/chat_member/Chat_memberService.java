@@ -9,6 +9,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.kedu.project.chatting.chat_message.Chat_messageDAO;
 import com.kedu.project.chatting.chat_room.Chat_roomDAO;
 import com.kedu.project.chatting.chat_room.Chat_roomDTO;
 import com.kedu.project.members.member.MemberDAO;
@@ -25,6 +26,9 @@ public class Chat_memberService {
 
 	@Autowired
 	private Chat_roomDAO roomDao;
+	
+	@Autowired
+	private Chat_messageDAO cMDao;
 
 	@Autowired
 	private MemberDAO memberDao;
@@ -40,6 +44,10 @@ public class Chat_memberService {
 			System.out.println(checkChat);
 			Map<String, Object> map = new HashMap<>();
 			if(checkChat > 0) { // 채팅방 존재시 map에 기록
+				int chatRoomLastMessageSeq = cMDao.lastMessageSeq(checkChat);
+				int myLastMessageSeq = dao.getLastMessageSeq(dto.getEmail(), checkChat);
+				// 내가 마지막으로 읽은 메세지보다 더 신규 메세지가 있다면
+				map.put("alert", myLastMessageSeq < chatRoomLastMessageSeq ? "y" : "");
 				map.put("chat_seq", checkChat);
 				map.put("level_code", members.getLevel_code());
 				map.put("name", members.getName());
@@ -64,6 +72,7 @@ public class Chat_memberService {
 				member.setRole("general");
 				dao.insertCahtMember(member);
 				// 정보 포장
+				map.put("alert", "");
 				map.put("chat_seq", chatSeq);
 				map.put("level_code", members.getLevel_code());
 				map.put("name", members.getName());
@@ -91,6 +100,10 @@ public class Chat_memberService {
 				members.setRole("general");
 				dao.insertCahtMember(members);
 			}
+			int chatRoomLastMessageSeq = cMDao.lastMessageSeq(checkChat);
+			int myLastMessageSeq = dao.getLastMessageSeq(dto.getEmail(), checkChat);
+			// 내가 마지막으로 읽은 메세지보다 더 신규 메세지가 있다면
+			map.put("alert", myLastMessageSeq < chatRoomLastMessageSeq ? "y" : "");
 			map.put("chat_seq", checkChat);
 			map.put("chat_name", department+" 단체 채팅");
 		}else {
@@ -115,6 +128,7 @@ public class Chat_memberService {
 				member.setRole("general");
 				dao.insertCahtMember(member);
 			}
+			map.put("alert", "");
 			map.put("chat_seq", chatSeq);
 			map.put("chat_name", department+" 단체 채팅");
 		}
@@ -126,6 +140,7 @@ public class Chat_memberService {
 			if(!chat.get("CHAT_NAME").equals(department + " 단체 채팅")) {
 				list.add(chat);
 			}
+			chat.put("alert", "");
 			chat.put("chat_seq", chat.get("CHAT_SEQ"));
 			chat.put("chat_name", chat.get("CHAT_NAME"));
 			chat.remove("CHAT_NAME");chat.remove("CHAT_SEQ");

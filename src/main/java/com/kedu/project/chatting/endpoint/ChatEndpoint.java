@@ -101,11 +101,10 @@ public class ChatEndpoint {
 				if (roomSeq != dto.getChat_seq()) { // 현재 메시지 방이 아니라면
 					Set<Session> otherClients = entry.getValue();
 					synchronized (otherClients) {
-						int lastSeq = cServ.lastMessageSeq(roomSeq); // 각 방의 마지막 메시지 seq 조회
 						for (Session otherClient : otherClients) {
 							Map<String, Object> alert = new HashMap<>();
 							alert.put("type", "alert");
-							alert.put("chat_seq", roomSeq);
+							alert.put("chat_seq", dto.getChat_seq());
 							otherClient.getBasicRemote().sendText(mapper.writeValueAsString(alert));
 						}
 					}
