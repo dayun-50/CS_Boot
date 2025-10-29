@@ -71,4 +71,14 @@ public class ScheduleService {
 	public int deleteEvent(ScheduleDTO dto) {
 		return dao.deleteEvent(dto);
 	}
+	
+	// 마이페이지 일정출력
+	public List<ScheduleDTO> selectMySchedule(ScheduleDTO dto){
+		List<ScheduleDTO> list = dao.selectMySchedule(dto);
+		for(ScheduleDTO l : list) {
+			String name = memberDao.selectMemberName(l.getMember_email());
+			l.setMember_email(name);
+		}
+		return list;
+	}
 }

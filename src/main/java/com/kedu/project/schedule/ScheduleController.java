@@ -53,4 +53,12 @@ public class ScheduleController {
 		ScheduleService.deleteEvent(dto);
 		return ResponseEntity.ok(null);
 	}
+	
+	// 마이페이지 일정출력
+	@PostMapping("/myschedule")
+	public ResponseEntity<List<ScheduleDTO>> selectMySchedule(@RequestBody ScheduleDTO dto){
+		List<ScheduleDTO> list = ScheduleService.selectMySchedule(dto);
+		System.out.println(dto.getMember_email());
+		return ResponseEntity.ok(list);
+	}
 }
