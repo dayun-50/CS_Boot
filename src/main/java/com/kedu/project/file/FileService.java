@@ -127,34 +127,41 @@ public class FileService {
     }
     
     //5. 시스네임으로 다운로드
-    public ResponseEntity<InputStreamResource> streamDownload( String sysname, String file_type) {
-        try {
-            String objectPath = file_type + "/" + sysname;
-            Blob blob = storage.get(bucketName, objectPath);
-            if (blob == null) {
-                return ResponseEntity.notFound().build();
-            }
+    public Map<String, Object> getFileStream(String sysname, String file_type) {
+        Map<String, Object> result = new HashMap<>();
+        String objectPath = file_type + "/" + sysname;
+        Blob blob = storage.get(bucketName, objectPath);
+        if (blob == null) return null;
 
-            String oriName = fileDao.findOriNameBySysName(sysname);
-            String encodedName = URLEncoder.encode(oriName, "UTF-8").replaceAll("\\+", "%20");
+        String oriName = fileDao.findOriNameBySysName(sysname);
+        InputStream inputStream = new ByteArrayInputStream(blob.getContent());
 
-            // GCS에서 바로 InputStream으로 읽기
-            InputStream inputStream = new ByteArrayInputStream(blob.getContent());
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", encodedName);
-
-            // InputStreamResource로 바로 스트리밍
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(new InputStreamResource(inputStream));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
-        }
+        result.put("oriName", oriName);
+        result.put("stream", inputStream);
+        return result;
     }
+	/*
+	 * public ResponseEntity<InputStreamResource> streamDownload( String sysname,
+	 * String file_type) { try { String objectPath = file_type + "/" + sysname; Blob
+	 * blob = storage.get(bucketName, objectPath); if (blob == null) { return
+	 * ResponseEntity.notFound().build(); }
+	 * 
+	 * String oriName = fileDao.findOriNameBySysName(sysname); String encodedName =
+	 * URLEncoder.encode(oriName, "UTF-8").replaceAll("\\+", "%20");
+	 * 
+	 * // GCS에서 바로 InputStream으로 읽기 InputStream inputStream = new
+	 * ByteArrayInputStream(blob.getContent());
+	 * 
+	 * HttpHeaders headers = new HttpHeaders();
+	 * headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+	 * headers.setContentDispositionFormData("attachment", encodedName);
+	 * 
+	 * // InputStreamResource로 바로 스트리밍 return ResponseEntity.ok() .headers(headers)
+	 * .body(new InputStreamResource(inputStream));
+	 * 
+	 * } catch (Exception e) { e.printStackTrace(); return
+	 * ResponseEntity.internalServerError().build(); } }
+	 */
 
     
 }
