@@ -63,7 +63,7 @@
     </select>
     
     <select id="selectName" resultType="String">
-    	select email from  where contact_seq = #{seq}
+    	select email from contact where contact_seq = #{seq}
     </select>
   
   </mapper>

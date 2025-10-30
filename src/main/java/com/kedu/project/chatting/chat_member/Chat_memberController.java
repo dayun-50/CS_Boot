@@ -29,28 +29,28 @@ public class Chat_memberController {
 		List<Map<String, Object>> list = Chat_memberService.privatChatSearch(dto);
 		return ResponseEntity.ok(list);
 	}
-	
+
 	// 부서 단체 톡방 생성 및 단체 톡방 출력
 	@PostMapping("/chatRoomList")
 	public ResponseEntity<List<Map<String, Object>>> chatRoomList(@RequestBody MemberDTO dto){
 		List<Map<String, Object>> list = Chat_memberService.chatRoomList(dto);
 		return ResponseEntity.ok(list);
 	}
-	
+
 	// 종료된 프로젝트 채팅방 출력
 	@PostMapping("/completedList")
 	public ResponseEntity<List<Map<String, Object>>> completedList(@RequestBody MemberDTO dto){
 		List<Map<String, Object>> list = Chat_memberService.completedList(dto);
 		return ResponseEntity.ok(list);
 	}
-	
+
 	// 부서원 제외 개인 채팅방 정보 출력
 	@PostMapping("/chatRoom")
 	public ResponseEntity<Map<String, Object>> chatRoom(@RequestBody Chat_memberDTO dto){
 		Map<String, Object> chatRoom = Chat_memberService.ChatRoom(dto);
 		return ResponseEntity.ok(chatRoom);
 	}
-	
+
 	// 채널 추가 주소록 출력
 	@PostMapping("/contactList")
 	public ResponseEntity<List<ContactDTO>> contactList(@RequestBody Chat_memberDTO dto){
@@ -58,10 +58,13 @@ public class Chat_memberController {
 		System.out.println(dto.getMember_email());
 		return ResponseEntity.ok(list);
 	}
-	
+
 	// 채널 추가
 	@PostMapping("/newCaht")
-	public ResponseEntity<?> newCaht(@RequestBody ContactDTO dto){
-		
+	public ResponseEntity<?> newCaht(@RequestBody Map<String, Object> body){
+		String ownerEmail = (String) body.get("owner_email");
+		List<Object> contactSeq = (List<Object>)body.get("contact_seq");	
+		int chatSeq = Chat_memberService.newCaht(ownerEmail, contactSeq);
+		return ResponseEntity.ok(chatSeq);
 	}
 }

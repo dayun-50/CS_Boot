@@ -140,8 +140,18 @@ public class Chat_memberService {
 		list.add(map);
 		// 내가 참여하고있는 단톡방 서치 (같은 부서제외)
 		List<Map<String, Object>> myChats = roomDao.selectChatRoom(dto, department);
+		System.out.println(myChats);
 		// 회사 단체 채팅은 제외하고 위에서 했으니까
 		for(Map<String, Object> chat : myChats) {
+			int memberCount = dao.memberCount(chat.get("CHAT_SEQ").toString());
+			if(memberCount <= 2) {
+				String chatName = (String) chat.get("CHAT_NAME");
+				// 사원 이름 출력
+				String username = memberDao.selectMemberName(dto.getEmail());
+				// 채팅방 이름에서 사원 이름을 제거후 저장
+				String cleanedName = chatName.replaceAll(username, "");
+				chat.put("CHAT_NAME", cleanedName);
+			}
 			if(!chat.get("CHAT_NAME").equals(department + " 단체 채팅")) {
 				list.add(chat);
 			}
@@ -193,8 +203,33 @@ public class Chat_memberService {
 	}
 
 	// 채널 추가
-	public int newCaht(ContactDTO dto) {
-		String memberName =  ContactDAO.selectName(dto.getContact_seq());
+	public int newCaht(String ownerEmail, List<Object> contactSeq) {
+		List<String> memberList = new ArrayList<>();
+		for(Object list : contactSeq) {
+			int contact_seq = (int)list;
+			String memberEmail =  ContactDAO.selectName(contact_seq);
+			memberList.add(memberEmail);
+		}
+		// 채팅방 생성 후 채팅방 seq 반환
+		Chat_roomDTO dto = new Chat_roomDTO();
+		dto.setChat_name("asdf"); // 나중에 받아야함
+		dto.setManager_email(ownerEmail);
+		int chatSeq = roomDao.insertPirvateCahtRoom(dto);
+		// chat_member insert (생성자)
+		Chat_memberDTO manager = new Chat_memberDTO();
+		manager.setChat_seq(chatSeq);
+		manager.setMember_email(ownerEmail);
+		manager.setRole("manager");
+		dao.insertCahtMember(manager);
+		// chat_member insert (초대받은인원)
+		for(String member : memberList) {
+			Chat_memberDTO chat_memberDTO = new Chat_memberDTO();
+			chat_memberDTO.setChat_seq(chatSeq);
+			chat_memberDTO.setMember_email(member);
+			chat_memberDTO.setRole("general");
+			dao.insertCahtMember(chat_memberDTO);
+		}
+		return chatSeq;
 	}
 
 }
