@@ -33,7 +33,7 @@
 	 </select>
 	 
 	 <insert id="insertChat">
-	 	insert into chat_member values (#{chat_seq}, #{member_email}, #{role})
+	 	insert into chat_member values (#{chat_seq}, #{member_email}, #{role}, 0)
 	 </insert>
 	 
 	 <select id="existDepartmentRoom" resultType="int">
@@ -43,5 +43,17 @@
 	 <select id="countMember" resultType="int">
 	 	select count(*) from chat_member where chat_seq = #{chat_seq}
 	 </select>
+	 
+	<update id="updateLastMessageSeq">
+		update chat_member set last_message_seq = #{last_message_seq} where chat_seq = #{chat_seq} and member_email = #{member_email}
+	</update>
+	
+	<select id="selectMember" resultType="String">
+		select member_email from chat_member where chat_seq = #{chat_seq}
+	</select>
+	
+	<select id="getLastMessageSeq" resultType="int">
+  		select last_message_seq from chat_member where member_email = #{member_email} and chat_seq = #{chat_seq}
+  	</select>
 	  	
   </mapper>

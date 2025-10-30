@@ -38,8 +38,7 @@ public class ApprovalController {
    private ApprovalService approvalService;
    @Autowired //파일 트랜잭셔널 처리용 레이어
    private ApprovalFacadeService approvalFService;
-   @Autowired //파일 처리용 레이어
-   private FileService fileService;
+ 
 
     
     //특정 아이디에 대하여, 타입과 페이지에 따라 해당하는 값만 꺼내오기
