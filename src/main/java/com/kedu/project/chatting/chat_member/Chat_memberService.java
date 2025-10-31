@@ -110,6 +110,7 @@ public class Chat_memberService {
 			// 내가 마지막으로 읽은 메세지보다 더 신규 메세지가 있다면
 			map.put("alert", myLastMessageSeq < chatRoomLastMessageSeq ? "y" : "");
 			map.put("chat_seq", checkChat);
+			map.put("dept_code", department);
 			map.put("chat_name", department+" 단체 채팅");
 		}else {
 			// 같은 부서의 팀 정보 출력
@@ -134,6 +135,7 @@ public class Chat_memberService {
 				dao.insertCahtMember(member);
 			}
 			map.put("alert", "");
+			map.put("dept_code", department);
 			map.put("chat_seq", chatSeq);
 			map.put("chat_name", department+" 단체 채팅");
 		}
@@ -203,7 +205,7 @@ public class Chat_memberService {
 	}
 
 	// 채널 추가
-	public int newCaht(String ownerEmail, List<Object> contactSeq) {
+	public int newCaht(String ownerEmail, String title, List<Object> contactSeq) {
 		List<String> memberList = new ArrayList<>();
 		for(Object list : contactSeq) {
 			int contact_seq = (int)list;
@@ -212,7 +214,7 @@ public class Chat_memberService {
 		}
 		// 채팅방 생성 후 채팅방 seq 반환
 		Chat_roomDTO dto = new Chat_roomDTO();
-		dto.setChat_name("asdf"); // 나중에 받아야함
+		dto.setChat_name(title); // 나중에 받아야함
 		dto.setManager_email(ownerEmail);
 		int chatSeq = roomDao.insertPirvateCahtRoom(dto);
 		// chat_member insert (생성자)

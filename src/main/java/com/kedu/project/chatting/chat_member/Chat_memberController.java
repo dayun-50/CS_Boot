@@ -63,8 +63,9 @@ public class Chat_memberController {
 	@PostMapping("/newCaht")
 	public ResponseEntity<?> newCaht(@RequestBody Map<String, Object> body){
 		String ownerEmail = (String) body.get("owner_email");
+		String title = (String) body.get("title");
 		List<Object> contactSeq = (List<Object>)body.get("contact_seq");	
-		int chatSeq = Chat_memberService.newCaht(ownerEmail, contactSeq);
+		int chatSeq = Chat_memberService.newCaht(ownerEmail, title, contactSeq);
 		return ResponseEntity.ok(chatSeq);
 	}
 }
