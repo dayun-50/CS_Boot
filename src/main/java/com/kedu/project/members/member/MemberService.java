@@ -14,7 +14,6 @@ import com.kedu.project.members.member_pto.Member_ptoDAO;
 
 
 
-
 /*
  * 		사원 회원가입 및 마이페이지 구현 Service
  * */
@@ -27,9 +26,7 @@ public class MemberService {
 
 	@Autowired
 	private Member_ptoDAO daoPTO;
-	
-	
-	
+
 
 // JamesAdminClient 주입
 
@@ -37,6 +34,7 @@ public class MemberService {
 	@Autowired
     private JamesAccountService jamesAccountService;
     
+
 
     // ----------------------------------------------------
     // 회원가입 (DB 저장 + James 계정 생성)
@@ -66,12 +64,13 @@ public class MemberService {
         throw e;
     }
 
-	}
+    }
     
     
 
     // 로그인
     public int login(MemberDTO dto) {
+
 
 
         // 1. 원본 비밀번호 확보 (IMAP/SMTP 사용을 위해 필요)
@@ -132,11 +131,19 @@ public class MemberService {
 		return dao.updateMypage(dto);
 	}
 
-	
-////	회사코드 연락처연동할 코드
-//	public String getCompanyCodeByEmail(String email) {
-//		return dao.getCompanyCodeByEmail(email);
-//	}
+
+	// -------------------- 주소록에 좀 뽑을게 --------------------------------
+	// 이메일로 company_code 조회 - 주소록 추가시 팔요하여 넣음
+	public String getCompanyCodeByEmail(String email) {
+		MemberDTO member = dao.findByEmail(email);
+		return member != null ? member.getCompany_code() : null;
+	}
+
+	// 부서
+	public String getDeptCodeByEmail(String email) {
+		// DAO를 통해 실제 부서 코드(DEPT_CODE)를 조회하도록 수정
+		return dao.getDeptCodeByEmail(email);
+	}
 
 
 }

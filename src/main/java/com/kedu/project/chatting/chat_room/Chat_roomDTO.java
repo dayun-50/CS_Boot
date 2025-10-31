@@ -7,7 +7,7 @@ package com.kedu.project.chatting.chat_room;
 public class Chat_roomDTO {
 	private int chat_seq; // 채팅방 고유번호
 	private String chat_name; // 채팅방 이름
-	private String manager_email; // 채팅방 권한자 아이디( 생성자 )
+	private String manager_email; // 채팅방 권한자 아이디	( 생성자 )
 	private String project_progress; // 프로젝트 진행현황 ( default : y, 종료 : n )
 	
 	public Chat_roomDTO() {}

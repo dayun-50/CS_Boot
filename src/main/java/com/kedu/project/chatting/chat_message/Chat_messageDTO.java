@@ -1,6 +1,5 @@
 package com.kedu.project.chatting.chat_message;
 
-import java.security.Timestamp;
 
 /*
   채팅 메세지 DTO
