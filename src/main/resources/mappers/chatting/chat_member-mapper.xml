@@ -7,7 +7,9 @@
   
   <mapper namespace="Chat_member">
   	
-  	 <select id="checkPrivateChat" resultType="int">
+  
+	 
+	   	 <select id="checkPrivateChat" resultType="int">
 		SELECT cm.chat_seq
 		FROM chat_member cm
 		JOIN chat_room cr ON cm.chat_seq = cr.chat_seq
@@ -17,6 +19,7 @@
 		   AND SUM(CASE WHEN cm.member_email = #{email1} THEN 1 ELSE 0 END) = 1
 		   AND SUM(CASE WHEN cm.member_email = #{email2} THEN 1 ELSE 0 END) = 1
 	 </select>
+	 
 	 
 	 <insert id="insertChat">
 	 	insert into chat_member values (#{chat_seq}, #{member_email}, #{role}, 0)
