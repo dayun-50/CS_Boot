@@ -15,7 +15,7 @@ public class SecurityConfig {
 		http
 		.csrf(csrf -> csrf.disable())   // CSRF 비활성화
 		.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/**").permitAll() // WebSocket 허용
+				.requestMatchers("/**").permitAll() 
 				.anyRequest().authenticated()
 				)
 		.httpBasic(httpBasic -> {}); // 최신 방식, 빈 람다로 대체

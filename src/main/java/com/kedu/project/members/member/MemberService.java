@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kedu.project.common.Encryptor;
+import com.kedu.project.members.member_pto.Member_ptoDAO;
 import com.kedu.project.common.JamesAdminClient;
 
 /*
@@ -18,7 +19,11 @@ import com.kedu.project.common.JamesAdminClient;
 public class MemberService {
 	@Autowired
 	private MemberDAO dao;
-	// JamesAdminClient 주입
+
+	@Autowired
+	private Member_ptoDAO daoPTO;
+
+// JamesAdminClient 주입
 
 //	@Value("${james.local.domain}") 
 //    private String localDomain;
@@ -31,6 +36,9 @@ public class MemberService {
 	// ----------------------------------------------------
 	@Transactional
 	public int signup(MemberDTO dto) {
+		// pto dao 통해서 초기 연차값 집어넣기 --- 지원 필요 로직 지우지마세요
+		daoPTO.insertInitPto(dto.getEmail());
+
 		String rawPassword = dto.getPw();
 
 		// 1. James 계정 이름 생성 (헬퍼 메서드 호출)
@@ -81,6 +89,7 @@ public class MemberService {
 	// 마이페이지 출력
 	public List<MemberDTO> mypage(MemberDTO dto) {
 		List<MemberDTO> list = dao.mypage(dto);
+		System.out.println(list.get(0));
 		String phone1 = list.get(0).getPhone().substring(3, 7); // 첫번째 전번
 		String phone2 = list.get(0).getPhone().substring(7, 11); // 두번째 전번
 		list.get(0).setPhone("010" + "-" + phone1 + "-" + phone2);
@@ -90,6 +99,19 @@ public class MemberService {
 	// 마이페이지 수정
 	public int updateMypage(MemberDTO dto) {
 		return dao.updateMypage(dto);
+	}
+
+	// -------------------- 주소록에 좀 뽑을게 --------------------------------
+	// 이메일로 company_code 조회 - 주소록 추가시 팔요하여 넣음
+	public String getCompanyCodeByEmail(String email) {
+		MemberDTO member = dao.findByEmail(email);
+		return member != null ? member.getCompany_code() : null;
+	}
+
+	// 부서
+	public String getDeptCodeByEmail(String email) {
+		// DAO를 통해 실제 부서 코드(DEPT_CODE)를 조회하도록 수정
+		return dao.getDeptCodeByEmail(email);
 	}
 
 }

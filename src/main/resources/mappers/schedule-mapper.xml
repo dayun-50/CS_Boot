@@ -5,11 +5,56 @@
   
   <!-- 일정표 -->
   
-  
- <!-- 오류 방지 예시용 고쳐쓰시오. -->
-  <mapper namespace="Test">
-  	<select id="test15" resultType="com.kedu.project.members.member.MemberDTO">
-  		select * from member
+  <mapper namespace="Schedule">
+  	<select id="selectMember" resultType="com.kedu.project.members.member.MemberDTO">
+  		SELECT 
+  			m.email,
+		    m.name,
+		    j.level_name AS level_code
+		FROM chat_member cm
+		JOIN member m 
+		    ON cm.member_email = m.email
+		LEFT JOIN job_level j 
+		    ON m.level_code = j.level_code
+		WHERE cm.chat_seq = #{chat_seq}
+		  AND cm.member_email != #{member_email}
   	</select>
   
+  	<insert id="savaEvent">
+  		insert into schedule values(schedule_seq.nextval, #{member_email},
+  		#{title}, #{all_day}, #{color}, #{start_at}, #{end_at}, sysdate, #{chat_seq})
+  	</insert>
+  	
+  	<select id="eventsList" resultType="com.kedu.project.schedule.ScheduleDTO">
+  		select * from schedule where chat_seq = #{chat_seq}
+  	</select>
+  		
+  	<select id="eventsListByEmail" resultType="com.kedu.project.schedule.ScheduleDTO">
+  		  SELECT *
+		  FROM schedule
+		  WHERE chat_seq = #{chat_seq}
+		    <if test="excludeEmails != null and excludeEmails.size() > 0">
+		      AND member_email NOT IN
+		      <foreach item="email" collection="excludeEmails" open="(" separator="," close=")">
+		        #{email}
+		      </foreach>
+		    </if>
+  	</select>
+  	
+  	<delete id="deleteEvent">
+  		delete from schedule where schedule_seq = #{schedule_seq}
+  	</delete>
+  	
+  	<select id="selectMySchedule" resultType="com.kedu.project.schedule.ScheduleDTO"> 
+  		<![CDATA[ SELECT *
+					FROM (
+					    SELECT *
+					    FROM schedule
+					    WHERE member_email = #{member_email}
+					      AND start_at > CURRENT_TIMESTAMP
+					    ORDER BY start_at ASC
+					)
+					WHERE ROWNUM <= 5   
+					]]> 
+  	</select>
   </mapper>

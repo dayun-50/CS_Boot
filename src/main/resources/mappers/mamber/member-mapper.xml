@@ -17,7 +17,7 @@
   	<select id="selectById" resultType="Integer"  parameterType="com.kedu.project.members.member.MemberDTO">
   		select count(*) from member where email = #{email}
   	</select>
-  	
+
   	<update id="updateByGnewpw">
   		update member set pw = #{pw} where email = #{email}
   	</update>
@@ -68,5 +68,24 @@
   	<select id="selectMemberName" resultType="String">
   		select name from member where email = #{member_email}
   	</select>
+  	
+  	<select id="checkMember" resultType="int">
+  		select count(*) from member where email = #{email}
+  	</select>
+  	
+  	<!-- 아래는 지원 사용:입사일 기준 연차 지급용으로 필요 -->
+	<!-- 모든 멤버 뽑아오기 -->
+  	<select id="selectAll" resultType="com.kedu.project.members.member.MemberDTO">
+  		select * from member
+  	</select>
+  	<!-- 아이디로 디티오 뽑아오기-->
+  	  <select id="findByEmail" resultType="com.kedu.project.members.member.MemberDTO">
+  		select * from member where email=#{email}
+  	</select> 
+  	
+  	<!-- 주소록에 좀 쓸게  -->
+  	<select id="getDeptCodeByEmail" resultType="String" parameterType="String">
+        SELECT DEPT_CODE FROM member WHERE EMAIL = #{email}
+    </select>
 
   </mapper>

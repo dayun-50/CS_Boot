@@ -1,6 +1,6 @@
 package com.kedu.project.notice;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 /*
  	공지사항 DTO

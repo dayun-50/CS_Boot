@@ -1,5 +1,6 @@
 package com.kedu.project.chatting.chat_member;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
@@ -34,5 +35,22 @@ public class Chat_memberDAO {
 				"email", dto.getEmail(),
 				"chat_seq", seq));
 	}
-	
+
+	// last_message_seq insert
+	public int updateLastMessageSeq(Chat_memberDTO dto) {
+		return mybatis.update("Chat_member.updateLastMessageSeq", dto);
+	}
+
+	// 채팅방 멤버 뽑기
+	public List<String> getMembersByRoomSeq(int chat_seq){
+		return mybatis.selectList("Chat_member.selectMember", chat_seq);
+	}
+
+	// 마지막으로 읽은 메세지 시퀀스 뽑기
+	public int getLastMessageSeq(String email, int chatSeq) {
+		return mybatis.selectOne("Chat_member.getLastMessageSeq", Map.of(
+				"member_email", email,
+				"chat_seq", chatSeq));
+	}
+
 }

@@ -25,10 +25,8 @@ public class Chat_roomDAO {
 	}
 
 	// 부서 단체 톡방 있는지 검사
-	public int searchRoom(MemberDTO dto, String departmentChatRoom) {
-		return mybatis.selectOne("Chat_room.searchRoom", Map.of(
-				"manager_email", dto.getEmail(),
-				"departmentChatRoom", departmentChatRoom));
+	public int searchRoom(String departmentChatRoom) {
+		return mybatis.selectOne("Chat_room.searchRoom",departmentChatRoom );
 	}
 	
 	// 부서 단톡이 없을시 생성
@@ -37,7 +35,7 @@ public class Chat_roomDAO {
 		return dto.getChat_seq();
 	}
 	
-	// 본인이 참여 되어있는 채팅방 출력
+	// 본인이 참여 되어있는 단체 채팅방 출력
 	public List<Map<String, Object>> selectChatRoom(MemberDTO dto, String department){
 		return mybatis.selectList("Chat_room.selectChatRoomList", Map.of(
 				"email", dto.getEmail(),
@@ -49,7 +47,7 @@ public class Chat_roomDAO {
 		return mybatis.selectList("Chat_room.completedList", dto);
 	}
 	
-	// 채팅방 정보 출력
+	// 부서원 제외 개인 채팅방 정보 출력
 	public Map<String, Object> chatRoom(Chat_memberDTO dto){
 		return mybatis.selectOne("Chat_room.selectChatRoom", dto);
 	}

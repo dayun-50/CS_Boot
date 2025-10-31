@@ -8,6 +8,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.kedu.project.chatting.chat_member.Chat_memberDAO;
+import com.kedu.project.chatting.chat_member.Chat_memberDTO;
 import com.kedu.project.members.member.MemberDAO;
 
 
@@ -18,6 +20,9 @@ import com.kedu.project.members.member.MemberDAO;
 public class Chat_messageService {
 	@Autowired
 	private Chat_messageDAO dao;
+	
+	@Autowired
+	private Chat_memberDAO cMemberDao;
 	
 	@Autowired
 	private MemberDAO memberDao;
@@ -44,5 +49,30 @@ public class Chat_messageService {
 	        messageList.add(map);
 	    }
 	    return messageList;
+	}
+	
+	// 채팅방 마지막 메세지 시퀀스값 출력
+	public int lastMessageSeq(int chatSeq) {
+		return dao.lastMessageSeq(chatSeq);
+	}
+	
+	// 채팅방 마지막 메세지 시퀀스 입력
+	public int updateLastMessageSeq(String email, int messageSeq, int chatSeq) {
+		Chat_memberDTO dto = new Chat_memberDTO();
+		dto.setLast_message_seq(messageSeq);
+		dto.setMember_email(email);
+		dto.setChat_seq(chatSeq);
+		
+		return cMemberDao.updateLastMessageSeq(dto);
+	}
+	
+	// 채팅방 멤버 뽑아오기
+	public List<String> getMembersByRoomSeq(int chat_seq){
+		return cMemberDao.getMembersByRoomSeq(chat_seq);
+	}
+	
+	// 마지막으로 읽은 메세지 시퀀스 뽑기
+	public int getLastMessageSeq(String email, int chatSeq) {
+		return cMemberDao.getLastMessageSeq(email,chatSeq);
 	}
 }

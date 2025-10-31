@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kedu.project.contact.ContactDTO;
 import com.kedu.project.members.member.MemberDTO;
 
 
@@ -22,30 +23,40 @@ public class Chat_memberController {
 	@Autowired
 	private Chat_memberService Chat_memberService;
 
-	// 팀원간 개인 메세지 출력 
+	// 팀원간 개인 메세지방 출력 
 	@PostMapping("/private")
 	public ResponseEntity<List<Map<String, Object>>> privateChat(@RequestBody MemberDTO dto) {
 		List<Map<String, Object>> list = Chat_memberService.privatChatSearch(dto);
 		return ResponseEntity.ok(list);
 	}
 	
-	// 단체 톡방 및 팀원 제외 개인톡방 출력
+	// 부서 단체 톡방 생성 및 단체 톡방 출력
 	@PostMapping("/chatRoomList")
 	public ResponseEntity<List<Map<String, Object>>> chatRoomList(@RequestBody MemberDTO dto){
 		List<Map<String, Object>> list = Chat_memberService.chatRoomList(dto);
 		return ResponseEntity.ok(list);
 	}
 	
-	// 종된 프로젝트 채팅방 출력
+	// 종료된 프로젝트 채팅방 출력
 	@PostMapping("/completedList")
 	public ResponseEntity<List<Map<String, Object>>> completedList(@RequestBody MemberDTO dto){
 		List<Map<String, Object>> list = Chat_memberService.completedList(dto);
 		return ResponseEntity.ok(list);
 	}
 	
+	// 부서원 제외 개인 채팅방 정보 출력
 	@PostMapping("/chatRoom")
 	public ResponseEntity<Map<String, Object>> chatRoom(@RequestBody Chat_memberDTO dto){
 		Map<String, Object> chatRoom = Chat_memberService.ChatRoom(dto);
 		return ResponseEntity.ok(chatRoom);
 	}
+	
+	// 채널 추가 주소록 출력
+	@PostMapping("/contactList")
+	public ResponseEntity<List<ContactDTO>> contactList(@RequestBody Chat_memberDTO dto){
+		List<ContactDTO> list = Chat_memberService.contactList(dto);
+		System.out.println(dto.getMember_email());
+		return ResponseEntity.ok(list);
+	}
+	
 }

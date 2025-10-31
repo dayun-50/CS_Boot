@@ -8,25 +8,32 @@
   <mapper namespace="Chat_member">
   	
   	 <select id="checkPrivateChat" resultType="int">
-	    SELECT COALESCE(
-	      (
-	        SELECT chat_seq
-	        FROM (
-	          SELECT chat_seq
-	          FROM chat_member
-	          WHERE member_email IN (#{email1}, #{email2})
-	          GROUP BY chat_seq
-	          HAVING COUNT(DISTINCT member_email) = 2
-	        )
-	        WHERE ROWNUM = 1
-	      ),
-	      0
-	    ) AS chat_seq
-	    FROM dual
+	      SELECT COALESCE(
+        (
+            SELECT chat_seq
+            FROM (
+                SELECT chat_seq
+                FROM chat_member
+                WHERE chat_seq IN (
+                    SELECT chat_seq
+                    FROM chat_member
+                    GROUP BY chat_seq
+                    HAVING COUNT(DISTINCT member_email) = 2
+                )
+                GROUP BY chat_seq
+                HAVING COUNT(DISTINCT member_email) = 2
+                   AND SUM(CASE WHEN member_email = #{email1} THEN 1 ELSE 0 END) = 1
+                   AND SUM(CASE WHEN member_email = #{email2} THEN 1 ELSE 0 END) = 1
+            )
+            WHERE ROWNUM = 1
+        ),
+        0
+    ) AS chat_seq
+    FROM dual
 	 </select>
 	 
 	 <insert id="insertChat">
-	 	insert into chat_member values (#{chat_seq}, #{member_email}, #{role})
+	 	insert into chat_member values (#{chat_seq}, #{member_email}, #{role}, 0)
 	 </insert>
 	 
 	 <select id="existDepartmentRoom" resultType="int">
@@ -36,5 +43,17 @@
 	 <select id="countMember" resultType="int">
 	 	select count(*) from chat_member where chat_seq = #{chat_seq}
 	 </select>
+	 
+	<update id="updateLastMessageSeq">
+		update chat_member set last_message_seq = #{last_message_seq} where chat_seq = #{chat_seq} and member_email = #{member_email}
+	</update>
+	
+	<select id="selectMember" resultType="String">
+		select member_email from chat_member where chat_seq = #{chat_seq}
+	</select>
+	
+	<select id="getLastMessageSeq" resultType="int">
+  		select last_message_seq from chat_member where member_email = #{member_email} and chat_seq = #{chat_seq}
+  	</select>
 	  	
   </mapper>

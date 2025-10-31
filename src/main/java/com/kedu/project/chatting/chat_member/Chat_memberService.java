@@ -9,8 +9,11 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.kedu.project.chatting.chat_message.Chat_messageDAO;
 import com.kedu.project.chatting.chat_room.Chat_roomDAO;
 import com.kedu.project.chatting.chat_room.Chat_roomDTO;
+import com.kedu.project.contact.ContactDAO;
+import com.kedu.project.contact.ContactDTO;
 import com.kedu.project.members.member.MemberDAO;
 import com.kedu.project.members.member.MemberDTO;
 
@@ -27,7 +30,13 @@ public class Chat_memberService {
 	private Chat_roomDAO roomDao;
 
 	@Autowired
+	private Chat_messageDAO cMDao;
+
+	@Autowired
 	private MemberDAO memberDao;
+
+	@Autowired
+	private ContactDAO ContactDAO;
 
 	// 팀원간 개인 메세지 목록 출력 및 생성(없을시)
 	public List<Map<String, Object>> privatChatSearch(MemberDTO dto){
@@ -37,8 +46,13 @@ public class Chat_memberService {
 		for(MemberDTO members : memberList) {
 			// 채팅방 존재 여부 및 존재시 채팅방 seq 반환
 			int checkChat = dao.checkPrivateChat(dto, members.getEmail());
+			System.out.println(checkChat);
 			Map<String, Object> map = new HashMap<>();
 			if(checkChat > 0) { // 채팅방 존재시 map에 기록
+				int chatRoomLastMessageSeq = cMDao.lastMessageSeq(checkChat);
+				int myLastMessageSeq = dao.getLastMessageSeq(dto.getEmail(), checkChat);
+				// 내가 마지막으로 읽은 메세지보다 더 신규 메세지가 있다면
+				map.put("alert", myLastMessageSeq < chatRoomLastMessageSeq ? "y" : "");
 				map.put("chat_seq", checkChat);
 				map.put("level_code", members.getLevel_code());
 				map.put("name", members.getName());
@@ -63,6 +77,7 @@ public class Chat_memberService {
 				member.setRole("general");
 				dao.insertCahtMember(member);
 				// 정보 포장
+				map.put("alert", "");
 				map.put("chat_seq", chatSeq);
 				map.put("level_code", members.getLevel_code());
 				map.put("name", members.getName());
@@ -72,14 +87,14 @@ public class Chat_memberService {
 		return list;
 	}
 
-	// 단체 톡방 및 팀원 제외 개인톡방 출력
+	// 부서 단체 톡방 생성 및 단체 톡방 출력
 	public List<Map<String, Object>> chatRoomList(MemberDTO dto){
 		// 내 부서명 출력
 		String department = memberDao.selectDepartment(dto);
 		List<Map<String, Object>> list = new ArrayList<>();
 		Map<String, Object> map = new HashMap<>();
 		// 팀 채팅방 있는지 확인 ( 존재 한다면 room_seq / 존재하지 않는다면 0 )
-		int checkChat = roomDao.searchRoom(dto, department+" 단체 채팅");
+		int checkChat = roomDao.searchRoom(department+" 단체 채팅");
 		if(checkChat > 0) {
 			int exist = dao.existDepartmentRoom(dto, checkChat);
 			// 단톡방에 내가 없을시 참여
@@ -90,6 +105,10 @@ public class Chat_memberService {
 				members.setRole("general");
 				dao.insertCahtMember(members);
 			}
+			int chatRoomLastMessageSeq = cMDao.lastMessageSeq(checkChat);
+			int myLastMessageSeq = dao.getLastMessageSeq(dto.getEmail(), checkChat);
+			// 내가 마지막으로 읽은 메세지보다 더 신규 메세지가 있다면
+			map.put("alert", myLastMessageSeq < chatRoomLastMessageSeq ? "y" : "");
 			map.put("chat_seq", checkChat);
 			map.put("chat_name", department+" 단체 채팅");
 		}else {
@@ -114,6 +133,7 @@ public class Chat_memberService {
 				member.setRole("general");
 				dao.insertCahtMember(member);
 			}
+			map.put("alert", "");
 			map.put("chat_seq", chatSeq);
 			map.put("chat_name", department+" 단체 채팅");
 		}
@@ -125,6 +145,7 @@ public class Chat_memberService {
 			if(!chat.get("CHAT_NAME").equals(department + " 단체 채팅")) {
 				list.add(chat);
 			}
+			chat.put("alert", "");
 			chat.put("chat_seq", chat.get("CHAT_SEQ"));
 			chat.put("chat_name", chat.get("CHAT_NAME"));
 			chat.remove("CHAT_NAME");chat.remove("CHAT_SEQ");
@@ -145,7 +166,7 @@ public class Chat_memberService {
 		return list;
 	}
 
-	// 채팅방 정보 출력
+	// 부서원 제외 개인 채팅방 정보 출력
 	public Map<String, Object> ChatRoom(Chat_memberDTO dto) {
 		// 채팅방 정보 출력
 		Map<String, Object> list = roomDao.chatRoom(dto);
@@ -153,13 +174,21 @@ public class Chat_memberService {
 		BigDecimal memberCount = (BigDecimal) list.get("MEMBER_COUNT");
 		// 만약 개인톡방이라면
 		if(memberCount.intValue() == 2) {
-	        String chatName = (String) list.get("CHAT_NAME");
+			String chatName = (String) list.get("CHAT_NAME");
 			// 사원 이름 출력
 			String username = memberDao.selectMemberName(dto.getMember_email());
 			// 채팅방 이름에서 사원 이름을 제거후 저장
 			String cleanedName = chatName.replaceAll(username, "");
 			list.put("CHAT_NAME", cleanedName);
 		}
+		return list;
+	}
+
+	// 채널 추가 주소록 출력 
+	public List<ContactDTO> contactList(Chat_memberDTO dto){
+		String eamil = dto.getMember_email();
+		List<ContactDTO> list = ContactDAO.contactList(eamil);
+		list.removeIf(l -> memberDao.checkMember(l.getEmail()) == 0);
 		return list;
 	}
 
