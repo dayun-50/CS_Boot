@@ -39,7 +39,7 @@ public class MemberDAO {
 
 	// 마이페이지 출력
 	public List<MemberDTO> mypage(MemberDTO dto) {
-		 return mybatis.selectList("Member.selectByMypage", dto);
+		return mybatis.selectList("Member.selectByMypage", dto);
 	}
 
 	// 마이페이지 수정
@@ -61,21 +61,27 @@ public class MemberDAO {
 	public String selectMemberName(String email) {
 		return mybatis.selectOne("Member.selectMemberName", email);
 	}
-	
-	// 그룹웨어 사용중인 id인지 확인 
+
+	// 그룹웨어 사용중인 id인지 확인
 	public int checkMember(String email) {
 		return mybatis.selectOne("Member.checkMember", email);
 	}
-	
-	//---------------------------------------------------------------------
-	//전체 리스트 뽑아오기 : 입사일 기준 연차 지급 로딩용으로 필요함 -- 지원
-	public List<MemberDTO> findAll(){
+
+	// ---------------------------------------------------------------------
+	// 전체 리스트 뽑아오기 : 입사일 기준 연차 지급 로딩용으로 필요함 -- 지원
+	public List<MemberDTO> findAll() {
 		return mybatis.selectList("Member.selectAll");
 	}
-	
-	//아이디로 dto 하나 뽑아오기 : 가입일자 별 연차 계산용-- 지원
+
+	// 아이디로 dto 하나 뽑아오기 : 가입일자 별 연차 계산용-- 지원
 	public MemberDTO findByEmail(String email) {
-		return mybatis.selectOne("Member.findByEmail", email);		
+		return mybatis.selectOne("Member.findByEmail", email);
+	}
+
+	// ----------------------주소록
+	public String getDeptCodeByEmail(String email) {
+		// "Member.getDeptCodeByEmail" ID를 사용하여 쿼리 실행
+		return mybatis.selectOne("Member.getDeptCodeByEmail", email);
 	}
 
 }

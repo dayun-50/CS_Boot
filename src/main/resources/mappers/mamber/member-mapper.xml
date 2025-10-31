@@ -82,5 +82,10 @@
   	  <select id="findByEmail" resultType="com.kedu.project.members.member.MemberDTO">
   		select * from member where email=#{email}
   	</select> 
+  	
+  	<!-- 주소록에 좀 쓸게  -->
+  	<select id="getDeptCodeByEmail" resultType="String" parameterType="String">
+        SELECT DEPT_CODE FROM member WHERE EMAIL = #{email}
+    </select>
 
   </mapper>

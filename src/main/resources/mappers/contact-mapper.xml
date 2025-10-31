@@ -3,67 +3,129 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
-  <!-- 연락처 -->
- <!-- 오류 방지 예시용 고쳐쓰시오. -->
- <mapper namespace="Contact">
- 
-	<!--  연락처 목록 조회  -->
-    <select id="getMyContacts" resultType="com.kedu.project.contact.ContactDTO">
-        SELECT 
-            CONTACT_SEQ,
-            OWNER_EMAIL,
-            "NAME",
-            EMAIL,
-            PHONE,
-            CONTACT_GROUP,
-            COMPANY_CODE,
-            MEMO,
-            IS_SHARE AS "share"
-        FROM contact
-        ORDER BY CONTACT_SEQ DESC
+<mapper namespace="Contact">
+
+    <resultMap id="contactResultMap" type="com.kedu.project.contact.ContactDTO">
+        <id column="CONTACT_SEQ" property="contact_seq" />
+        <result column="OWNER_EMAIL" property="owner_email" />
+        <result column="NAME" property="name" /> <result column="EMAIL" property="email" />
+        <result column="PHONE" property="phone" />
+        <result column="CONTACT_GROUP" property="contact_group" />
+        <result column="COMPANY_CODE" property="company_code" />
+        <result column="MEMO" property="memo" />
+        <result column="IS_SHARE" property="share" /> 
+    </resultMap>
+
+	<!-- 조회 -->
+    <select id="getMyContacts" resultMap="contactResultMap">
+	    SELECT 
+	        CONTACT_SEQ,     
+	        OWNER_EMAIL,     
+	        "NAME",
+	        EMAIL,
+	        PHONE,
+	        CONTACT_GROUP,
+	        COMPANY_CODE,
+	        MEMO,
+	        IS_SHARE  FROM contact
+	    ORDER BY CONTACT_SEQ DESC
+	</select>
+
+    <select id="contactList" resultMap="contactResultMap" parameterType="string">
+		SELECT 
+	        CONTACT_SEQ,   
+	        OWNER_EMAIL,
+	        "NAME",
+	        EMAIL,
+	        PHONE,
+	        CONTACT_GROUP, 
+        	COMPANY_CODE,
+	        MEMO,
+	        IS_SHARE FROM contact 
+	     WHERE OWNER_EMAIL = #{email}
     </select>
 
-    <!-- 연락처 등록 -->
-    <insert id="insertContact" parameterType="com.kedu.project.contact.ContactDTO">
-        <selectKey keyProperty="contact_seq" resultType="int" order="BEFORE">
-            SELECT contact_seq_seq.NEXTVAL FROM DUAL
-        </selectKey>
+	<!-- 개인 -->
+    <select id="selectIndividualContacts" resultMap="contactResultMap" parameterType="String">
+		SELECT 
+        CONTACT_SEQ,
+        OWNER_EMAIL,
+        "NAME",
+        EMAIL,
+        PHONE,
+        CONTACT_GROUP,
+        COMPANY_CODE,
+        MEMO,
+        IS_SHARE
+        FROM contact
+	    WHERE 
+	        OWNER_EMAIL = #{email}
+	        AND IS_SHARE = 'n'
+	    ORDER BY CONTACT_SEQ DESC
+    </select>
+    
+    <!-- 팀원 -->
+	<select id="selectTeamContact" resultMap="contactResultMap" parameterType="map">
+		SELECT 
+	        c.CONTACT_SEQ, c.OWNER_EMAIL, c."NAME", c.EMAIL, c.PHONE,
+	        c.CONTACT_GROUP, 
+	        c.COMPANY_CODE, c.MEMO, c.IS_SHARE FROM contact c
+	    JOIN member m ON c.OWNER_EMAIL = m.EMAIL
+	    WHERE 
+	        m.DEPT_CODE = #{dept_code}  
+	        AND c.IS_SHARE = 'y'
+	        ORDER BY c.CONTACT_SEQ DESC
+	</select>
 
-        INSERT INTO contact (
-            CONTACT_SEQ, "OWNER_EMAIL", "NAME", "EMAIL", "PHONE",
-            CONTACT_GROUP, COMPANY_CODE, MEMO, IS_SHARE
-        )
-        VALUES (
-            #{contact_seq}, #{owner_email}, #{name}, #{email}, #{phone},
-            #{contact_group}, #{company_code}, #{memo}, #{share}
-        )
-    </insert>
-
-    <!-- 연락처 수정 (share 포함) -->
+	<!-- 방 -->
+    <select id="selectName" resultType="String">
+        SELECT EMAIL FROM contact WHERE CONTACT_SEQ = #{seq}
+    </select>
+    
+    <!-- 업데이트 -->
     <update id="updateContact" parameterType="com.kedu.project.contact.ContactDTO">
-        UPDATE contact
-        SET
-            "NAME" = #{name},
-            EMAIL = #{email},
-            PHONE = #{phone},
-            CONTACT_GROUP = #{contact_group},
-            COMPANY_CODE = #{company_code},
-            MEMO = #{memo},
-            IS_SHARE = #{share}
-        WHERE CONTACT_SEQ = #{contact_seq}
-    </update>
-
-    <!-- 연락처 삭제 -->
-    <delete id="deleteContact" parameterType="int">
-        DELETE FROM contact WHERE contact_seq = #{contact_seq}
+	    UPDATE contact
+	    <set>
+	        <if test="name != null">"NAME" = #{name},</if>
+	        <if test="email != null">EMAIL = #{email},</if>
+	        <if test="phone != null">PHONE = #{phone},</if>
+	        <if test="contact_group != null">CONTACT_GROUP = #{contact_group},</if>
+	        <if test="company_code != null">COMPANY_CODE = #{company_code},</if>
+	        <if test="memo != null">MEMO = #{memo},</if>
+	        
+	        IS_SHARE = #{share} 
+	    </set>
+	    WHERE CONTACT_SEQ = #{contact_seq} 
+	    <if test="owner_email != null">
+	        AND OWNER_EMAIL = #{owner_email}
+	    </if>
+	</update>
+	
+	<!-- 연락처 추가 -->
+	<insert id="insertContact" parameterType="com.kedu.project.contact.ContactDTO">
+	    <selectKey keyProperty="contact_seq" resultType="int" order="BEFORE">
+	        SELECT contact_seq.NEXTVAL FROM DUAL
+	    </selectKey>
+	    INSERT INTO contact (
+	        CONTACT_SEQ, OWNER_EMAIL, "NAME", EMAIL, PHONE,
+	        CONTACT_GROUP, COMPANY_CODE, MEMO, IS_SHARE )
+	    VALUES (
+	        #{contact_seq}, 
+	        #{owner_email}, 
+	        #{name}, 
+	        #{email}, 
+	        #{phone},
+	        #{contact_group}, 	        
+	        #{company_code, jdbcType=VARCHAR}, 
+	        #{memo, jdbcType=VARCHAR}, 
+	        #{share}
+	    )
+	</insert>
+    
+    <!-- 삭제 -->
+    <delete id="deleteContactByOwner" parameterType="map">
+        DELETE FROM contact 
+        WHERE CONTACT_SEQ = #{contact_seq} AND OWNER_EMAIL = #{owner_email}
     </delete>
     
-    <select id="contactList" resultType="com.kedu.project.contact.ContactDTO">
-    	select * from contact where owner_email = #{email}
-    </select>
-    
-    <select id="selectName" resultType="String">
-    	select email from contact where contact_seq = #{seq}
-    </select>
-  
-  </mapper>
+</mapper>

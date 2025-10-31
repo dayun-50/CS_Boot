@@ -2,7 +2,6 @@ package com.kedu.project.notice;
 
 import java.sql.Timestamp;
 
-
 /*
  	공지사항 DTO
  */
