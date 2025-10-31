@@ -7,32 +7,57 @@
 
   <mapper namespace="File">
 
- <!-- 파일 업로드. -->
-  	<insert id="upload" parameterType="com.kedu.project.file.FileDTO">
-	  insert into file_info 
-	  (file_seq, file_type, member_email, sysname, oriname, parent_seq, upload_at)
-	  values (file_seq.nextval, #{file_type}, #{member_email}, #{sysname}, #{oriname}, #{parent_seq}, sysdate)
+ <!-- 파일 업로드. : 건들 ㄴㄴ-->
+	<insert id="upload" parameterType="com.kedu.project.file.FileDTO">
+	    <selectKey keyProperty="file_seq" resultType="int" order="BEFORE">
+	        SELECT file_seq.nextval FROM dual
+	    </selectKey>
+	    insert into file_info 
+	    (file_seq, file_type, member_email, sysname, oriname, parent_seq, upload_at)
+	    values (#{file_seq}, #{file_type}, #{member_email}, #{sysname}, #{oriname}, #{parent_seq}, sysdate)
 	</insert>
-	
- <!-- 부모시퀀스, 종류에 따른 파일 리스트 뽑아오기 -->	
+<!-- 부모시퀀스, 종류에 따른 파일 리스트 뽑아오기 : 건들 ㄴㄴ-->	
   	<select id="selectByParentSeq" resultType="com.kedu.project.file.FileDTO">
-  		select * from file_info where parent_seq=#{parent_seq} and file_type=#{file_type}
+  		select * from file_info where parent_seq=#{parent_seq} and file_type=#{file_type} order by file_seq desc
   	</select>
 
- <!-- 부모시퀀스, 종류에 따른 파일 삭제하기-->	
+ <!-- 부모시퀀스, 종류에 따른 파일 삭제하기: 건들 ㄴㄴ-->	
   	<delete id="deleteByParentSeq" >
   		delete from file_info where parent_seq=#{parent_seq} and file_type=#{file_type}
   	</delete>
   	
-<!--시스네임으로 지우기-->  	
+<!--시스네임으로 지우기 : 건들 ㄴㄴ-->  	
   	<delete id="deleteBySysname">
   		delete from file_info where sysname =#{sysname}
   	</delete>
   	
-<!--시스네임으로 오리네임 찾기-->    	
+<!--시스네임으로 오리네임 찾기: 건들 ㄴㄴ-->    	
 	<select id="findOriNameBySysName" resultType="String">
 		select oriname from file_info where sysname = #{sysname}
 	</select>
 
-  	
+
+ <!-- 채팅 파일 업로드. -->
+	<insert id="uploadChatFile" parameterType="com.kedu.project.file.FileDTO">
+	    <selectKey keyProperty="file_seq" resultType="int" order="BEFORE">
+	        SELECT file_seq.nextval FROM dual
+	    </selectKey>
+	    insert into file_info 
+	    (file_seq, file_type, member_email, sysname, oriname, parent_seq, upload_at, chat_seq)
+	    values (#{file_seq}, #{file_type}, #{member_email}, #{sysname}, #{oriname}, #{parent_seq}, sysdate, #{chat_seq})
+	</insert>	
+<!--시퀀스번호로 dto 뽑기-->
+	<select id="findBySeq" parameterType="int" resultType="com.kedu.project.file.FileDTO">
+    	select * from file_info where file_seq = #{file_seq}
+	</select>
+
+<!--채팅시퀀스 = 부모시퀀스로 파일 디티오 가져오기-->  	
+	<select id="getFileByChatSeq" resultType="com.kedu.project.file.FileDTO">
+    	select * from file_info where parent_seq = #{parent_seq} and file_type= #{file_type}
+	</select>
+<!-- 부모시퀀스, 종류에 따른 파일 리스트 뽑아오기 : 건들 ㄴㄴ-->	
+  	<select id="getFilesByChatSeq" resultType="com.kedu.project.file.FileDTO">
+  		select * from file_info where chat_seq=#{chat_seq} and file_type=#{file_type} order by file_seq desc
+  	</select>
+	  	
   </mapper>

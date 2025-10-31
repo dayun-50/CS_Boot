@@ -14,11 +14,12 @@ public class FileDTO {
 	private Timestamp upload_at; // 업로드 날짜 ( default : sysdate )
 	private String file_type; // 파일 종류 코드
 	private int parent_seq; // 부모 시퀀스
+	private Integer chat_seq; // 채팅메세지시퀀스
 	
-	public FileDTO() {}
-
+	
+	
 	public FileDTO(int file_seq, String member_email, String sysname, String oriname, Timestamp upload_at,
-			String file_type, int parent_seq) {
+			String file_type, int parent_seq, Integer chat_seq) {
 		super();
 		this.file_seq = file_seq;
 		this.member_email = member_email;
@@ -27,7 +28,10 @@ public class FileDTO {
 		this.upload_at = upload_at;
 		this.file_type = file_type;
 		this.parent_seq = parent_seq;
+		this.chat_seq = chat_seq;
 	}
+
+	public FileDTO() {}
 
 	public int getFile_seq() {
 		return file_seq;
@@ -85,6 +89,13 @@ public class FileDTO {
 		this.parent_seq = parent_seq;
 	}
 
-	
+	public Integer getChat_seq() {
+		return chat_seq;
+	}
+
+	public void setChat_seq(Integer chat_seq) {
+		this.chat_seq = chat_seq;
+	}
+
 	
 }
