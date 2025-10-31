@@ -69,6 +69,10 @@
   		select name from member where email = #{member_email}
   	</select>
   	
+  	<select id="checkMember" resultType="int">
+  		select count(*) from member where email = #{email}
+  	</select>
+  	
   	<!-- 아래는 지원 사용:입사일 기준 연차 지급용으로 필요 -->
 	<!-- 모든 멤버 뽑아오기 -->
   	<select id="selectAll" resultType="com.kedu.project.members.member.MemberDTO">

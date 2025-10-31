@@ -62,6 +62,11 @@ public class MemberDAO {
 		return mybatis.selectOne("Member.selectMemberName", email);
 	}
 	
+	// 그룹웨어 사용중인 id인지 확인 
+	public int checkMember(String email) {
+		return mybatis.selectOne("Member.checkMember", email);
+	}
+	
 	//---------------------------------------------------------------------
 	//전체 리스트 뽑아오기 : 입사일 기준 연차 지급 로딩용으로 필요함 -- 지원
 	public List<MemberDTO> findAll(){

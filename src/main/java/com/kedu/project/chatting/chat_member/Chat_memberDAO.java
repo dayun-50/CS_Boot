@@ -7,6 +7,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.kedu.project.chatting.chat_room.Chat_roomDTO;
 import com.kedu.project.members.member.MemberDTO;
 
 /*
@@ -51,6 +52,16 @@ public class Chat_memberDAO {
 		return mybatis.selectOne("Chat_member.getLastMessageSeq", Map.of(
 				"member_email", email,
 				"chat_seq", chatSeq));
+	}
+
+	// 채팅방 인원 측정
+	public int memberCount(String chat_seq) {
+		return mybatis.selectOne("Chat_member.countMember", chat_seq);
+	}
+
+	// 채팅방 나가기
+	public int outChat(Chat_memberDTO dto) {
+		return mybatis.delete("Chat_member.outChat", dto);
 	}
 
 }

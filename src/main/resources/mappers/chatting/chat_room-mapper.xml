@@ -93,5 +93,13 @@
 			  )
 			GROUP BY r.chat_seq, r.chat_name
   	</select>
+
+	<select id="selectChatRoomManager" resultType="com.kedu.project.chatting.chat_room.Chat_roomDTO">
+		select * from chat_room where chat_seq = #{chat_seq}
+	</select>
+	
+	<update id="updateProjectOnOff">
+		update chat_room set project_progress = #{project_progress} where chat_seq = #{chat_seq}
+	</update>
   
   </mapper>

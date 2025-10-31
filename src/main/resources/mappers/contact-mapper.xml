@@ -57,5 +57,13 @@
     <delete id="deleteContact" parameterType="int">
         DELETE FROM contact WHERE contact_seq = #{contact_seq}
     </delete>
+    
+    <select id="contactList" resultType="com.kedu.project.contact.ContactDTO">
+    	select * from contact where owner_email = #{email}
+    </select>
+    
+    <select id="selectName" resultType="String">
+    	select email from contact where contact_seq = #{seq}
+    </select>
   
   </mapper>

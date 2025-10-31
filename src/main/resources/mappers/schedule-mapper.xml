@@ -44,4 +44,17 @@
   	<delete id="deleteEvent">
   		delete from schedule where schedule_seq = #{schedule_seq}
   	</delete>
+  	
+  	<select id="selectMySchedule" resultType="com.kedu.project.schedule.ScheduleDTO"> 
+  		<![CDATA[ SELECT *
+					FROM (
+					    SELECT *
+					    FROM schedule
+					    WHERE member_email = #{member_email}
+					      AND start_at > CURRENT_TIMESTAMP
+					    ORDER BY start_at ASC
+					)
+					WHERE ROWNUM <= 5   
+					]]> 
+  	</select>
   </mapper>

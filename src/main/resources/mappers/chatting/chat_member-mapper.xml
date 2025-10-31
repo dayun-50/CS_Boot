@@ -55,5 +55,10 @@
 	<select id="getLastMessageSeq" resultType="int">
   		select last_message_seq from chat_member where member_email = #{member_email} and chat_seq = #{chat_seq}
   	</select>
+  	
+  	<delete id="outChat">
+  		delete from chat_member where chat_seq = #{chat_seq} and member_email = #{member_email}
+  	</delete>	
+	
 	  	
   </mapper>

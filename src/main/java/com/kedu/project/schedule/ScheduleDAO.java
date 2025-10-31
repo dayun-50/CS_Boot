@@ -45,4 +45,8 @@ public class ScheduleDAO {
 		return mybatis.delete("Schedule.deleteEvent", dto);
 	}
 	
+	// 마이페이지 일정출력
+	public List<ScheduleDTO> selectMySchedule(ScheduleDTO dto){
+		return mybatis.selectList("Schedule.selectMySchedule", dto);
+	}
 }
