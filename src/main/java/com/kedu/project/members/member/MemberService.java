@@ -74,7 +74,7 @@ public class MemberService {
 
 	// 로그인
 	public int login(MemberDTO dto) {
-		dto.setPw(Encryptor.encrypt(dto.getPw()));  //암호화
+		dto.setPw(Encryptor.encrypt(dto.getPw()));  
 		return dao.login(dto);
 	}
 
