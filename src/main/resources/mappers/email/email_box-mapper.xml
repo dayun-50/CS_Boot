@@ -7,9 +7,30 @@
   
   
   <!-- 오류 방지 예시용 고쳐쓰시오. -->
-  <mapper namespace="Test">
-  	<select id="test5" resultType="com.kedu.project.members.member.MemberDTO">
-  		select * from member
-  	</select>
+  <mapper namespace="Email_box">
+  	
+  
+  <insert id="insertInbox" parameterType="String">
+  INSERT INTO emailbox (emailbox_seq, member_email, emailbox_type)
+  SELECT emailbox_seq.nextval, #{email}, 'INBOX' FROM dual
+  WHERE NOT EXISTS (
+    SELECT 1 FROM emailbox 
+    WHERE member_email = #{email} AND emailbox_type = 'INBOX'
+  )
+</insert>
+<insert id="insertSent" parameterType="String">
+  INSERT INTO emailbox (emailbox_seq, member_email, emailbox_type)
+  SELECT emailbox_seq.nextval, #{email}, 'Sent' FROM dual
+  WHERE NOT EXISTS (
+    SELECT 1 FROM emailbox 
+    WHERE member_email = #{email} AND emailbox_type = 'Sent'
+  )
+</insert>
+<!-- 메일박스 존재 확인 -->
+<select id="countByEmailAndType" resultType="int">
+  SELECT COUNT(*) 
+  FROM emailbox 
+  WHERE member_email = #{email} AND emailbox_type = #{type}
+</select>
   
   </mapper>

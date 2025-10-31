@@ -6,6 +6,7 @@
   <!-- 사원 회원가입 등등 -->
   
   <mapper namespace="Member">
+  
   	<insert id="insert">
   		insert into member (email, pw, name, phone, company_code, signup_at) values (#{email}, #{pw}, #{name}, #{phone}, #{company_code}, sysdate)
   	</insert>

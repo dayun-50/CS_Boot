@@ -28,6 +28,8 @@ public class MemberService {
 	@Autowired
 	private Member_ptoDAO daoPTO;
 	
+	
+	
 
 // JamesAdminClient 주입
 
@@ -46,13 +48,23 @@ public class MemberService {
     	
     	//비밀번호 암호화 및 db 저장
     	dto.setPw(Encryptor.encrypt(dto.getPw()));
+    	
+    try {
         int dbResult = dao.signup(dto);
+        System.out.println("Member INSERT 성공: " + dbResult);
     	
         //  James 서버에 메일 계정 생성
         if (dbResult > 0) {
         	jamesAccountService.createMailAccount(dto.getEmail(), rawPassword);
+        	System.out.println("James 계정 생성 성공");
+        	
         }
         return dbResult;
+    } catch (Exception e) {
+        System.err.println("에러 발생 지점 확인:");
+        e.printStackTrace();
+        throw e;
+    }
 
 	}
     

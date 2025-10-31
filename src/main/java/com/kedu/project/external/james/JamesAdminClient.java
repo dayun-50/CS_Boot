@@ -53,6 +53,7 @@ public class JamesAdminClient {
 		}
 	}
 
+	
 	/**
 	 * James 서버에 등록된 계정인지 확인하고 비밀번호를 검증합니다. POST /users/{username}/verify 엔드포인트 사용
 	 * 
@@ -81,5 +82,34 @@ public class JamesAdminClient {
 			throw new RuntimeException("James 서버 인증 중 오류 발생", e);
 		}
 	}
+	
+	//////////////////////////// 필요없음
+	
+	public void createMailbox(String jamesUsername, String mailboxName) {
+		try {
+			this.webClient.put()
+					.uri("/users/{username}/mailboxes/{mailboxName}", jamesUsername, mailboxName) 
+					// PUT /users/'user@company.com'/mailboxes/'INBOX' 호출
+					.retrieve()
+					.onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+							response -> response.createException())
+					// 400~ 500 에러가 발생하면 예외처리
+					.toBodilessEntity()
+					.block(); // 상태코드 대기 및 동기 통신으로 전환
+					
+		} catch (WebClientResponseException.Conflict e) {
+			// 409 Conflict: 이미 존재하는 메일박스 (에러가 아닌 정상 상황으로 처리)
+			System.out.println("메일박스 이미 존재: " + mailboxName + " (" + jamesUsername + ")");
+			
+		} catch (WebClientResponseException e) {
+			// 4xx/5xx 응답 에러 처리
+			throw new RuntimeException("James 서버 메일박스 생성 실패: " + e.getResponseBodyAsString(), e);
+		} catch (Exception e) {
+			// 기타 통신 오류 처리
+			throw new RuntimeException("James 서버와 통신 중 오류 발생", e);
+		}
+	}
+
+	
 
 }

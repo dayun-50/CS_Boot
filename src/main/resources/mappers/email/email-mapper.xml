@@ -4,12 +4,33 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
   <!-- 이메일 기능 -->
-  
-  
-   <!-- 오류 방지 예시용 고쳐쓰시오. -->
-  <mapper namespace="Test">
-  	<select id="test6" resultType="com.kedu.project.members.member.MemberDTO">
-  		select * from member
-  	</select>
-  
-  </mapper>
+  <mapper namespace="Email">
+
+    <select id="getEmailboxSeq" parameterType="map" resultType="int">
+        SELECT emailbox_seq 
+        FROM emailbox
+        WHERE SUBSTR(member_email, 1, INSTR(member_email, '@') - 1) =
+        SUBSTR(#{memberEmail}, 1, INSTR(#{memberEmail}, '@') - 1)
+         AND emailbox_type = #{emailboxType}
+    </select>
+    
+    <insert id="insertEmail" parameterType="com.kedu.project.emails.email.EmailDTO">
+        <selectKey keyProperty="email_seq" resultType="int" order="BEFORE">
+            SELECT email_seq.nextval FROM DUAL
+        </selectKey>
+        
+        INSERT INTO email 
+            (email_seq, emailbox_seq, james_message_uid, title, email_from, content, read, push_at)
+        VALUES 
+            (#{email_seq}, #{emailbox_seq}, #{james_message_uid}, #{subject}, #{sender}, #{content}, #{isRead}, SYSDATE)
+    </insert>
+    
+    <insert id="insertEmailSender" parameterType="map">
+        INSERT INTO email_sender 
+            (sender_seq, email_seq, sender_email)
+        VALUES 
+            (sender_seq.nextval, #{emailSeq}, #{senderEmail})
+    </insert>
+    
+    
+</mapper>
