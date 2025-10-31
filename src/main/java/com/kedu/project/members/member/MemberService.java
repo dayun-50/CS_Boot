@@ -83,21 +83,21 @@ public class MemberService {
 
         // 3. DB 인증 실패 시 null 반환
         if (dbResult <= 0) {
-            System.out.println("WARN: 2. DB 인증 실패. DAO 결과값: " + dbResult); // 💡 추가
+            
             return 0;
         }
-        System.out.println("INFO: 3. DB 인증 성공. James 서버 인증 시도."); // 💡 추가
+        
         
         boolean jamesAuthSuccess = jamesAccountService.authenticateUser(dto.getEmail(), rawPassword);
        
         if (!jamesAuthSuccess) {
             // James 서버 인증 실패: DB에는 있지만 메일 서버 계정이 유효하지 않음
             // 메일 기능이 필수이므로, 예외를 발생시키거나 null 반환
-            System.err.println("ERROR: 5. James 서버 계정 인증 실패! (평문 비밀번호 불일치 가능성 높음)"); // 💡 추가
+            System.err.println("ERROR: 5. James 서버 계정 인증 실패! (평문 비밀번호 불일치 가능성 높음)"); 
             throw new RuntimeException("메일 서버 계정 인증에 실패했습니다. (관리자에게 문의하세요)");
             // return null; // 또는 null을 반환하여 로그인 실패 처리
         }
-        System.out.println("INFO: 6. 모든 인증 성공. 로그인 처리 완료."); // 💡 추가
+        System.out.println("INFO: 6. 모든 인증 성공. 로그인 처리 완료."); // 
         // 7. 최종 성공: DB 인증 결과 반환
         // **주의:** 원본 비밀번호(rawPassword)는 이 메서드 외부로 DTO를 통해 전달되지 않습니다.
         // 별도의 세션/인증 로직에서 rawPassword를 관리해야 합니다.

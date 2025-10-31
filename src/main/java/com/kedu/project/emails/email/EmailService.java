@@ -327,22 +327,22 @@ public class EmailService {
 
 			dto.setIsRead(message.getFlags().contains(Flags.Flag.SEEN) ? "y" : "n");
 
-			// 💡 [핵심] 본문(Content) 파싱 및 설정
+			//  [핵심] 본문(Content) 파싱 및 설정
 			dto.setContent(extractTextFromMultipart(message.getContent()));
 
-			// 💡 [수신자 목록] 설정
+			//  [수신자 목록] 설정
 			dto.setMailTo(message.getRecipients(Message.RecipientType.TO));
 
 			return dto;
 
 		} finally {
-			// 💡 [최종 수정] close(true)로 닫아야 \Seen 플래그가 서버에 저장됨
+			//  [최종 수정] close(true)로 닫아야 \Seen 플래그가 서버에 저장됨
 			if (folder != null && folder.isOpen()) folder.close(true); 
 			if (store != null && store.isConnected()) store.close();
 		}
 	}
 
-	// 💡 [신규 헬퍼] Message.getContent() 객체에서 텍스트 본문을 추출합니다.
+	//  [신규 헬퍼] Message.getContent() 객체에서 텍스트 본문을 추출합니다.
 	private String extractTextFromMultipart(Object content) throws Exception {
 		if (content instanceof Multipart) {
 			Multipart multipart = (Multipart) content;
@@ -374,8 +374,8 @@ public class EmailService {
 		//props.put("mail.imaps.ssl.enable", "true");
 		// props.put("mail.imaps.ssl.trust", mailHost); // 로컬 인증서 무시
 		props.put("mail.imaps.ssl.enable", "true");
-		props.put("mail.imaps.ssl.checkserveridentity", "false"); // 💡 [추가] 이름 검사 무시
-		props.put("mail.imaps.ssl.trust", "*");                     // 💡 [추가] 모든 호스트 신뢰
+		props.put("mail.imaps.ssl.checkserveridentity", "false"); //  [추가] 이름 검사 무시
+		props.put("mail.imaps.ssl.trust", "*");                     // [추가] 모든 호스트 신뢰
 		return Session.getDefaultInstance(props, null);
 	}
 

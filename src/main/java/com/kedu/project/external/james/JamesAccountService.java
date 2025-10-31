@@ -52,7 +52,7 @@ public class JamesAccountService {
     }
 
     public boolean authenticateUser(String email, String rawPassword) {
-        String jamesUsername = getJamesUsername(email); // 💡 ID 변환까지 내부에서 처리
+        String jamesUsername = getJamesUsername(email); //  ID 변환까지 내부에서 처리
         return jamesAdminClient.authenticateUser(jamesUsername, rawPassword);
     }
     

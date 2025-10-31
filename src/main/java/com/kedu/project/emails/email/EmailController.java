@@ -78,7 +78,7 @@ public class EmailController {
             String generalToken = tokenParts[0]; 
             String jamesAccessToken = tokenParts[1];
             
-            // 2. 💡 ID 및 비밀번호 획득 (JwtUtil 사용)
+            // 2.  ID 및 비밀번호 획득 (JwtUtil 사용)
             // (a) 일반 토큰으로 DB ID 획득
             String senderDbId = jwtUtil.verifyToken(generalToken).getSubject(); 
             // (b) James Access Token으로 평문 비밀번호 획득
@@ -145,7 +145,7 @@ public class EmailController {
         }
     }
     
-// --- 💡 /message/{uid} (메일 상세 조회) -------------------------------------------
+// ---  /message/{uid} (메일 상세 조회) -------------------------------------------
     
     @GetMapping("/message/{uid}") 
     public ResponseEntity<EmailDTO> getMessageDetail(
@@ -162,7 +162,7 @@ public class EmailController {
             String receiverRawPassword = jwtUtil.getRawJamesPassword(jamesAccessToken);
             String receiverJamesId = jamesAccountService.getJamesUsername(loggedInDbId);
             
-            // 💡 EmailService 호출: 상세 정보가 채워진 EmailDTO 반환
+            //  EmailService 호출: 상세 정보가 채워진 EmailDTO 반환
             EmailDTO detailDTO = emailService.getMessageDetail(
                 receiverJamesId, 
                 receiverRawPassword, 
@@ -180,17 +180,17 @@ public class EmailController {
     
 
     
-    // --- 💡 /delete-all-emails (메일 삭제) ---------------------------------------------
+    // ---  /delete-all-emails (메일 삭제) ---------------------------------------------
     
     @DeleteMapping("/delete-all-emails") 
     public ResponseEntity<Map<String, Object>> deleteAllEmailsApi(HttpServletRequest request) {
         try {
-            // 1. 💡 토큰 분리
+            // 1.  토큰 분리
             String[] tokenParts = splitAuthorizationToken(request);
             String generalToken = tokenParts[0]; 
             String jamesAccessToken = tokenParts[1];
 
-            // 2. 💡 ID 및 비밀번호 획득
+            // 2.  ID 및 비밀번호 획득
             String deleterDbId = jwtUtil.verifyToken(generalToken).getSubject();
             String deleterRawPassword = jwtUtil.getRawJamesPassword(jamesAccessToken);
             

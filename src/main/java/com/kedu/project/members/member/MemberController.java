@@ -55,7 +55,7 @@ public class MemberController {
 		             dto.getEmail(),    
 		             rawPassword // DTO에서 평문 비밀번호를 사용하여 토큰 B 생성
 		         );
-			// 3. 💡 [핵심 수정] 두 토큰을 특정 구분자("|||")로 결합하여 하나의 String으로 반환
+			// 3.  [핵심 수정] 두 토큰을 특정 구분자("|||")로 결합하여 하나의 String으로 반환
 	         String combinedToken = generalToken + "|||" + jamesAccessToken;
 			
 			return ResponseEntity.ok(combinedToken);
