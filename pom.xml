@@ -40,7 +40,13 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		
+		<!-- MockMultipartFile을 실제 코드에서도 사용하기 위함 -->
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-test</artifactId>
+		    <version>6.1.5</version> <!-- spring boot 3.5.x는 spring 6.x 기반 -->
+		    <scope>compile</scope>
+		</dependency>
 		<!--구글 클라우드 업로드용-->
 		<dependency>
 			<groupId>com.google.cloud</groupId>

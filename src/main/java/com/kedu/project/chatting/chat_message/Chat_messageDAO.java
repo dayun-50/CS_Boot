@@ -14,6 +14,14 @@ public class Chat_messageDAO {
 	@Autowired
 	private SqlSession mybatis;
 	
+	// 파일 DB저장
+	public Chat_messageDTO fileInsert(Chat_messageDTO dto) {
+	    // 파일메시지 insert
+	    mybatis.insert("Chat_message.fileInsert", dto);
+	    // 2방금 삽입된 message_seq를 가져와서 전체 DTO 조회
+	    return mybatis.selectOne("Chat_message.getLastInsertedMessage", dto.getChat_seq());
+	}
+	
 	// 메세지 DB저장
 	public int messageInsert(Chat_messageDTO dto) {
 		return mybatis.insert("Chat_message.messageInsert",dto);

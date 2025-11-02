@@ -9,8 +9,11 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.kedu.project.chatting.chat_message.Chat_messageDAO;
 import com.kedu.project.chatting.chat_room.Chat_roomDAO;
 import com.kedu.project.chatting.chat_room.Chat_roomDTO;
+import com.kedu.project.contact.ContactDAO;
+import com.kedu.project.contact.ContactDTO;
 import com.kedu.project.members.member.MemberDAO;
 import com.kedu.project.members.member.MemberDTO;
 
@@ -27,19 +30,33 @@ public class Chat_memberService {
 	private Chat_roomDAO roomDao;
 
 	@Autowired
+	private Chat_messageDAO cMDao;
+
+	@Autowired
 	private MemberDAO memberDao;
+
+	@Autowired
+	private ContactDAO ContactDAO;
 
 	// 팀원간 개인 메세지 목록 출력 및 생성(없을시)
 	public List<Map<String, Object>> privatChatSearch(MemberDTO dto){
 		// 같은 부서의 팀 정보 출력
 		List<MemberDTO> memberList = memberDao.memberSearch(dto);
+		String department = memberDao.selectDepartment(dto);
+		String depChatName = (department+" 단체 채팅");
+		System.out.println("멤버서칭"+memberList);
 		List<Map<String, Object>> list = new ArrayList<>();
 		for(MemberDTO members : memberList) {
 			// 채팅방 존재 여부 및 존재시 채팅방 seq 반환
-			int checkChat = dao.checkPrivateChat(dto, members.getEmail());
-			System.out.println(checkChat);
+			int checkChat = dao.checkPrivateChat(dto, members.getEmail(),depChatName);
+//			int checkChat = dao.checkPrivateChat(dto, members.getEmail());
+			System.out.println("개인채팅ㅌ"+checkChat);
 			Map<String, Object> map = new HashMap<>();
 			if(checkChat > 0) { // 채팅방 존재시 map에 기록
+				int chatRoomLastMessageSeq = cMDao.lastMessageSeq(checkChat);
+				int myLastMessageSeq = dao.getLastMessageSeq(dto.getEmail(), checkChat);
+				// 내가 마지막으로 읽은 메세지보다 더 신규 메세지가 있다면
+				map.put("alert", myLastMessageSeq < chatRoomLastMessageSeq ? "y" : "");
 				map.put("chat_seq", checkChat);
 				map.put("level_code", members.getLevel_code());
 				map.put("name", members.getName());
@@ -64,6 +81,7 @@ public class Chat_memberService {
 				member.setRole("general");
 				dao.insertCahtMember(member);
 				// 정보 포장
+				map.put("alert", "");
 				map.put("chat_seq", chatSeq);
 				map.put("level_code", members.getLevel_code());
 				map.put("name", members.getName());
@@ -91,7 +109,12 @@ public class Chat_memberService {
 				members.setRole("general");
 				dao.insertCahtMember(members);
 			}
+			int chatRoomLastMessageSeq = cMDao.lastMessageSeq(checkChat);
+			int myLastMessageSeq = dao.getLastMessageSeq(dto.getEmail(), checkChat);
+			// 내가 마지막으로 읽은 메세지보다 더 신규 메세지가 있다면
+			map.put("alert", myLastMessageSeq < chatRoomLastMessageSeq ? "y" : "");
 			map.put("chat_seq", checkChat);
+			map.put("dept_code", department);
 			map.put("chat_name", department+" 단체 채팅");
 		}else {
 			// 같은 부서의 팀 정보 출력
@@ -115,17 +138,30 @@ public class Chat_memberService {
 				member.setRole("general");
 				dao.insertCahtMember(member);
 			}
+			map.put("alert", "");
+			map.put("dept_code", department);
 			map.put("chat_seq", chatSeq);
 			map.put("chat_name", department+" 단체 채팅");
 		}
 		list.add(map);
 		// 내가 참여하고있는 단톡방 서치 (같은 부서제외)
 		List<Map<String, Object>> myChats = roomDao.selectChatRoom(dto, department);
+		System.out.println(myChats);
 		// 회사 단체 채팅은 제외하고 위에서 했으니까
 		for(Map<String, Object> chat : myChats) {
+			int memberCount = dao.memberCount(chat.get("CHAT_SEQ").toString());
+			if(memberCount <= 2) {
+				String chatName = (String) chat.get("CHAT_NAME");
+				// 사원 이름 출력
+				String username = memberDao.selectMemberName(dto.getEmail());
+				// 채팅방 이름에서 사원 이름을 제거후 저장
+				String cleanedName = chatName.replaceAll(username, "");
+				chat.put("CHAT_NAME", cleanedName);
+			}
 			if(!chat.get("CHAT_NAME").equals(department + " 단체 채팅")) {
 				list.add(chat);
 			}
+			chat.put("alert", "");
 			chat.put("chat_seq", chat.get("CHAT_SEQ"));
 			chat.put("chat_name", chat.get("CHAT_NAME"));
 			chat.remove("CHAT_NAME");chat.remove("CHAT_SEQ");
@@ -162,6 +198,44 @@ public class Chat_memberService {
 			list.put("CHAT_NAME", cleanedName);
 		}
 		return list;
+	}
+
+	// 채널 추가 주소록 출력 
+	public List<ContactDTO> contactList(Chat_memberDTO dto){
+		String eamil = dto.getMember_email();
+		List<ContactDTO> list = ContactDAO.contactList(eamil);
+		list.removeIf(l -> memberDao.checkMember(l.getEmail()) == 0);
+		return list;
+	}
+
+	// 채널 추가
+	public int newCaht(String ownerEmail, String title, List<Object> contactSeq) {
+		List<String> memberList = new ArrayList<>();
+		for(Object list : contactSeq) {
+			int contact_seq = (int)list;
+			String memberEmail =  ContactDAO.selectName(contact_seq);
+			memberList.add(memberEmail);
+		}
+		// 채팅방 생성 후 채팅방 seq 반환
+		Chat_roomDTO dto = new Chat_roomDTO();
+		dto.setChat_name(title); // 나중에 받아야함
+		dto.setManager_email(ownerEmail);
+		int chatSeq = roomDao.insertPirvateCahtRoom(dto);
+		// chat_member insert (생성자)
+		Chat_memberDTO manager = new Chat_memberDTO();
+		manager.setChat_seq(chatSeq);
+		manager.setMember_email(ownerEmail);
+		manager.setRole("manager");
+		dao.insertCahtMember(manager);
+		// chat_member insert (초대받은인원)
+		for(String member : memberList) {
+			Chat_memberDTO chat_memberDTO = new Chat_memberDTO();
+			chat_memberDTO.setChat_seq(chatSeq);
+			chat_memberDTO.setMember_email(member);
+			chat_memberDTO.setRole("general");
+			dao.insertCahtMember(chat_memberDTO);
+		}
+		return chatSeq;
 	}
 
 }
