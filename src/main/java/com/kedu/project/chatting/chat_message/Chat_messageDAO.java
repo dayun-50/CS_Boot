@@ -36,4 +36,14 @@ public class Chat_messageDAO {
 	public int lastMessageSeq(int chat_seq) {
 		return mybatis.selectOne("Chat_message.lastMessageSeq", chat_seq);
 	}
+	
+	// 메세지 글자로 검색
+	public List<Chat_messageDTO> serchByText(Chat_messageDTO dto){
+		return mybatis.selectList("Chat_message.serchByText", dto);
+	}
+	
+	// 메세지 날짜로 검색
+	public List<Chat_messageDTO> serchByDate(Chat_messageDTO dto){
+		return mybatis.selectList("Chat_message.serchByDate", dto);
+	}
 }

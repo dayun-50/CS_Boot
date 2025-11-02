@@ -83,5 +83,9 @@ public class MemberDAO {
 		// "Member.getDeptCodeByEmail" ID를 사용하여 쿼리 실행
 		return mybatis.selectOne("Member.getDeptCodeByEmail", email);
 	}
+	
+	public String selectMemberCompany(String email) {
+		return mybatis.selectOne("Member.selectMemberCompany", email);
+	}
 
 }

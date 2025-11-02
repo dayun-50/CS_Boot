@@ -88,4 +88,8 @@
         SELECT DEPT_CODE FROM member WHERE EMAIL = #{email}
     </select>
 
+	<select id="selectMemberCompany" resultType="String">
+		select company_code from member where email = #{email}
+	</select>
+
   </mapper>

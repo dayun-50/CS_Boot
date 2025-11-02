@@ -19,7 +19,7 @@ import com.kedu.project.file.FileService;
 
 /*
 	채팅방 메세지 기능 구현 controller
-*/
+ */
 
 @RequestMapping("/chatMessage")
 @RestController
@@ -28,11 +28,32 @@ public class Chat_messageController {
 	private Chat_messageService chat_messageService;
 	@Autowired
 	private FileService fileService;
+
+	//채팅방 번호로 리스트 가져오기
+	@GetMapping("/{seq}")
+	public ResponseEntity<List<FileDTO>> getDetailBoard(@PathVariable int seq){
+		List<FileDTO> list =fileService.getFilesByChatSeq(seq, FileConstants.FC);
+		return ResponseEntity.ok(list);
+	}
+
+	// 메세지 글자로 검색
+	@PostMapping("/serchByText")
+	public ResponseEntity<Map<String, Object>> serchByText(@RequestBody Chat_messageDTO dto){
+		Map<String, Object> list = chat_messageService.serchByText(dto);
+		return ResponseEntity.ok(list);
+	}
+
+	// 메세지 날짜로 검색
+	@PostMapping("/serchByDate")
+	public ResponseEntity<Map<String, Object>> serchByDate(@RequestBody Chat_messageDTO dto){
+		Map<String, Object> list = chat_messageService.serchByDate(dto);
+		return ResponseEntity.ok(list);
+	}
 	
-	   //채팅방 번호로 리스트 가져오기
-	   @GetMapping("/{seq}")
-	   public ResponseEntity<List<FileDTO>> getDetailBoard(@PathVariable int seq){
-		   List<FileDTO> list =fileService.getFilesByChatSeq(seq, FileConstants.FC);
-		   return ResponseEntity.ok(list);
-	   }
+	// 파일 제목 검색
+	@PostMapping("/serchByFileText")
+	public ResponseEntity<List<FileDTO>> serchByFileText(@RequestBody FileDTO dto){
+		List<FileDTO> list = fileService.serchByFileText(dto, FileConstants.FC);
+		return ResponseEntity.ok(list);
+	}
 }

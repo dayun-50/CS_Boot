@@ -7,7 +7,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.kedu.project.chatting.chat_room.Chat_roomDTO;
+import com.kedu.project.chatting.chat_message.Chat_messageDTO;
 import com.kedu.project.members.member.MemberDTO;
 
 /*

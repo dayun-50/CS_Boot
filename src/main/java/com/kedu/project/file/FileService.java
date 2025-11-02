@@ -118,6 +118,10 @@ public class FileService {
         return fileDao.getFilesByChatSeq(param);
     }
     
+    // 혜빈 추가 채팅방 파일 검색 기능 로직
+    public List<FileDTO> serchByFileText(FileDTO dto, String file_type){
+    	return fileDao.serchByFileText(dto, file_type);
+    }
     
     //건들 ㄴㄴ
     // 3. 종류+부모 시퀀스로 삭제하기 : 글 하나 지우면 거기에 딸린 모든 파일 삭제
