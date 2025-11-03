@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kedu.project.members.member_pto.Member_ptoService;
 import com.kedu.project.security.JwtUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,12 +28,15 @@ public class MemberController {
 	private MemberService memberService;
 	@Autowired
 	private JwtUtil jwt;
-
+	@Autowired
+	private Member_ptoService member_ptoService;
+	
 	// 회원가입
 	@PostMapping
 	public ResponseEntity<Void> signup(@RequestBody MemberDTO dto) {
 		System.out.println(dto);
 		memberService.signup(dto);
+		member_ptoService.insertInitPto(dto.getEmail());//회원가입시에 초기 연차 넣기
 		return ResponseEntity.ok().build();
 	}
 

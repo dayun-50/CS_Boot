@@ -20,7 +20,7 @@ public class CommuteScheduler {
     
     
     //매일 12시 59분 실행
-    @Scheduled(cron = "59 59 23 * * *")
+    @Scheduled(cron = "0 59 23  * * *")
     public void updateAbsenceForMissingCommute() {
         LocalDate today = LocalDate.now();
 
