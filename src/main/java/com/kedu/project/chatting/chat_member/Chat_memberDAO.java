@@ -7,7 +7,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.kedu.project.chatting.chat_room.Chat_roomDTO;
+import com.kedu.project.chatting.chat_message.Chat_messageDTO;
 import com.kedu.project.members.member.MemberDTO;
 
 /*
@@ -18,12 +18,20 @@ public class Chat_memberDAO {
 	@Autowired
 	private SqlSession mybatis;
 
+//	// 채팅방 존재 여부 및 존재시 채팅방 seq 반환
+//	public int checkPrivateChat(MemberDTO dto, String timeEmail) {
+//		return mybatis.selectOne("Chat_member.checkPrivateChat", Map.of(
+//				"email1", dto.getEmail(),
+//				"email2", timeEmail));
+//	}
+	
 	// 채팅방 존재 여부 및 존재시 채팅방 seq 반환
-	public int checkPrivateChat(MemberDTO dto, String timeEmail) {
-		return mybatis.selectOne("Chat_member.checkPrivateChat", Map.of(
-				"email1", dto.getEmail(),
-				"email2", timeEmail));
-	}
+		public int checkPrivateChat(MemberDTO dto, String timeEmail, String depChatName) {
+			return mybatis.selectOne("Chat_member.checkPrivateChat", Map.of(
+					"email1", dto.getEmail(),
+					"email2", timeEmail, 
+					"depChatName", depChatName));
+		}
 
 	// 채팅방 존재 여부에 없을시 생성 후 멤버 insert
 	public int insertCahtMember(Chat_memberDTO dto) {

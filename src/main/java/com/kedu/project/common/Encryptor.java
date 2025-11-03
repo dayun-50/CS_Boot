@@ -21,4 +21,6 @@ public class Encryptor {
 			throw new RuntimeException("SHA-512 암호화 실패", e);
 		}
 	}
+	
+	
 }

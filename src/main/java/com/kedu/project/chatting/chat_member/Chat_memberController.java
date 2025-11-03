@@ -58,14 +58,5 @@ public class Chat_memberController {
 		System.out.println(dto.getMember_email());
 		return ResponseEntity.ok(list);
 	}
-
-	// 채널 추가
-	@PostMapping("/newCaht")
-	public ResponseEntity<?> newCaht(@RequestBody Map<String, Object> body){
-		String ownerEmail = (String) body.get("owner_email");
-		String title = (String) body.get("title");
-		List<Object> contactSeq = (List<Object>)body.get("contact_seq");	
-		int chatSeq = Chat_memberService.newCaht(ownerEmail, title, contactSeq);
-		return ResponseEntity.ok(chatSeq);
-	}
+	
 }

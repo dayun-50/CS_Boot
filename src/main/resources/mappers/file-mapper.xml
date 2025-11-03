@@ -59,5 +59,9 @@
   	<select id="getFilesByChatSeq" resultType="com.kedu.project.file.FileDTO">
   		select * from file_info where chat_seq=#{chat_seq} and file_type=#{file_type} order by file_seq desc
   	</select>
+  	
+  	<select id="serchByFileText" resultType="com.kedu.project.file.FileDTO">
+  		select * from file_info where chat_seq = #{chat_seq} and oriname LIKE '%' || #{oriname} || '%' and file_type = #{file_type}
+  	</select>
 	  	
   </mapper>

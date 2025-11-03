@@ -7,30 +7,34 @@
   
  <!-- 오류 방지 예시용 고쳐쓰시오. -->
 <mapper namespace="NoticeMapper">
-<select id="getNoticeList" resultType="com.kedu.project.notice.NoticeDTO"> 
-	SELECT 
-		notice_seq, 
-		view_count, 
-		writer_email, 
-		company_code, 
-		title, 
-		content, 
-		created_at 
-	FROM NOTICE 
-	ORDER BY created_at DESC 
-</select>
-
-<select id="getNoticeById" parameterType="int" resultType="com.kedu.project.notice.NoticeDTO"> 
-	SELECT 
-		notice_seq, 
-		view_count, 
-		writer_email, 
-		company_code, 
-		title, 
-		content, 
-		created_at 
-		FROM notice 
-	WHERE notice_seq = #{notice_seq} 
-</select>
+	<select id="getNoticeList" resultType="com.kedu.project.notice.NoticeDTO"> 
+	    SELECT 
+	        notice_seq,
+	        view_count,
+	        writer_email,
+	        company_code,
+	        title,
+	        content,
+	        created_at
+	    FROM notice where company_code = #{company_code}
+	    ORDER BY created_at DESC
+	</select>
+	
+	<select id="getNoticeById" parameterType="int" resultType="com.kedu.project.notice.NoticeDTO"> 
+	    SELECT 
+	        notice_seq,
+	        view_count,
+	        writer_email,
+	        company_code,
+	        title,
+	        content,
+	        created_at
+	    FROM notice
+	    WHERE notice_seq = #{notice_seq}
+	</select>
+	
+	<update id="updateViewCount">
+		update notice SET view_count = #{view_count} where notice_seq = #{notice_seq}
+	</update>
 
 </mapper>
