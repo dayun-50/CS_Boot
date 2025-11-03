@@ -18,6 +18,15 @@ public class ContactService {
 
 	// 연락처 등록
 	public int insertContact(ContactDTO dto) {
+		if (dto.getCompany_code() == null) {
+			dto.setCompany_code("");
+		}
+		
+		// MEMO도 NOT NULL 제약 조건일 수 있으므로 함께 확인
+		if (dto.getMemo() == null) {
+			dto.setMemo("");
+		}
+
 		return dao.insertContact(dto);
 	}
 

@@ -87,5 +87,9 @@
   	<select id="getDeptCodeByEmail" resultType="String" parameterType="String">
         SELECT DEPT_CODE FROM member WHERE EMAIL = #{email}
     </select>
+    
+    <select id="getCompanyCodeEmail" resultType="String">
+        SELECT 	COMPANY_CODE FROM member WHERE EMAIL = #{email}
+    </select>
 
   </mapper>

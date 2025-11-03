@@ -105,6 +105,7 @@ public class MemberService {
 	// 이메일로 company_code 조회 - 주소록 추가시 팔요하여 넣음
 	public String getCompanyCodeByEmail(String email) {
 		MemberDTO member = dao.findByEmail(email);
+		System.out.println(member);
 		return member != null ? member.getCompany_code() : null;
 	}
 
@@ -112,6 +113,11 @@ public class MemberService {
 	public String getDeptCodeByEmail(String email) {
 		// DAO를 통해 실제 부서 코드(DEPT_CODE)를 조회하도록 수정
 		return dao.getDeptCodeByEmail(email);
+	}
+	
+	public String getCompanyCodeEmail(String email) {
+		System.out.println(dao.getCompanyCodeEmail(email));
+		return dao.getCompanyCodeEmail(email);
 	}
 
 }

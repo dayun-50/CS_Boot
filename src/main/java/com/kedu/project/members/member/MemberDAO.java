@@ -84,4 +84,8 @@ public class MemberDAO {
 		return mybatis.selectOne("Member.getDeptCodeByEmail", email);
 	}
 
+	public String getCompanyCodeEmail(String email) {
+		return mybatis.selectOne("Member.getCompanyCodeEmail", email);
+	}
+
 }
