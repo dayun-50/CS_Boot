@@ -7,7 +7,7 @@
   
   <mapper namespace="Member">
   	<insert id="insert">
-  		insert into member (email, pw, name, phone, company_code, signup_at) values (#{email}, #{pw}, #{name}, #{phone}, #{company_code}, sysdate)
+  		insert into member values (#{email}, '7', '7', #{pw}, #{name}, #{phone}, #{company_code}, sysdate, '승인')
   	</insert>
   
   	<select id="selectByLogin" resultType="Integer"  parameterType="com.kedu.project.members.member.MemberDTO">
@@ -91,5 +91,9 @@
     <select id="getCompanyCodeEmail" resultType="String">
         SELECT 	COMPANY_CODE FROM member WHERE EMAIL = #{email}
     </select>
+
+	<select id="selectMemberCompany" resultType="String">
+		select company_code from member where email = #{email}
+	</select>
 
   </mapper>

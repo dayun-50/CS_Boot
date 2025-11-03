@@ -51,5 +51,17 @@ public class Chat_roomDAO {
 	public Map<String, Object> chatRoom(Chat_memberDTO dto){
 		return mybatis.selectOne("Chat_room.selectChatRoom", dto);
 	}
+	
+	// 방 생성자(매니저) 이메일 출력
+	public Chat_roomDTO selectChatRoomManager(Chat_roomDTO dto) {
+		return mybatis.selectOne("Chat_room.selectChatRoomManager", dto);
+	}
+	
+	// 채팅방 on/ off
+	public int updateProjectOnOff(Chat_roomDTO dto) {
+		return mybatis.update("Chat_room.updateProjectOnOff", dto);
+	}
+
+
 
 }

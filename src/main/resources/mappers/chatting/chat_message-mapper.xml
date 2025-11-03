@@ -6,6 +6,44 @@
   <!-- 채팅 메세지 -->
   
   <mapper namespace="Chat_message">
+	  <!-- 파일 메시지 저장 -->
+	  <insert id="fileInsert" parameterType="com.kedu.project.chatting.chat_message.Chat_messageDTO">
+		  <selectKey keyProperty="message_seq" resultType="int" order="BEFORE">
+		    SELECT MESSAGE_SEQ.NEXTVAL FROM DUAL
+		  </selectKey>
+	  INSERT INTO CHAT_MESSAGE (
+	    MESSAGE_SEQ,
+	    CHAT_SEQ,
+	    MEMBER_EMAIL,
+	    MESSAGE,
+	    MESSAGE_AT
+	  )
+	  VALUES (
+	    #{message_seq},
+	    #{chat_seq},
+	    #{member_email},
+	    #{message},
+	    SYSDATE
+	  )
+	</insert>
+	
+	<!-- 방금 삽입된 메시지 조회 -->
+	<select id="getLastInsertedMessage" resultType="com.kedu.project.chatting.chat_message.Chat_messageDTO" parameterType="int">
+	  SELECT 
+	    MESSAGE_SEQ,
+	    CHAT_SEQ,
+	    MEMBER_EMAIL,
+	    MESSAGE,
+	    TO_CHAR(MESSAGE_AT, 'YYYY-MM-DD HH24:MI:SS') AS MESSAGE_AT
+	  FROM (
+	    SELECT * FROM CHAT_MESSAGE
+	    WHERE CHAT_SEQ = #{chat_seq}
+	    ORDER BY MESSAGE_SEQ DESC
+	  )
+	  WHERE ROWNUM = 1
+	</select>
+
+  
   	<insert id="messageInsert">
   		insert into chat_message values (message_seq.nextval, #{chat_seq}, #{member_email}, #{message}, sysdate)
   	</insert>
@@ -25,6 +63,14 @@
   		SELECT NVL(MAX(message_seq), 0) as message_seq
 		FROM chat_message
 		WHERE chat_seq = #{chat_seq}
+  	</select>
+  	
+  	<select id="serchByText" resultType="com.kedu.project.chatting.chat_message.Chat_messageDTO">
+  		select * from chat_message where chat_seq = #{chat_seq} and message LIKE '%' || #{message} || '%' 
+  	</select>
+  	
+  	<select id="serchByDate" resultType="com.kedu.project.chatting.chat_message.Chat_messageDTO">
+  		select * from chat_message where chat_seq = #{chat_seq} AND TRUNC(message_at) = TO_DATE(#{message_at}, 'YYMMDD') 
   	</select>
   	
   </mapper>

@@ -35,18 +35,18 @@ public class FileService {
 
     @Value("${spring.cloud.gcp.storage.bucket:hwi_study}")  
     private String bucketName; // application.properties에서 가져옴
-
+    
+    //건들 ㄴㄴ
     // 1. 파일 업로드
-    public void upload(MultipartFile[] files, int parent_seq, String file_type, String member_email) {
-    	if (files == null || files.length == 0) return;
+    public int upload(MultipartFile[] files, int parent_seq, String file_type, String member_email) {
+        if (files == null || files.length == 0) return 0;
 
+        int result = 0;
         for (MultipartFile file : files) {
             if (!file.isEmpty()) {
                 try {
                     String oriName = file.getOriginalFilename();
                     String sysName = UUID.randomUUID() + "_" + oriName;
-
-                    // 폴더 구조 흉내내기 (approval/uuid_filename)
                     String objectName = file_type + "/" + sysName;
 
                     BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, objectName))
@@ -57,24 +57,73 @@ public class FileService {
                         storage.createFrom(blobInfo, is);
                         System.out.println("파일업로드완료");
                     }
-                    // DB에 파일 메타데이터 저장
-                    fileDao.upload(new FileDTO(0, member_email, sysName, oriName, null, file_type, parent_seq));
+
+                    result += fileDao.upload(new FileDTO(0, member_email, sysName, oriName, null, file_type, parent_seq, null));
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new RuntimeException("파일 업로드 중 오류 발생", e);
                 }
             }
         }
+        return result;
+    }
+    
+    
+    // 1-1. 채팅 파일 업로드 chat_seq:방번호, parent_seq는 채팅메세지 시퀀스 :건들ㄴㄴ
+    public int uploadChatFile(MultipartFile[] files, int chat_seq, int parent_seq, String file_type, String member_email) {
+        if (files == null || files.length == 0) return 0;
+        int result = 0;
+        for (MultipartFile file : files) {
+            if (!file.isEmpty()) {
+                try {
+                    String oriName = file.getOriginalFilename();
+                    String sysName = UUID.randomUUID() + "_" + oriName;
+                    String objectName = file_type + "/" + sysName;
+
+                    BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, objectName))
+                                                .setContentType(file.getContentType())
+                                                .build();
+
+                    try (InputStream is = file.getInputStream()) {
+                        storage.createFrom(blobInfo, is);
+                        System.out.println("파일업로드완료");
+                    }
+
+                    result = fileDao.uploadChatFile(new FileDTO(0, member_email, sysName, oriName, null, file_type, parent_seq, chat_seq));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new RuntimeException("파일 업로드 중 오류 발생", e);
+                }
+            }
+        }
+        return result;
     }
 
+    //건들 ㄴㄴ
     // 2. 리스트 가져오기: DB에서 조회 (GCS에서 조회 x)
     public List<FileDTO> getFilesByParent(int parent_seq, String file_type) {
         Map<String, Object> param = new HashMap<>();
         param.put("parent_seq", parent_seq);
         param.put("file_type", file_type);
+        System.out.println(parent_seq + file_type);
         return fileDao.selectByParentSeq(param);
     }
     
+ // 2-1 리스트 가져오기: DB에서 조회 (GCS에서 조회 x) 채팅일때사용
+    public List<FileDTO> getFilesByChatSeq(int chat_seq, String file_type) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("chat_seq", chat_seq);
+        param.put("file_type", file_type);
+        System.out.println(chat_seq + file_type);
+        return fileDao.getFilesByChatSeq(param);
+    }
+    
+    // 혜빈 추가 채팅방 파일 검색 기능 로직
+    public List<FileDTO> serchByFileText(FileDTO dto, String file_type){
+    	return fileDao.serchByFileText(dto, file_type);
+    }
+    
+    //건들 ㄴㄴ
     // 3. 종류+부모 시퀀스로 삭제하기 : 글 하나 지우면 거기에 딸린 모든 파일 삭제
     public int deleteFilesByParent(int parent_seq,String file_type ) {
     	// 1. 파일이 없다면 리턴
@@ -97,6 +146,7 @@ public class FileService {
         return fileDao.deleteByParentSeq(param);
     }
     
+    //건들ㄴㄴ
     //4. 유지할 파일은 제외하고 나머지만 삭제
     public void deleteFilesExcept(int parentSeq, String fileType, List<String> keepFiles) {
         Map<String, Object> param = new HashMap<>();
@@ -127,34 +177,41 @@ public class FileService {
     }
     
     //5. 시스네임으로 다운로드
-    public ResponseEntity<InputStreamResource> streamDownload( String sysname, String file_type) {
-        try {
-            String objectPath = file_type + "/" + sysname;
-            Blob blob = storage.get(bucketName, objectPath);
-            if (blob == null) {
-                return ResponseEntity.notFound().build();
-            }
+    public Map<String, Object> getFileStream(String sysname, String file_type) {
+        Map<String, Object> result = new HashMap<>();
+        String objectPath = file_type + "/" + sysname;
+        Blob blob = storage.get(bucketName, objectPath);
+        if (blob == null) return null;
 
-            String oriName = fileDao.findOriNameBySysName(sysname);
-            String encodedName = URLEncoder.encode(oriName, "UTF-8").replaceAll("\\+", "%20");
+        String oriName = fileDao.findOriNameBySysName(sysname);
+        InputStream inputStream = new ByteArrayInputStream(blob.getContent());
 
-            // GCS에서 바로 InputStream으로 읽기
-            InputStream inputStream = new ByteArrayInputStream(blob.getContent());
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", encodedName);
-
-            // InputStreamResource로 바로 스트리밍
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(new InputStreamResource(inputStream));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
-        }
+        result.put("oriName", oriName);
+        result.put("stream", inputStream);
+        return result;
     }
+	/*
+	 * public ResponseEntity<InputStreamResource> streamDownload( String sysname,
+	 * String file_type) { try { String objectPath = file_type + "/" + sysname; Blob
+	 * blob = storage.get(bucketName, objectPath); if (blob == null) { return
+	 * ResponseEntity.notFound().build(); }
+	 * 
+	 * String oriName = fileDao.findOriNameBySysName(sysname); String encodedName =
+	 * URLEncoder.encode(oriName, "UTF-8").replaceAll("\\+", "%20");
+	 * 
+	 * // GCS에서 바로 InputStream으로 읽기 InputStream inputStream = new
+	 * ByteArrayInputStream(blob.getContent());
+	 * 
+	 * HttpHeaders headers = new HttpHeaders();
+	 * headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+	 * headers.setContentDispositionFormData("attachment", encodedName);
+	 * 
+	 * // InputStreamResource로 바로 스트리밍 return ResponseEntity.ok() .headers(headers)
+	 * .body(new InputStreamResource(inputStream));
+	 * 
+	 * } catch (Exception e) { e.printStackTrace(); return
+	 * ResponseEntity.internalServerError().build(); } }
+	 */
 
     
 }

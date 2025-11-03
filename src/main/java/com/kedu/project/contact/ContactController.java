@@ -18,8 +18,6 @@ public class ContactController {
 	@Autowired
 	private ContactService contactService;
 
-	@Autowired
-	private MemberService memberService;
 
 	// 본인 연락처 목록 조회
 	@GetMapping("/list/{owner_email}")
@@ -36,7 +34,8 @@ public class ContactController {
 		}
 
 		// 로그인한 사용자 company_code 자동 세팅
-		String companyCode = memberService.getCompanyCodeEmail(dto.getOwner_email());
+		String companyCode = contactService.getCompanyCodeByEmail(dto.getOwner_email());
+
 		dto.setCompany_code(companyCode);
 
 		int rowsInserted = contactService.insertContact(dto);
@@ -81,8 +80,8 @@ public class ContactController {
 	public ResponseEntity<List<ContactDTO>> getTeamContacts(@PathVariable("owner_email") String ownerEmail) { 
 		// ownerEmail만
 
-		// 1. MemberService를 사용하여 현재 사용자의 부서 코드(dept_code)를 조회합니다.
-		String deptCode = memberService.getDeptCodeByEmail(ownerEmail);
+		// 💡 1. MemberService를 사용하여 현재 사용자의 부서 코드(dept_code)를 조회합니다.
+		String deptCode = contactService.getDeptCodeByEmail(ownerEmail);
 
 		// 만약 부서 코드를 가져오지 못했다면 빈 목록을 반환합니다.
 		if (deptCode == null || deptCode.isEmpty()) {
