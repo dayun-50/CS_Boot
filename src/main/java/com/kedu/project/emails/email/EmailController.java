@@ -16,8 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
-import com.kedu.project.emails.MailSendRequestDTO;
+import com.kedu.project.emails.james.JamesEmailDTO;
 import com.kedu.project.external.james.JamesAccountService;
 import com.kedu.project.security.JwtUtil;
 
@@ -73,14 +72,15 @@ public class EmailController {
     @PostMapping("/send")
     public ResponseEntity<?> sendEmail(
         HttpServletRequest request, 
-        @RequestBody MailSendRequestDTO mailSendRequestDTO 
+        @RequestBody EmailSendRequestDTO mailSendRequestDTO 
     ) {
         try {
+        	System.out.println("sendemail 토큰분리전");
             // 1.  토큰 분리: General Token과 James Access Token 획득
             String[] tokenParts = splitAuthorizationToken(request);
             String generalToken = tokenParts[0]; 
             String jamesAccessToken = tokenParts[1];
-            
+            System.out.println("sendemail 토큰분리완료");
             // 2.  ID 및 비밀번호 획득 (JwtUtil 사용)
             // (a) 일반 토큰으로 DB ID 획득
             String senderDbId = jwtUtil.verifyToken(generalToken).getSubject(); 
@@ -89,20 +89,32 @@ public class EmailController {
             
             // 3. James 계정 아이디로 전환
             String senderJamesId = jamesAccountService.getJamesUsername(senderDbId); 
-            
+            System.out.println("sendemail 계정 아이디 전환완료");
             // 4. 수신자 목록 파싱
-            List<String> recipients = Arrays.stream(mailSendRequestDTO.getReceiverEmails().split(","))
+            System.out.println("sendemail 수신자 목록 파싱 대기");
+            String receiverStr = mailSendRequestDTO.getReceiverEmails();
+            System.out.println("sendemail 수신자 목록 파싱중");
+            List<String> recipients = Arrays.stream((receiverStr != null ? receiverStr : "").split(","))
                                             .map(String::trim)
+                                            .filter(email -> !email.isEmpty()) // 공백/빈 문자열 제거
                                             .toList();
-            
+            System.out.println("sendemail 수신자 목록 파싱 된건가?");
+            System.out.println("수신자 목록: " + recipients);
+            // 수신자가 없으면 발송 건너뛰기
+            if (recipients.isEmpty()) {
+                return ResponseEntity.ok(Map.of("message", "수신자가 없어서 발송을 건너뜀"));
+            }
+            System.out.println("발송 서비스 호출 전");
             // 5. 발송 서비스 호출
             emailService.sendEmail(
                 senderJamesId, senderRawPassword, recipients, 
                 mailSendRequestDTO.getSubject(), mailSendRequestDTO.getContent()
             );
-
+            System.out.println("이전에 다 가던디? ");
+            System.out.println("수신자 목록: " + recipients);
             return ResponseEntity.ok(Map.of("message", "메일 발송에 성공했습니다.", 
                                            "recipients", recipients.size() + "명"));
+            
 
         } catch (AuthenticationFailedException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "메일 서버 인증 실패: James 계정 ID/PW 불일치"));
@@ -132,7 +144,7 @@ public class EmailController {
             String receiverJamesId = jamesAccountService.getJamesUsername(loggedInDbId);
             
             //  EmailService 호출: List<EmailDTO> 반환
-            List<EmailDTO> mailList = emailService.getMailList(
+            List<JamesEmailDTO> mailList = emailService.getMailList(
                 receiverJamesId, 
                 receiverRawPassword, 
                 folderName
@@ -151,7 +163,7 @@ public class EmailController {
 // ---  /message/{uid} (메일 상세 조회) -------------------------------------------
     
     @GetMapping("/message/{uid}") 
-    public ResponseEntity<EmailDTO> getMessageDetail(
+    public ResponseEntity<JamesEmailDTO> getMessageDetail(
         HttpServletRequest request,
         @PathVariable long uid, //  목록에서 선택한 메시지의 UID를 받습니다.
         @RequestParam(name = "folder", defaultValue = "INBOX") String folderName
@@ -166,7 +178,7 @@ public class EmailController {
             String receiverJamesId = jamesAccountService.getJamesUsername(loggedInDbId);
             
             //  EmailService 호출: 상세 정보가 채워진 EmailDTO 반환
-            EmailDTO detailDTO = emailService.getMessageDetail(
+            JamesEmailDTO detailDTO = emailService.getMessageDetail(
                 receiverJamesId, 
                 receiverRawPassword, 
                 folderName, // 폴더 이름은 INBOX 또는 Sent 중 선택 가능

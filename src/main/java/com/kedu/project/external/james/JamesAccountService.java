@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kedu.project.emails.email.EmailDAO;
+import com.kedu.project.emails.email.OracleEmailDAO;
 import com.kedu.project.members.member.MemberDAO;
 
 @Service
@@ -17,8 +17,6 @@ public class JamesAccountService {
     @Autowired
     private MemberDAO dao;
     
-    @Autowired
-    private EmailDAO emailDAO;
     
     @Value("${james.local.domain}")
     private String localDomain;
@@ -58,10 +56,6 @@ public class JamesAccountService {
     
     
     
-    ///////////////////////////////////////////// 필요없음
-    
-    
-    
     @Transactional
     public void createDefaultMailboxes(String memberEmail) {
       
@@ -70,24 +64,8 @@ public class JamesAccountService {
              
              // 1. James 서버에 INBOX, Sent 메일박스 생성
              jamesAdminClient.createMailbox(jamesUsername, "INBOX");
-             System.out.println("James INBOX 생성: " + jamesUsername);
-             
              jamesAdminClient.createMailbox(jamesUsername, "Sent");
-             System.out.println("James Sent 생성: " + jamesUsername);
-             
-             // 2. Oracle DB에 메일박스 정보 저장
-             int inboxResult = emailDAO.insertInbox(memberEmail);
-             
-             int sentResult = emailDAO.insertSent(memberEmail);
-             
-          // 3. 저장 확인
-             int inboxCount = emailDAO.countByEmailAndType(memberEmail, "INBOX");
-             int sentCount = emailDAO.countByEmailAndType(memberEmail, "Sent");
-             
-             if (inboxCount == 0 || sentCount == 0) {
-                 throw new RuntimeException("DB에 메일박스 정보 저장 실패");
-             }
-             
+      
              System.out.println("기본 메일박스 생성 완료: " + memberEmail);
              
          } catch (Exception e) {

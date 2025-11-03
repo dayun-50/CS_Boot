@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <!-- 이메일 기능 -->
+  <mapper namespace="james">	
+
+    <select id="getEmailboxSeq" parameterType="map" resultType="int">
+        select mailbox_id
+        from james_mailbox
+        where substr(user_name, 1, instr(user_name, '@') - 1) =
+        substr(#{user_name}, 1, instr(#{user_name}, '@') - 1)
+         and mailbox_name = #{mailbox_name}
+    </select>
+    
+   
+   
+</mapper>

@@ -83,7 +83,7 @@ public class JamesAdminClient {
 		}
 	}
 	
-	//////////////////////////// 필요없음
+
 	
 	public void createMailbox(String jamesUsername, String mailboxName) {
 		try {

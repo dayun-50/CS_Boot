@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <!-- 메일함 -->
+  
+  
+  <!-- 오류 방지 예시용 고쳐쓰시오. -->
+  <mapper namespace="oracle">
+   <insert id="insertEmail" parameterType="com.kedu.project.emails.email.OracleEmailDTO">
+        <selectKey keyProperty="email_seq" resultType="int" order="BEFORE">
+            select email_seq.nextval from dual
+        </selectKey>
+        
+        insert into email 
+            (email_seq, emailbox_seq, james_message_uid, title, email_from, content, is_read, push_at,pull_at)
+        values 
+            (#{email_seq}, #{emailbox_seq}, #{james_message_uid}, #{title}, #{email_from}, #{content}, #{is_read}, #{push_at}, #{pull_at})
+    </insert>
+  	
+   <insert id="insertEmailSender" parameterType="map">
+        <selectKey keyProperty="sender_seq" resultType="int" order="BEFORE">
+             select sender_seq.nextval FROM DUAL
+        </selectKey>
+        
+        insert into email_sender 
+            (sender_seq, email_seq, sender_email)
+        VALUES 
+            (#{sender_seq}, #{email_seq}, #{sender_email})
+    </insert>
+  	<select id="getSortedMailMetadata" parameterType="map" resultType="com.kedu.project.emails.email.OracleEmailDTO">
+   	SELECT E.EMAIL_SEQ, E.JAMES_MESSAGE_UID, E.PUSH_AT, E.PULL_AT  FROM EMAIL E
+	WHERE E.EMAILBOX_SEQ = #{mailboxId} AND E.EMAIL_FROM = #{userEmail} ORDER BY 
+    	CASE 
+    		WHEN #{folderType} = 'Sent' THEN E.PUSH_AT
+			ELSE E.PULL_AT
+    		END DESC
+    
+	</select>
+
+  
+  </mapper>

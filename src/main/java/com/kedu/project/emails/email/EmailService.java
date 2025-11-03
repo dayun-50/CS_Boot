@@ -1,17 +1,23 @@
 package com.kedu.project.emails.email;
 
-import java.text.SimpleDateFormat;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+
 import java.util.List;
+
 import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.kedu.project.emails.james.JamesEmailDAO;
+import com.kedu.project.emails.james.JamesEmailDTO;
 
 import jakarta.mail.Authenticator;
 import jakarta.mail.FetchProfile;
@@ -34,7 +40,10 @@ import jakarta.mail.internet.MimeUtility;
 public class EmailService {	
 
 	@Autowired
-	private EmailDAO dao;
+	private OracleEmailDAO oracleDao;
+	
+	@Autowired
+	private JamesEmailDAO jamesDao;
 
 	// application.properties에서 @Value로 로드 (Final Configuration)
 	@Value("${james.host}")
@@ -56,14 +65,15 @@ public class EmailService {
 	 */
 	public void sendEmail(String fromEmail, String rawPassword, Collection<String> toEmails, 
 			String subject, String content) throws Exception {
-
+		System.out.println("sendemail 들어옴");
 		// 1. 메시지 객체 생성 (전송과 저장을 위해 필요)
+		
 		Session smtpSession = getSmtpsSession(fromEmail, rawPassword);
 		MimeMessage message = createMimeMessage(smtpSession, fromEmail, toEmails, subject, content);
-
+		System.out.println("sendemail 객체 생성함");
 		// 2. SMTPS를 통한 메일 발송
 		sendSmtpMessage(message, fromEmail, rawPassword);
-
+		System.out.println("메일발송하고 난 후");
 		// 3. IMAPS를 통한 'Sent' 폴더 저장 + Oracle 동기화
 		saveToSentFolder(message, fromEmail, rawPassword, toEmails);
 	}
@@ -72,19 +82,20 @@ public class EmailService {
 
 	//  SMTPS 세션 획득
 	private Session getSmtpsSession(String username, String password) {
+		System.out.println("왜 안떠요!?!?!?!?!??!");
 		Properties props = new Properties();
 		props.put("mail.transport.protocol", "smtps");
 		props.put("mail.smtps.host", mailHost);
 		props.put("mail.smtps.port", smtpsPort);
 		props.put("mail.smtps.auth", "true");
 		//  [추가] SSL 연결을 명시적으로 활성화
-		props.put("mail.smtps.ssl.enable", "true"); 
+		props.put("mail.smtps.ssl.enable", "true");
+		
+		
 
 		//  [핵심 수정] 호스트 이름과 인증서 이름 불일치 검사를 무시합니다. 
 		// 자체 서명된 인증서에서 가장 흔하게 발생하는 오류를 해결합니다. 
-		props.put("mail.smtps.ssl.checkserveridentity", "false"); 
-
-
+		props.put("mail.smtps.ssl.checkserveridentity", "false");
 		// 로컬 인증서 무시 설정 (기존 설정 유지)
 		//props.put("mail.smtps.ssl.trust", mailHost); 
 		props.put("mail.smtps.ssl.trust", "*");
@@ -100,21 +111,37 @@ public class EmailService {
 		});
 	}
 
-	//  메시지 객체 생성 (수신자 목록을 처리하도록 수정)
-	private MimeMessage createMimeMessage(Session session, String from, Collection<String> to, String subject, String content) throws MessagingException {
-		MimeMessage message = new MimeMessage(session);
-		message.setFrom(new InternetAddress(from));
+	private MimeMessage createMimeMessage(Session session, String from, Collection<String> toCollection, String subject, String content) throws MessagingException {
+	    MimeMessage message = new MimeMessage(session);
+	    message.setFrom(new InternetAddress(from));
 
-		// 1.  [수정] subject와 content가 null이 아닌지 확인하여 빈 문자열로 치환
-		String safeSubject = (subject != null) ? subject : "";
-		String safeContent = (content != null) ? content : "";
-		//  Collection<String>을 받아 String.join으로 쉼표로 구분된 String을 만들어 RecipientType.TO로 설정
-		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(String.join(",", to))); 
-		message.setSubject(safeSubject, "UTF-8");
-		message.setText(safeContent, "UTF-8");
-		return message;
+	    // subject와 content null 처리
+	    String safeSubject = (subject != null) ? subject : "";
+	    String safeContent = (content != null) ? content : "";
+
+	    // toCollection이 null이면 빈 리스트로 처리
+	    Collection<String> safeTo = (toCollection != null) ? toCollection : Collections.emptyList();
+
+	    // 공백 제거 및 빈 문자열 제외
+	    List<String> filteredTo = safeTo.stream()
+	                                    .map(String::trim)
+	                                    .filter(email -> !email.isEmpty())
+	                                    .toList();
+
+	    // 수신자가 없으면 발송 안 함
+	    if (filteredTo.isEmpty()) {
+	        System.out.println("메일 수신자가 없습니다. 발송을 건너뜁니다.");
+	        return null; // 또는 필요에 따라 예외 처리
+	    }
+
+	    // RecipientType.TO 세팅
+	    message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(String.join(",", filteredTo)));
+
+	    message.setSubject(safeSubject, "UTF-8");
+	    message.setText(safeContent, "UTF-8");
+	    
+	    return message;
 	}
-
 	//  SMTPS를 통한 실제 전송 로직
 	private void sendSmtpMessage(MimeMessage message, String username, String password) throws MessagingException {
 		Transport transport = message.getSession().getTransport("smtps");
@@ -148,38 +175,55 @@ public class EmailService {
 			sentFolder.appendMessages(new Message[]{message});
 
 
-			// a.Oracle DB 동기화
+			// james DB 에서 Sent 폴더 ID 찾기 
 			System.out.println(username);
-			Integer emailboxSeq = dao.getEmailboxSeq(username, "Sent");
+			Integer mailboxId = jamesDao.getEmailboxSeq(username, "Sent");
 
-			if (emailboxSeq != null) {
+			if (mailboxId != null) {
 
-				// b. Email DTO 생성 및 필드 채우기 (Oracle DB 영속성 필드 포함)
-				EmailDTO emailDto = new EmailDTO();
-				emailDto.setEmailbox_seq(emailboxSeq.intValue());
+				// Oracle DB  필드 채우기 
+				OracleEmailDTO Odto = new OracleEmailDTO();
+				Odto.setEmailbox_seq(mailboxId.intValue());
 
-				//  [핵심] James 서버의 Message-ID를 Oracle DB에 저장하여 두 시스템을 연결
-				emailDto.setJames_message_uid(message.getMessageID() != null ? message.getMessageID() : "NO_ID_" + System.currentTimeMillis()); 
-				emailDto.setSubject(message.getSubject() != null ? message.getSubject() : "");
-				emailDto.setSender(username); // 보낸 사람 (본인)
+				// James 서버의 Message-ID를  DTO 저장
+				Odto.setJames_message_uid(message.getMessageID() != null ? message.getMessageID() : "NO_ID_" + System.currentTimeMillis());
+				
+				// JavaMail API로 데이터 추출한 후 DTO 저장
+				Odto.setTitle(message.getSubject() != null ? message.getSubject() : "(제목 없음)");
+  
+				String fromAddress = InternetAddress.toString(message.getFrom()); 
+				Odto.setEmail_from(fromAddress != null ? fromAddress : username);
 
-				//  Content는 CLOB이므로, 단순 String으로 변환하여 저장
-				emailDto.setContent(message.getContent().toString()); 
-				emailDto.setIsRead("y"); // 보낸 메일은 '읽음' 처리
+				// Content 추출 (CLOB 저장용)
+				Odto.setContent(extractTextFromMultipart(message.getContent())); 
+	            
+	            // Read 플래그 및 시간 설정
+				Odto.setIs_read("y"); // 보낸 메일은 '읽음' 처리
 
-				// c. EMAIL 테이블에 INSERT (useGeneratedKeys로 email_seq를 DTO에 채웁니다)
-				dao.insertEmail(emailDto); 
+	            // PUSH_AT (보낸 시간): SentDate 사용 (Timestamp 변환)
+	            Date sentDate = message.getSentDate();
+	            if (sentDate != null) {
+	            	Odto.setPush_at(new Timestamp(sentDate.getTime()));
+	            }
+	            // PULL_AT (받은 시간): Sent 폴더이므로 NULL 또는 임시값 (NULL 유지)
+	            Odto.setPull_at(null); 
+	            
+
+	            // c. EMAIL 테이블에 INSERT
+	            oracleDao.insertEmail(Odto);
+	            
+	            
 
 				// d. EMAIL_SENDER 테이블에 수신자 목록 INSERT
-				int newEmailSeq = emailDto.getEmail_seq();
+				int newEmailSeq = Odto.getEmail_seq();
 
 				for (String recipient : toEmails) {
-					//  EmailSenderDTO 없이 DAO에 emailSeq와 recipient를 직접 전달
-					dao.insertEmailSender(newEmailSeq, recipient); 
+					//  dao.insertEmailSender의 인수는 emailSeq와 recipient
+					oracleDao.insertEmailSender(newEmailSeq, recipient); 
 				}
 
 			} else {
-				System.err.println("WARN: Sent 메일함 PK를 찾을 수 없어 Oracle DB 저장을 건너뜁니다.");
+				System.err.println("WARN: Sent 메일함 ID를 찾을 수 없어 Oracle DB 저장을 건너뜁니다.");
 			}
 
 		} catch (MessagingException e) {
@@ -197,6 +241,7 @@ public class EmailService {
 				store.close();
 			}
 		}
+		
 	}
 
 
@@ -212,13 +257,15 @@ public class EmailService {
 	 * @param folderName 조회할 폴더 이름 (예: "INBOX", "Sent")
 	 * @return Message[] 배열
 	 */
-	public List<EmailDTO> getMailList(String email, String rawPassword, String folderName) throws Exception {
+	public List<JamesEmailDTO> getMailList(String email, String rawPassword, String folderName) throws Exception {
 		Store store = null;
 		Folder folder = null;
-		List<EmailDTO> mailList = new ArrayList<>();
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		List<JamesEmailDTO> mailList = new ArrayList<>();
+		
 
 		try {
+	        
+			//2. james 서버 연결 (java mail)
 			Session imapsSession = getImapsSession();
 			store = imapsSession.getStore("imaps");
 			store.connect(mailHost, imapsPort, email, rawPassword);
@@ -229,6 +276,8 @@ public class EmailService {
 				return mailList; // 폴더가 없으면 빈 배열 반환
 			}
 			folder.open(Folder.READ_ONLY);
+		
+			
 
 			Message[] messages = folder.getMessages();
 
@@ -264,17 +313,24 @@ public class EmailService {
 			//  Message 객체를 EmailDTO로 변환
 			UIDFolder uf = (UIDFolder) folder;
 			for (Message message : messages) {
-				EmailDTO dto = new EmailDTO();
+				JamesEmailDTO dto = new JamesEmailDTO();
 
 				// [핵심] IMAP UID 획득
 				dto.setUid(uf.getUID(message)); 
 
-				dto.setIsRead(message.getFlags().contains(Flags.Flag.SEEN) ? "y" : "n");
+				dto.setIs_read(message.getFlags().contains(Flags.Flag.SEEN) ? "y" : "n");
 
-				// 날짜 설정
-				java.util.Date dateFromMessage = message.getReceivedDate() != null ? message.getReceivedDate() : message.getSentDate();
-				dto.setReceivedDate(dateFromMessage != null ? formatter.format(dateFromMessage) : "");
-
+				// 날짜 설정 - 맞으면 수신 다르면 발신
+				Date dateFromMessage = ("Sent".equalsIgnoreCase(folderName)) ? message.getSentDate() : message.getReceivedDate();
+				
+				if (dateFromMessage != null) {
+			        dto.setReceived_date(new Timestamp(dateFromMessage.getTime())); // DTO 필드 유형 변경 가정
+			    } else {
+			    	dto.setReceived_date(null);
+			    }
+				
+				
+				
 				// 나머지 필드 설정
 				dto.setSender(InternetAddress.toString(message.getFrom()));
 				dto.setSubject(message.getSubject() != null ? MimeUtility.decodeText(message.getSubject()) : "(제목 없음)");
@@ -292,10 +348,23 @@ public class EmailService {
 		}
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
-	// 메일 상세조회 메서드
+	//3. 메일 상세조회 메서드
 
-	public EmailDTO getMessageDetail(String email, String rawPassword, String folderName, long uid) throws Exception {
+	public JamesEmailDTO getMessageDetail(String email, String rawPassword, String folderName, long uid) throws Exception {
 		Store store = null;
 		Folder folder = null;
 
@@ -320,18 +389,18 @@ public class EmailService {
 
 
 			// DTO 변환 (기본 정보)
-			EmailDTO dto = new EmailDTO();
+			JamesEmailDTO dto = new JamesEmailDTO();
 			dto.setUid(uid);
 			dto.setSender(InternetAddress.toString(message.getFrom()));
 			dto.setSubject(message.getSubject() != null ? MimeUtility.decodeText(message.getSubject()) : "(제목 없음)");
 
-			dto.setIsRead(message.getFlags().contains(Flags.Flag.SEEN) ? "y" : "n");
+			dto.setIs_read(message.getFlags().contains(Flags.Flag.SEEN) ? "y" : "n");
 
 			//  [핵심] 본문(Content) 파싱 및 설정
 			dto.setContent(extractTextFromMultipart(message.getContent()));
 
 			//  [수신자 목록] 설정
-			dto.setMailTo(message.getRecipients(Message.RecipientType.TO));
+			dto.setMail_to(message.getRecipients(Message.RecipientType.TO));
 
 			return dto;
 
@@ -380,7 +449,7 @@ public class EmailService {
 	}
 
 	// ----------------------------------------------------
-	// 3. 메일 삭제 기능 (IMAPS) - 기존 구현체
+	// 4. 메일 삭제 기능 (IMAPS) - 기존 구현체
 	// ----------------------------------------------------
 
 	public void deleteAllEmails(String userEmail, String rawPassword) throws Exception {
