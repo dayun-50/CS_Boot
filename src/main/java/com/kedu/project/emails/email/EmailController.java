@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import com.kedu.project.emails.MailSendRequestDTO;
 import com.kedu.project.external.james.JamesAccountService;
 import com.kedu.project.security.JwtUtil;
@@ -34,9 +35,10 @@ public class EmailController {
     @Autowired
     private JwtUtil jwtUtil;
     
+
     @Autowired
     private JamesAccountService jamesAccountService;
-    
+
 
     // ---  헬퍼 메서드 (토큰 분리) ---------------------------------------------------
     // 이 메서드만 남기고, 이전의 getLoggedInDbId, getRawJamesPassword 헬퍼는 모두 삭제되었습니다.
@@ -65,6 +67,7 @@ public class EmailController {
         return parts;
     }
     
+
  // ---  /send (메일 발송) ---------------------------------------------------------
 
     @PostMapping("/send")
@@ -206,4 +209,5 @@ public class EmailController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "메일 삭제 중 오류 발생: " + e.getMessage()));
         }
     }
+
 }

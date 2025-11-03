@@ -30,7 +30,7 @@ public class MemberService {
 
 // JamesAdminClient 주입
 
-  
+
 	@Autowired
     private JamesAccountService jamesAccountService;
     
@@ -70,6 +70,7 @@ public class MemberService {
 
     // 로그인
     public int login(MemberDTO dto) {
+
 
 
 
@@ -132,6 +133,7 @@ public class MemberService {
 	}
 
 
+
 	// -------------------- 주소록에 좀 뽑을게 --------------------------------
 	// 이메일로 company_code 조회 - 주소록 추가시 팔요하여 넣음
 	public String getCompanyCodeByEmail(String email) {
@@ -144,6 +146,7 @@ public class MemberService {
 		// DAO를 통해 실제 부서 코드(DEPT_CODE)를 조회하도록 수정
 		return dao.getDeptCodeByEmail(email);
 	}
+
 
 
 }

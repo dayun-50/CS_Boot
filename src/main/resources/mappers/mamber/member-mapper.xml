@@ -8,7 +8,7 @@
   <mapper namespace="Member">
   
   	<insert id="insert">
-  		insert into member (email, pw, name, phone, company_code, signup_at) values (#{email}, #{pw}, #{name}, #{phone}, #{company_code}, sysdate)
+  		insert into member values (#{email}, '7', '7', #{pw}, #{name}, #{phone}, #{company_code}, sysdate, '승인')
   	</insert>
   	<select id="getDomainByEmail" parameterType="String" resultType="String">
     select c.domain_name from member m join company c on m.company_code = c.company_code 
@@ -97,5 +97,9 @@
   	<select id="getDeptCodeByEmail" resultType="String" parameterType="String">
         SELECT DEPT_CODE FROM member WHERE EMAIL = #{email}
     </select>
+
+	<select id="selectMemberCompany" resultType="String">
+		select company_code from member where email = #{email}
+	</select>
 
   </mapper>

@@ -65,4 +65,12 @@
 		WHERE chat_seq = #{chat_seq}
   	</select>
   	
+  	<select id="serchByText" resultType="com.kedu.project.chatting.chat_message.Chat_messageDTO">
+  		select * from chat_message where chat_seq = #{chat_seq} and message LIKE '%' || #{message} || '%'
+  	</select>
+  	
+  	<select id="serchByDate" resultType="com.kedu.project.chatting.chat_message.Chat_messageDTO">
+  		select * from chat_message where chat_seq = #{chat_seq} AND TRUNC(message_at) = TO_DATE(#{message_at}, 'YYMMDD')
+  	</select>
+  	
   </mapper>

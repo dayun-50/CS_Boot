@@ -18,16 +18,17 @@ import jakarta.servlet.http.HttpSession;
 
 
 /*
- * 		사원 회원가입 및 마이페이지 구현 Controller
+ *       사원 회원가입 및 마이페이지 구현 Controller
  * */
 
 @RequestMapping("/member")
 @RestController
 public class MemberController {
-	@Autowired
-	private MemberService memberService;
-	@Autowired
-	private JwtUtil jwt;
+   @Autowired
+   private MemberService memberService;
+   @Autowired
+   private JwtUtil jwt;
+
 
 
 	// 회원가입
@@ -75,32 +76,35 @@ public class MemberController {
 		}
 	}
 
-	// 비밀번호 변경
-	@PostMapping("/gnewpw")
-	public ResponseEntity<String> gnewpw(@RequestBody MemberDTO dto) {
-		int result = memberService.gnewpw(dto);
-		if (result > 0) {
-			return ResponseEntity.ok().build();
-		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
-		}
-	}
 
-	// 마이페이지 출력
-	@PostMapping("/mypage")
-	public ResponseEntity<List<MemberDTO>> mypage(@RequestBody MemberDTO dto) {
-		List<MemberDTO> list = memberService.mypage(dto);
-		return ResponseEntity.ok(list);
-	}
+   
 
-	// 마이페이지 수정
-	@PostMapping("/updateMypage")
-	public ResponseEntity<String> updateMypage(@RequestBody MemberDTO dto) {
-		int result = memberService.updateMypage(dto);
-		if (result > 0) {
-			return ResponseEntity.ok().build();
-		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
-		}
-	}
+   // 비밀번호 변경
+   @PostMapping("/gnewpw")
+   public ResponseEntity<String> gnewpw(@RequestBody MemberDTO dto) {
+      int result = memberService.gnewpw(dto);
+      if (result > 0) {
+         return ResponseEntity.ok().build();
+      } else {
+         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
+      }
+   }
+
+   // 마이페이지 출력
+   @PostMapping("/mypage")
+   public ResponseEntity<List<MemberDTO>> mypage(@RequestBody MemberDTO dto) {
+      List<MemberDTO> list = memberService.mypage(dto);
+      return ResponseEntity.ok(list);
+   }
+
+   // 마이페이지 수정
+   @PostMapping("/updateMypage")
+   public ResponseEntity<String> updateMypage(@RequestBody MemberDTO dto) {
+      int result = memberService.updateMypage(dto);
+      if (result > 0) {
+         return ResponseEntity.ok().build();
+      } else {
+         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
+      }
+   }
 }

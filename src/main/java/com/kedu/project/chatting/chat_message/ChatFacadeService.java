@@ -17,8 +17,6 @@ import com.kedu.project.file.FileService;
 @Service
 public class ChatFacadeService {
 
-	
-	
     @Autowired
     private Chat_messageService chat_messageService;
     @Autowired

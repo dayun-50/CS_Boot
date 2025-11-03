@@ -16,7 +16,7 @@
 	        title,
 	        content,
 	        created_at
-	    FROM notice
+	    FROM notice where company_code = #{company_code}
 	    ORDER BY created_at DESC
 	</select>
 	
@@ -32,5 +32,9 @@
 	    FROM notice
 	    WHERE notice_seq = #{notice_seq}
 	</select>
+	
+	<update id="updateViewCount">
+		update notice SET view_count = #{view_count} where notice_seq = #{notice_seq}
+	</update>
 
 </mapper>

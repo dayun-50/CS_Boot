@@ -13,17 +13,18 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 @Component
 public class JwtUtil {
-	@Value("${jwt.expiration}")
-	private Long exp;
+   @Value("${jwt.expiration}")
+   private Long exp;
 
-	private Algorithm algorithm;
-	private JWTVerifier jwt;
+   private Algorithm algorithm;
+   private JWTVerifier jwt;
 
-	// 생성자
-	public JwtUtil(@Value("${jwt.secret}") String secret) { // 비번
-		this.algorithm = Algorithm.HMAC256(secret);
-		this.jwt = JWT.require(algorithm).build();
-	}
+   // 생성자
+   public JwtUtil(@Value("${jwt.secret}") String secret) { // 비번
+      this.algorithm = Algorithm.HMAC256(secret);
+      this.jwt = JWT.require(algorithm).build();
+   }
+
 
 
 	// 토큰설정
@@ -37,6 +38,7 @@ public class JwtUtil {
 	
 	//james 서버 전용 토큰
 	public String createJamesToken(String email, String rawPassword) {
+
         // 평문 비밀번호를 Base64로 인코딩하여 저장 (보안 강화를 위해)
         String encodedPassword = Base64.getEncoder().encodeToString(rawPassword.getBytes(StandardCharsets.UTF_8));
         
@@ -49,17 +51,21 @@ public class JwtUtil {
             .withExpiresAt(new Date(System.currentTimeMillis() + exp))
             .sign(this.algorithm);
     }
+
 	public String getRawJamesPassword(String ticket) {
+
         DecodedJWT jwt = verifyToken(ticket); // 토큰 유효성 검증
         String encodedPassword = jwt.getClaim("james_pw").asString();
         
         // Base64 디코딩하여 평문 비밀번호 반환
         return new String(Base64.getDecoder().decode(encodedPassword), StandardCharsets.UTF_8);
     }
+
 	
 	
 
 	public DecodedJWT verifyToken(String token) {
 		return jwt.verify(token);
 	}
+
 }

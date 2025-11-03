@@ -6,10 +6,16 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.kedu.project.members.member.MemberDAO;
+import com.kedu.project.members.member.MemberDTO;
+
 @Service
 public class ContactService {
 	@Autowired
 	private ContactDAO dao;
+	
+	@Autowired
+	private MemberDAO memberDAO;
 
 	// 본인 연락처 목록 조회
 	public List<ContactDTO> getContactsByOwner(String ownerEmail) {
@@ -41,4 +47,17 @@ public class ContactService {
 	public List<ContactDTO> selectTeamContact(Map<String, Object> params) {
 		return dao.selectTeamContact(params); // <- dao.selectTeamContact (단수형) 호출
 	}
+
+	// -------------------- 주소록에 좀 뽑을게 --------------------------------
+	// 이메일로 company_code 조회 - 주소록 추가시 팔요하여 넣음
+	public String getCompanyCodeByEmail(String email) {
+		MemberDTO member = memberDAO.findByEmail(email);
+		return member != null ? member.getCompany_code() : null;
+	}
+
+	// 부서
+	public String getDeptCodeByEmail(String email) {
+		// DAO를 통해 실제 부서 코드(DEPT_CODE)를 조회하도록 수정
+		return memberDAO.getDeptCodeByEmail(email);
+	}	
 }

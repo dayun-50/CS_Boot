@@ -43,6 +43,7 @@ public class ScheduleController {
 	@PostMapping("eventsList")
 	public ResponseEntity<List<Map<String, Object>>> eventsList(@RequestBody ScheduleDTO dto,
 			@RequestParam(required = false) List<String> selectedEmails) {
+		System.out.println(selectedEmails);
 		List<Map<String, Object>> result = ScheduleService.eventsList(dto, selectedEmails);
 		return ResponseEntity.ok(result);
 	}
