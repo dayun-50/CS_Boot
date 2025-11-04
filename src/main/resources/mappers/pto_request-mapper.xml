@@ -9,21 +9,28 @@
   <mapper namespace="PtoRequest">
     <!-- 모든타입의 데이터 페이지에 맞게 가져오기 -->
   	<select id="selectfromto" resultType="com.kedu.project.pto_request.Pto_requestDTO">
-  		  	select * 
-  			from (select pto_request.*, row_number() over (order by pto_seq desc) as rn from pto_request) sub 
-  			where rn between #{start} and #{end} 
-  			order by rn
+  		  	    select *
+			    from (
+			        select pto_request.*, row_number() over (order by pto_seq desc) as rn
+			        from pto_request
+			        where member_email = #{member_email}
+			    ) sub
+			    where rn between #{start} and #{end}
+			    order by rn
+
   	</select>
     <!-- 특정 데이터 페이지에 맞게 가져오기 -->
 	<select id="selectTypeFromTo" resultType="com.kedu.project.pto_request.Pto_requestDTO">
-	    select * 
-	    from (
-	        select pto_request.*, row_number() over (order by pto_seq desc) as rn 
-	        from pto_request 
-	        where pto_status = #{pto_status}
-	    ) sub 
-	    where rn between #{start} and #{end} 
-	    order by rn
+	        select *
+    from (
+        select pto_request.*, row_number() over (order by pto_seq desc) as rn
+        from pto_request
+        where pto_status = #{pto_status}
+          and member_email = #{member_email}
+    ) sub
+    where rn between #{start} and #{end}
+    order by rn
+
 	</select>
 
   	
@@ -46,7 +53,17 @@
   	</select>
   	
   	<select id="getDetailBySeq" resultType="com.kedu.project.pto_request.Pto_requestDTO">
-  		select * from pto_request where member_email =#{member_email} and pto_seq =#{seq} 
+  		  SELECT 
+		    p.pto_seq,
+		    m.name AS member_email,
+		    p.pto_status,
+		    p.pto_content,
+		    p.pto_start_at,
+		    p.pto_end_at,
+		    p.pto_used
+		  FROM pto_request p
+		  JOIN member m ON p.member_email = m.email
+		  WHERE p.pto_seq = #{seq} 
   	</select>
   
   	<update id="updateDetailBoard">

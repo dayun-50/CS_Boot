@@ -38,7 +38,7 @@ public class Pto_requestController {
             @RequestParam(required = false) String type,
             HttpServletRequest request) {
 
-        String member_email = "test01@test.com"; // 이후 토큰에서 꺼내도록 변경 예정
+        String member_email = "test@test.com"; // 이후 토큰에서 꺼내도록 변경 예정
 
         int pageSize = 5;
         int cpage = page;
@@ -75,7 +75,7 @@ public class Pto_requestController {
    //연차 디테일 가져오기 
    @GetMapping("/{seq}")
    public ResponseEntity<Pto_requestDTO> getDetailBoard(@PathVariable int seq){
-	   String member_email = "test01@test.com"; // 이후 토큰에서 꺼내도록 변경 예정
+	   String member_email = "test@test.com"; // 이후 토큰에서 꺼내도록 변경 예정
 	   Pto_requestDTO temp =pto_requestService.getDetailBySeq(member_email,seq);
 
 	   if (temp == null) {//204 No Content
@@ -88,7 +88,7 @@ public class Pto_requestController {
    //디테일 연차 수정하기
    @PutMapping("/{seq}")
    public ResponseEntity<Void> updateDetailBoard(@PathVariable int seq, @RequestBody Pto_requestDTO dto){
-	   String member_email = "test01@test.com"; // 이후 토큰에서 꺼내도록 변경 예정
+	   String member_email = "test@test.com"; // 이후 토큰에서 꺼내도록 변경 예정
 
 	   dto.setMember_email(member_email);
 	   int result =pto_requestService.updateDetailBoard(dto);
@@ -102,7 +102,7 @@ public class Pto_requestController {
    //디테일 연차 삭제하기
    @DeleteMapping("/{seq}")
    public ResponseEntity<Void> deleteDetailBoard(@PathVariable int seq){
-	   String member_email = "test01@test.com"; // 이후 토큰에서 꺼내도록 변경 예정
+	   String member_email = "test@test.com"; // 이후 토큰에서 꺼내도록 변경 예정
 	   int result =pto_requestService.deleteDetailBoard(seq, member_email);
 	   
 	    if (result == 0) {
@@ -114,7 +114,7 @@ public class Pto_requestController {
    //연차 신청하기
    @PostMapping
    public ResponseEntity<Void> insertPtoRequest(@RequestBody Pto_requestDTO dto){
-	   String member_email = "test01@test.com"; // 이후 토큰에서 꺼내도록 변경 예정
+	   String member_email = "test@test.com"; // 이후 토큰에서 꺼내도록 변경 예정
 	   Timestamp pto_start_at = Timestamp.valueOf(dto.getPto_start_at().toLocalDateTime());
 	   Timestamp pto_end_at = Timestamp.valueOf(dto.getPto_end_at().toLocalDateTime());
 
