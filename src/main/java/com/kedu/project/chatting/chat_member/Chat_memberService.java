@@ -50,7 +50,7 @@ public class Chat_memberService {
 			// 채팅방 존재 여부 및 존재시 채팅방 seq 반환
 			int checkChat = dao.checkPrivateChat(dto, members.getEmail(),depChatName);
 //			int checkChat = dao.checkPrivateChat(dto, members.getEmail());
-			System.out.println("개인채팅ㅌ"+checkChat);
+			System.out.println("개인채팅ㅌ"+checkChat+members.getEmail());
 			Map<String, Object> map = new HashMap<>();
 			if(checkChat > 0) { // 채팅방 존재시 map에 기록
 				int chatRoomLastMessageSeq = cMDao.lastMessageSeq(checkChat);
@@ -146,7 +146,6 @@ public class Chat_memberService {
 		list.add(map);
 		// 내가 참여하고있는 단톡방 서치 (같은 부서제외)
 		List<Map<String, Object>> myChats = roomDao.selectChatRoom(dto, department);
-		System.out.println(myChats);
 		// 회사 단체 채팅은 제외하고 위에서 했으니까
 		for(Map<String, Object> chat : myChats) {
 			int memberCount = dao.memberCount(chat.get("CHAT_SEQ").toString());

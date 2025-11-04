@@ -72,6 +72,7 @@ public class MemberService {
     public int login(MemberDTO dto) {
 
 
+
         // 1. 원본 비밀번호 확보 (IMAP/SMTP 사용을 위해 필요)
         String rawPassword = dto.getPw();
        
@@ -145,18 +146,29 @@ public class MemberService {
 
    
 	// 마이페이지 수정
-	public int updateMypage(MemberDTO dto) {
+	public int updateMypage(MemberDTO dto, String email) {
+		dto.setEmail(email);
 		return dao.updateMypage(dto);
 	}
-
-
 
 	// -------------------- 주소록에 좀 뽑을게 --------------------------------
 	// 이메일로 company_code 조회 - 주소록 추가시 팔요하여 넣음
 	public String getCompanyCodeByEmail(String email) {
 		MemberDTO member = dao.findByEmail(email);
+		System.out.println(member);
 		return member != null ? member.getCompany_code() : null;
 	}
+
+	
+	public String getCompanyCodeEmail(String email) {
+		System.out.println(dao.getCompanyCodeEmail(email));
+		return dao.getCompanyCodeEmail(email);
+	}
+
+
+
+	
+	
 
 	// 부서
 	public String getDeptCodeByEmail(String email) {
