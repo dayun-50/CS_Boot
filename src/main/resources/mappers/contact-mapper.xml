@@ -116,7 +116,7 @@
 	        #{email}, 
 	        #{phone},
 	        #{contact_group}, 	        
-	        #{company_code, jdbcType=VARCHAR}, 
+	        #{company_code, jdbcType=VARCHAR},
 	        #{memo, jdbcType=VARCHAR}, 
 	        #{share}
 	    )
