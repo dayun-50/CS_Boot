@@ -87,10 +87,10 @@ public class MemberService {
 	}
 
 	// 마이페이지 출력
-	public List<MemberDTO> mypage(MemberDTO dto) {
+	public List<MemberDTO> mypage(String email) {
+		MemberDTO dto = new MemberDTO();
+		dto.setEmail(email);
 		List<MemberDTO> list = dao.mypage(dto);
-		System.out.println("이이"+dto.getEmail());
-		System.out.println("아아"+list);
 		String phone1 = list.get(0).getPhone().substring(3, 7); // 첫번째 전번
 		String phone2 = list.get(0).getPhone().substring(7, 11); // 두번째 전번
 		list.get(0).setPhone("010" + "-" + phone1 + "-" + phone2);
@@ -98,7 +98,8 @@ public class MemberService {
 	}
 
 	// 마이페이지 수정
-	public int updateMypage(MemberDTO dto) {
+	public int updateMypage(MemberDTO dto, String email) {
+		dto.setEmail(email);
 		return dao.updateMypage(dto);
 	}
 

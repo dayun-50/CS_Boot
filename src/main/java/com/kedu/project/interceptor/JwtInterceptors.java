@@ -13,19 +13,19 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtInterceptors implements HandlerInterceptor{
 	@Autowired
-	private static JwtUtil jwt;
+	private JwtUtil jwt;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 		String path = request.getRequestURI();
 		String method = request.getMethod();	
-		if(method.equals("OPTIONS")) { // prefilght 보안 패킷은 그냥 허용
+		if(method.equals("OPTIONS")) { 
 			return true;
 		}
 
 		if(path.equals("/member") || path.equals("/member/login") || path.equals("/member/findpw")
-				|| path.equals("/member/gnewpw")) { // members 와 같은 경우
+				|| path.equals("/member/gnewpw")) { 
 			if(method.equals("POST")) {
 				return true;
 			}
@@ -37,11 +37,11 @@ public class JwtInterceptors implements HandlerInterceptor{
 			return false;	
 		}
 		String token = authHeader.substring(7);
-		System.out.println(token);
 
 		try {
 			DecodedJWT djwt = jwt.verifyToken(token);
 			request.setAttribute("email", djwt.getSubject());
+			System.out.println("으에에에에"+request.getAttribute("email"));
 
 			return true;
 		}catch (Exception e) {
