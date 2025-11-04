@@ -26,17 +26,19 @@ public class JwtUtil {
    }
 
 
-   // 토큰설정
 
-   public String createToken(String id) {
-      return JWT.create().withSubject(id) // 이메일을 대표로 넣어둠
-            .withIssuedAt(new Date(System.currentTimeMillis()))
-            .withExpiresAt(new Date(System.currentTimeMillis() + exp)).sign(this.algorithm);
-   }
+	// 토큰설정
 
-   
-   //james 서버 전용 토큰
-   public String createJamesToken(String email, String rawPassword) {
+	public String createToken(String id) {
+		return JWT.create().withSubject(id) // 이메일을 대표로 넣어둠
+				.withIssuedAt(new Date(System.currentTimeMillis()))
+				.withExpiresAt(new Date(System.currentTimeMillis() + exp)).sign(this.algorithm);
+	}
+
+	
+	//james 서버 전용 토큰
+	public String createJamesToken(String email, String rawPassword) {
+
         // 평문 비밀번호를 Base64로 인코딩하여 저장 (보안 강화를 위해)
         String encodedPassword = Base64.getEncoder().encodeToString(rawPassword.getBytes(StandardCharsets.UTF_8));
         
@@ -49,17 +51,21 @@ public class JwtUtil {
             .withExpiresAt(new Date(System.currentTimeMillis() + exp))
             .sign(this.algorithm);
     }
-   public String getRawJamesPassword(String ticket) {
+
+	public String getRawJamesPassword(String ticket) {
+
         DecodedJWT jwt = verifyToken(ticket); // 토큰 유효성 검증
         String encodedPassword = jwt.getClaim("james_pw").asString();
         
         // Base64 디코딩하여 평문 비밀번호 반환
         return new String(Base64.getDecoder().decode(encodedPassword), StandardCharsets.UTF_8);
     }
-   
-   
 
-   public DecodedJWT verifyToken(String token) {
-      return jwt.verify(token);
-   }
+	
+	
+
+	public DecodedJWT verifyToken(String token) {
+		return jwt.verify(token);
+	}
+
 }

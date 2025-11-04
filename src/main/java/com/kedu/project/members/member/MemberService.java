@@ -3,13 +3,16 @@ package com.kedu.project.members.member;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kedu.project.common.Encryptor;
+
+import com.kedu.project.external.james.JamesAccountService;
 import com.kedu.project.members.member_pto.Member_ptoDAO;
-import com.kedu.project.common.JamesAdminClient;
+
+
 
 /*
  * 		사원 회원가입 및 마이페이지 구현 Service
@@ -17,86 +20,131 @@ import com.kedu.project.common.JamesAdminClient;
 
 @Service
 public class MemberService {
+
 	@Autowired
 	private MemberDAO dao;
 
 	@Autowired
 	private Member_ptoDAO daoPTO;
 
+
 // JamesAdminClient 주입
 
-	@Value("${james.local.domain}") 
-    private String localDomain;
 
 	@Autowired
-	private JamesAdminClient jamesAdminClient;
+    private JamesAccountService jamesAccountService;
+    
 
-	// ----------------------------------------------------
-	// 회원가입 (DB 저장 + James 계정 생성)
-	// ----------------------------------------------------
-	@Transactional
-	public int signup(MemberDTO dto) {
-		// pto dao 통해서 초기 연차값 집어넣기 --- 지원 필요 로직 지우지마세요
-		daoPTO.insertInitPto(dto.getEmail());
 
-		String rawPassword = dto.getPw();
-
-		// 1. James 계정 이름 생성 (헬퍼 메서드 호출)
-        String jamesUsername = getJamesUsername(dto.getEmail()); 
-
-		// 2. DB 저장을 위해 비밀번호 암호화 및 저장 (member 테이블)
-		dto.setPw(Encryptor.encrypt(dto.getPw()));
-//		return dao.signup(dto);
-		int dbResult = dao.signup(dto); 
-        
-        // 3. DB 저장이 성공하면, James 서버에 메일 계정 생성
+    // ----------------------------------------------------
+    // 회원가입 (DB 저장 + James 계정 생성)
+    // ----------------------------------------------------
+    @Transactional
+    public int signup(MemberDTO dto) {
+    	
+    	String rawPassword = dto.getPw();
+    	
+    	//비밀번호 암호화 및 db 저장
+    	dto.setPw(Encryptor.encrypt(dto.getPw()));
+    	
+    try {
+        int dbResult = dao.signup(dto);
+        System.out.println("Member INSERT 성공: " + dbResult);
+    	
+        //  James 서버에 메일 계정 생성
         if (dbResult > 0) {
-            // James Admin Client 호출 (실패 시 RuntimeException 발생 -> DB 자동 롤백)
-			jamesAdminClient.createMailAccount(jamesUsername, rawPassword);
+        	jamesAccountService.createMailAccount(dto.getEmail(), rawPassword);
+        	System.out.println("James 계정 생성 성공");
+        	
         }
-        
-		return dbResult; 
-	}
-
-    // 헬퍼 메서드: 이메일에서 ID를 추출하고 James 도메인 결합
-    private String getJamesUsername(String fullEmail) {
-        
-        // 유효성 검사를 React에서 완료했다고 가정하고, @ 앞부분(ID)만 추출
-        String userId = fullEmail.substring(0, fullEmail.indexOf('@'));
-        
-        // 최종 James 계정 이름 반환
-        return userId + "@" + localDomain;
+        return dbResult;
+    } catch (Exception e) {
+        System.err.println("에러 발생 지점 확인:");
+        e.printStackTrace();
+        throw e;
     }
 
-	// 로그인
-	public int login(MemberDTO dto) {
-		dto.setPw(Encryptor.encrypt(dto.getPw()));  
-		return dao.login(dto);
-	}
+    }
+    
+    
 
-	// 비밀번호찾기(초반 이메일인증)
-	public int findpw(MemberDTO dto) {
-		return dao.findpw(dto);
-	}
+    // 로그인
+    public int login(MemberDTO dto) {
 
-	// 비밀번호 변경
-	public int gnewpw(MemberDTO dto) {
-		dao.gnewpw(dto);
-		dto.setPw(Encryptor.encrypt(dto.getPw())); // 암호화
-		return dao.gnewpw(dto);
-	}
 
-	// 마이페이지 출력
-	public List<MemberDTO> mypage(String email) {
-		MemberDTO dto = new MemberDTO();
-		dto.setEmail(email);
-		List<MemberDTO> list = dao.mypage(dto);
-		String phone1 = list.get(0).getPhone().substring(3, 7); // 첫번째 전번
-		String phone2 = list.get(0).getPhone().substring(7, 11); // 두번째 전번
-		list.get(0).setPhone("010" + "-" + phone1 + "-" + phone2);
-		return list;
-	}
 
+        // 1. 원본 비밀번호 확보 (IMAP/SMTP 사용을 위해 필요)
+        String rawPassword = dto.getPw();
+       
+        // 2. DB 인증을 위한 비밀번호 암호화 및 DAO 호출
+        dto.setPw(Encryptor.encrypt(rawPassword)); // DB 비교를 위해 비밀번호 암호화
+        int dbResult = dao.login(dto);
+
+
+        // 3. DB 인증 실패 시 null 반환
+        if (dbResult <= 0) {
+            
+            return 0;
+        }
+        
+        
+        boolean jamesAuthSuccess = jamesAccountService.authenticateUser(dto.getEmail(), rawPassword);
+       
+        if (!jamesAuthSuccess) {
+            // James 서버 인증 실패: DB에는 있지만 메일 서버 계정이 유효하지 않음
+            // 메일 기능이 필수이므로, 예외를 발생시키거나 null 반환
+            System.err.println("ERROR: 5. James 서버 계정 인증 실패! (평문 비밀번호 불일치 가능성 높음)"); 
+            throw new RuntimeException("메일 서버 계정 인증에 실패했습니다. (관리자에게 문의하세요)");
+            // return null; // 또는 null을 반환하여 로그인 실패 처리
+        }
+        System.out.println("INFO: 6. 모든 인증 성공. 로그인 처리 완료."); // 
+        // 7. 최종 성공: DB 인증 결과 반환
+        // **주의:** 원본 비밀번호(rawPassword)는 이 메서드 외부로 DTO를 통해 전달되지 않습니다.
+        // 별도의 세션/인증 로직에서 rawPassword를 관리해야 합니다.
+        return dbResult;
+    }
+
+    // 비밀번호찾기(초반 이메일인증)
+    public int findpw(MemberDTO dto) {
+        return dao.findpw(dto);
+    }
+
+    // 비밀번호 변경
+    public int gnewpw(MemberDTO dto) {
+    	String email = dto.getEmail();
+        String rawPassword = dto.getPw();
+    	
+    	
+        dto.setPw(Encryptor.encrypt(dto.getPw())); // 암호화
+        
+        int result = dao.gnewpw(dto);
+        if (result > 0) {
+            try {
+                jamesAccountService.changePassword(email, rawPassword);
+                
+            } catch (Exception e) {
+               
+                e.printStackTrace();
+                throw new RuntimeException("James 서버 비밀번호 변경 실패", e);
+            }
+        }
+        
+        
+        return result;
+    }
+
+    // 마이페이지 출력
+    public List<MemberDTO> mypage(MemberDTO dto) {
+        List<MemberDTO> list = dao.mypage(dto);
+        String phone1 = list.get(0).getPhone().substring(3, 7); // 첫번째 전번
+        String phone2 = list.get(0).getPhone().substring(7, 11); // 두번째 전번
+        list.get(0).setPhone("010" + "-" + phone1 + "-" + phone2);
+        return list;
+    }
+    
+    
+
+   
 	// 마이페이지 수정
 	public int updateMypage(MemberDTO dto, String email) {
 		dto.setEmail(email);
@@ -111,16 +159,23 @@ public class MemberService {
 		return member != null ? member.getCompany_code() : null;
 	}
 
-	// 부서
-	public String getDeptCodeByEmail(String email) {
-		// DAO를 통해 실제 부서 코드(DEPT_CODE)를 조회하도록 수정
-		return dao.getDeptCodeByEmail(email);
-	}
 	
 	public String getCompanyCodeEmail(String email) {
 		System.out.println(dao.getCompanyCodeEmail(email));
 		return dao.getCompanyCodeEmail(email);
 	}
+
+
+
+	
+	
+
+	// 부서
+	public String getDeptCodeByEmail(String email) {
+		// DAO를 통해 실제 부서 코드(DEPT_CODE)를 조회하도록 수정
+		return dao.getDeptCodeByEmail(email);
+	}
+
 
 
 }
