@@ -25,7 +25,7 @@ public class JwtInterceptors implements HandlerInterceptor{
 		}
 
 		if(path.equals("/member") || path.equals("/member/login") || path.equals("/member/findpw")
-				|| path.equals("/member/gnewpw")) { 
+				|| path.equals("/member/gnewpw") || path.equals("/emailauth") || path.equals("/file/download")) { 
 			if(method.equals("POST")) {
 				return true;
 			}

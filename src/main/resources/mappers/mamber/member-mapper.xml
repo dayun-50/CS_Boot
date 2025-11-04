@@ -8,7 +8,7 @@
   <mapper namespace="Member">
   
   	<insert id="insert">
-  		insert into member values (#{email}, '7', '7', #{pw}, #{name}, #{phone}, #{company_code}, sysdate, '승인')
+  		insert into member (email, pw, name, phone, company_code, signup_at)values (#{email}, #{pw}, #{name}, #{phone}, #{company_code}, sysdate)
   	</insert>
   	<select id="getDomainByEmail" parameterType="String" resultType="String">
     select c.domain_name from member m join company c on m.company_code = c.company_code 
@@ -21,7 +21,7 @@
 	</select>
   
   	<select id="selectByLogin" resultType="Integer"  parameterType="com.kedu.project.members.member.MemberDTO">
-  		select count(*) from member where email = #{email} and pw = #{pw}
+  		select count(*) from member where email = #{email} and pw = #{pw} and status = '승인' and dept_code IS NOT NULL and level_code IS NOT NULL
   	</select>
   	
   	<select id="selectById" resultType="Integer"  parameterType="com.kedu.project.members.member.MemberDTO">

@@ -44,8 +44,6 @@ public class MemberController {
 		return ResponseEntity.ok().build();
 	}
 
-	
-
 	// 로그인
 	@PostMapping("/login")
 	public ResponseEntity<String> login(@RequestBody MemberDTO dto, HttpServletRequest request){
@@ -71,7 +69,6 @@ public class MemberController {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
 		}
 	}
-
 	
 	// 비밀번호찾기(초반 이메일인증)
 	@PostMapping("/findpw")
@@ -84,9 +81,6 @@ public class MemberController {
 		}
 	}
 
-
-   
-
    // 비밀번호 변경	
    @PostMapping("/gnewpw")
    public ResponseEntity<String> gnewpw(@RequestBody MemberDTO dto) {
@@ -97,8 +91,6 @@ public class MemberController {
          return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
       }
    }
-
-
 	
 	// 마이페이지 출력
 	@PostMapping("/mypage")

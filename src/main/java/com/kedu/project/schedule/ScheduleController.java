@@ -64,6 +64,7 @@ public class ScheduleController {
 	@PostMapping("/myschedule")
 	public ResponseEntity<List<ScheduleDTO>> selectMySchedule(HttpServletRequest request){
 		String email = (String) request.getAttribute("email");
+		System.out.println("아아"+email);
 		List<ScheduleDTO> list = ScheduleService.selectMySchedule(email);
 		return ResponseEntity.ok(list);
 	}
