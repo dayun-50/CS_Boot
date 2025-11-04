@@ -45,13 +45,13 @@ public class Chat_memberService {
 		// 같은 부서의 팀 정보 출력
 		List<MemberDTO> memberList = memberDao.memberSearch(dto);
 		String department = memberDao.selectDepartment(dto);
-		String depChatName = (department+" 단체 채팅");
+//		String depChatName = (department+" 단체 채팅");
 		System.out.println("멤버서칭"+memberList);
 		List<Map<String, Object>> list = new ArrayList<>();
 		for(MemberDTO members : memberList) {
 			// 채팅방 존재 여부 및 존재시 채팅방 seq 반환
-			int checkChat = dao.checkPrivateChat(dto, members.getEmail(),depChatName);
-//			int checkChat = dao.checkPrivateChat(dto, members.getEmail());
+//			int checkChat = dao.checkPrivateChat(dto, members.getEmail(),depChatName);
+			int checkChat = dao.checkPrivateChat(dto, members.getEmail());
 			System.out.println("개인채팅ㅌ"+checkChat+members.getEmail());
 			Map<String, Object> map = new HashMap<>();
 			if(checkChat > 0) { // 채팅방 존재시 map에 기록

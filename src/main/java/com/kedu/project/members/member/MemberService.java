@@ -70,9 +70,6 @@ public class MemberService {
 
     // 로그인
     public int login(MemberDTO dto) {
-
-
-
         // 1. 원본 비밀번호 확보 (IMAP/SMTP 사용을 위해 필요)
         String rawPassword = dto.getPw();
        
@@ -80,13 +77,10 @@ public class MemberService {
         dto.setPw(Encryptor.encrypt(rawPassword)); // DB 비교를 위해 비밀번호 암호화
         int dbResult = dao.login(dto);
 
-
         // 3. DB 인증 실패 시 null 반환
         if (dbResult <= 0) {
-            
             return 0;
         }
-        
         
         boolean jamesAuthSuccess = jamesAccountService.authenticateUser(dto.getEmail(), rawPassword);
        
@@ -128,8 +122,6 @@ public class MemberService {
                 throw new RuntimeException("James 서버 비밀번호 변경 실패", e);
             }
         }
-        
-        
         return result;
     }
 
@@ -143,9 +135,6 @@ public class MemberService {
         list.get(0).setPhone("010" + "-" + phone1 + "-" + phone2);
         return list;
     }
-    
-    
-
    
 	// 마이페이지 수정
 	public int updateMypage(MemberDTO dto, String email) {

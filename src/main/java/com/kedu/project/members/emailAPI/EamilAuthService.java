@@ -24,10 +24,9 @@ import jakarta.servlet.ServletException;
 public class EamilAuthService {
 	private static final long serialVersionUID = 1L;
 	
-	// 서버 전용 Naver 계정 (실제 발송용)
-	@Value("${mail.from.email}") // 서버 전용 네이버 계정
+	@Value("${mail.from.email}") // 네이버 계정
     private String fromEmail; 
-    @Value("${mail.app.password}") // 네이버 앱 비밀번호
+    @Value("${mail.app.password}") // 비밀번호
     private String appPassword;
     String authCode = generateAuthCode(); // 발송할 인증 코드
 	
