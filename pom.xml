@@ -40,6 +40,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		
+		
+		
+		
 		<!-- MockMultipartFile을 실제 코드에서도 사용하기 위함 -->
 		<dependency>
 		    <groupId>org.springframework</groupId>
@@ -61,6 +65,12 @@
         <artifactId>jakarta.mail-api</artifactId>
         <version>2.1.2</version>
     </dependency>
+    <!-- Jakarta Mail Starter-->
+    <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-mail</artifactId>
+</dependency>
+    
 	<!--webClient Rest API-->
 	<dependency>
     <groupId>org.springframework.boot</groupId>
@@ -106,12 +116,17 @@
  <artifactId>spring-boot-starter-security</artifactId>
 </dependency>
 
-		
+<!--Mysql -->
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.33</version> </dependency>
 		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>
 			<artifactId>mybatis-spring-boot-starter</artifactId>
 			<version>3.0.5</version>
 		</dependency>
+
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -134,6 +149,16 @@
 			<artifactId>mybatis-spring-boot-starter-test</artifactId>
 			<version>3.0.5</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>

@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import com.kedu.project.members.member_pto.Member_ptoService;
+
 import com.kedu.project.security.JwtUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,6 +44,7 @@ public class MemberController {
 		return ResponseEntity.ok().build();
 	}
 
+	
 
 	// 로그인
 	@PostMapping("/login")
@@ -50,25 +53,26 @@ public class MemberController {
 		String rawPassword = dto.getPw();
 		int result = memberService.login(dto);
 		if(result > 0) { // 로그인 성공시
-			// 세션에 ID 저장
-			HttpSession session = request.getSession();
-			session.setAttribute("id", dto.getEmail());
-			//웹 인증 토큰
+			 // 세션에 ID 저장
+	        HttpSession session = request.getSession();
+	        session.setAttribute("id", dto.getEmail());
+	        //웹 인증 토큰
 			String generalToken = jwt.createToken(dto.getEmail());
 			//james 서버 인증 토큰
 			String jamesAccessToken = jwt.createJamesToken(
-					dto.getEmail(),    
-					rawPassword // DTO에서 평문 비밀번호를 사용하여 토큰 B 생성
-					);
-			// 3. 💡 [핵심 수정] 두 토큰을 특정 구분자("|||")로 결합하여 하나의 String으로 반환
-			String combinedToken = generalToken + "|||" + jamesAccessToken;
-
+		             dto.getEmail(),    
+		             rawPassword // DTO에서 평문 비밀번호를 사용하여 토큰 B 생성
+		         );
+			// 3.  [핵심 수정] 두 토큰을 특정 구분자("|||")로 결합하여 하나의 String으로 반환
+	         String combinedToken = generalToken + "|||" + jamesAccessToken;
+			
 			return ResponseEntity.ok(combinedToken);
 		} else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
 		}
 	}
 
+	
 	// 비밀번호찾기(초반 이메일인증)
 	@PostMapping("/findpw")
 	public ResponseEntity<String> findpw(@RequestBody MemberDTO dto) {
@@ -80,17 +84,22 @@ public class MemberController {
 		}
 	}
 
-	// 비밀번호 변경
-	@PostMapping("/gnewpw")
-	public ResponseEntity<String> gnewpw(@RequestBody MemberDTO dto) {
-		int result = memberService.gnewpw(dto);
-		if (result > 0) {
-			return ResponseEntity.ok().build();
-		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
-		}
-	}
 
+   
+
+   // 비밀번호 변경	
+   @PostMapping("/gnewpw")
+   public ResponseEntity<String> gnewpw(@RequestBody MemberDTO dto) {
+      int result = memberService.gnewpw(dto);
+      if (result > 0) {
+         return ResponseEntity.ok().build();
+      } else {
+         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
+      }
+   }
+
+
+	
 	// 마이페이지 출력
 	@PostMapping("/mypage")
 	public ResponseEntity<List<MemberDTO>> mypage(HttpServletRequest request) {
