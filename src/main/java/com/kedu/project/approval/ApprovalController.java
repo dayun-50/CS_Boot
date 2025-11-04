@@ -48,7 +48,7 @@ public class ApprovalController {
             @RequestParam(required = false) String type,
             HttpServletRequest request) {
 
-        String member_email = "test@test.com"; // 이후 토큰에서 꺼내도록 변경 예정
+        String member_email = (String)request.getAttribute("email"); // 이후 토큰에서 꺼내도록 변경 예정
 
         int pageSize = PageNaviConfig.RECORD_COUNT_PER_PAGE;
         int cpage = page;
@@ -84,8 +84,8 @@ public class ApprovalController {
    
    //디테일 전자결재 디테일 가져오기
    @GetMapping("/{seq}")
-   public ResponseEntity<Map<String, Object>> getDetailBoard(@PathVariable int seq){
-	   String member_email = "test@test.com";// 토큰으로 변경되면 토큰에서 꺼낸 작성자로 가져와야함
+   public ResponseEntity<Map<String, Object>> getDetailBoard(@PathVariable int seq, HttpServletRequest request){
+	   String member_email = (String)request.getAttribute("email");
 	   
 	   Map<String, Object> result =approvalFService.getDetailBySeq(seq,member_email);// 파사드 레이어에서 처리
 	   if (result == null) {//204 No Content
@@ -103,9 +103,10 @@ public class ApprovalController {
            @RequestParam("approval_title") String approval_title,
            @RequestParam("approval_content") String approval_content,
            @RequestParam(required = false) MultipartFile[] files,
-           @RequestParam(required = false) List<String> keepFiles) {
+           @RequestParam(required = false) List<String> keepFiles,
+           HttpServletRequest request) {
 
-       String member_email = "test@test.com"; // TODO: 토큰 추출 예정
+	   String member_email = (String)request.getAttribute("email");
 
        // DTO 세팅
        ApprovalDTO dto = new ApprovalDTO();
@@ -121,16 +122,16 @@ public class ApprovalController {
    
    //디테일 전자결재 삭제하기
    @DeleteMapping("/{seq}")
-   public ResponseEntity<Void> deleteDetailBoard(@PathVariable int seq) {
-	    String member_email = "test@test.com"; // 나중에 토큰에서 추출 예정
+   public ResponseEntity<Void> deleteDetailBoard(@PathVariable int seq, HttpServletRequest request) {
+	   String member_email = (String)request.getAttribute("email");
 	    approvalFService.deleteApprovalWithFiles(seq, member_email); // 파사드 레이어에서 처리
 	    return ResponseEntity.ok().build();
 	}
    
    //전자결재 업로드 하기
    @PostMapping
-   public ResponseEntity<Void> upload(ApprovalDTO dto, @RequestParam(required = false) MultipartFile[] files){
-	   String member_email = "test@test.com";// 토큰으로 변경되면 토큰에서 꺼낸 작성자로 가져와야함
+   public ResponseEntity<Void> upload(ApprovalDTO dto, @RequestParam(required = false) MultipartFile[] files,HttpServletRequest request){
+	   String member_email = (String)request.getAttribute("email");
 	    dto.setMember_email(member_email);
 	    approvalFService.upload(dto,files); // 파사드 레이어에서 처리
 	    

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 /*
  *  	근태관리 기능 구현 Controller
  * */
@@ -25,9 +27,8 @@ public class CommuteController {
 	
 	//페이지 들어갔을때 데이터 가져오기
 	@GetMapping
-	public ResponseEntity<CommuteDTO> getTodayData(){
-		String member_email = "test@test.com";// 토큰으로 변경되면 토큰에서 꺼낸 작성자로 가져와야함
-		//String member_email=(String)session.getAttribute("loginId");
+	public ResponseEntity<CommuteDTO> getTodayData(HttpServletRequest request){
+		String member_email = (String)request.getAttribute("email");
 		
 		
 		LocalDate today = LocalDate.now();// 현재 날짜 가져오기
@@ -49,9 +50,8 @@ public class CommuteController {
 	
 	//시작시간 입력
 	@PostMapping("/start")
-	public ResponseEntity<Void> inputStart(@RequestBody Map<String, String> param) {
-	    String member_email = "test@test.com"; // 추후 토큰에서 추출 예정
-	    //String member_email=(String)session.getAttribute("loginId");
+	public ResponseEntity<Void> inputStart(@RequestBody Map<String, String> param,HttpServletRequest request) {
+		String member_email = (String)request.getAttribute("email");
 	    String workAtStr = param.get("work_at");
 
 	    if (workAtStr == null) {
@@ -64,9 +64,8 @@ public class CommuteController {
 	
 	//퇴근시간 입력
 	@PostMapping("/end")
-	public ResponseEntity<Void> inputEnd(@RequestBody Map<String, String> param){
-	    String member_email = "test@test.com";// 토큰으로 변경되면 토큰에서 꺼낸 작성자로 가져와야함
-	  //String member_email=(String)session.getAttribute("loginId");
+	public ResponseEntity<Void> inputEnd(@RequestBody Map<String, String> param,HttpServletRequest request){
+		String member_email = (String)request.getAttribute("email");
 	    String workAtStr = param.get("work_at");
 	    String leavAtStr = param.get("leave_at");
 
@@ -80,9 +79,8 @@ public class CommuteController {
 	
 	//위클리 토탈 시간 뽑아오기
 	@GetMapping("/weekly")
-	public ResponseEntity<Integer> getWeeklyTotalMin(){
-		String member_email = "test@test.com"; // 추후 토큰에서 추출 예정
-		//String member_email=(String)session.getAttribute("loginId");
+	public ResponseEntity<Integer> getWeeklyTotalMin(HttpServletRequest request){
+		String member_email = (String)request.getAttribute("email");
 		LocalDate today = LocalDate.now(); // 오늘 날짜
 		// LocalDate today = LocalDate.of(2025, 10, 17);임의 날짜 설정: 2025년 10월 17일
 	    LocalDate monday = today.minusDays(today.getDayOfWeek().getValue() - 1); // 이번 주 월요일		
@@ -93,9 +91,8 @@ public class CommuteController {
 	
 	//달별 이슈들 뽑아오기
 	@GetMapping("/issue")
-	public ResponseEntity<Map<String, Object>> getMonthlyIssue(){
-		String member_email = "test@test.com"; // 추후 토큰에서 추출 예정
-		//String member_email=(String)session.getAttribute("loginId");
+	public ResponseEntity<Map<String, Object>> getMonthlyIssue(HttpServletRequest request){
+		String member_email = (String)request.getAttribute("email");
 		LocalDate today = LocalDate.now(); // 오늘 날짜
 		LocalDate startOfMonth = today.withDayOfMonth(1);
 		
