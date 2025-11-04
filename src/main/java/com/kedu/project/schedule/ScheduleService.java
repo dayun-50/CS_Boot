@@ -26,12 +26,14 @@ public class ScheduleService {
 	private MemberDAO memberDao;
 
 	// 같은 채팅방 멤버 목록 출력
-	public List<MemberDTO> selectMember(Chat_memberDTO dto) {
+	public List<MemberDTO> selectMember(Chat_memberDTO dto, String email) {
+		dto.setMember_email(email);
 		return dao.selectMember(dto);
 	}
 
 	// 새로운 이벤트 DB 저장
-	public int sevaEvent(ScheduleDTO dto) {
+	public int sevaEvent(ScheduleDTO dto, String email) {
+		dto.setMember_email(email);
 		Timestamp start_at = dto.getStart_at();
 		Timestamp end_at = dto.getEnd_at();
 		long all_day = end_at.getTime() - start_at.getTime();
@@ -43,7 +45,8 @@ public class ScheduleService {
 	}
 
 	// 일정 목록 뽑아서 전달
-	public List<Map<String, Object>> eventsList(ScheduleDTO dto, List<String> selectedEmails){
+	public List<Map<String, Object>> eventsList(ScheduleDTO dto, List<String> selectedEmails, String email){
+		dto.setMember_email(email);
 		List<ScheduleDTO> events;
 		if(selectedEmails == null) { // 제외할 member가없을시 dto만전달
 			events = dao.eventsList(dto);
@@ -73,7 +76,9 @@ public class ScheduleService {
 	}
 	
 	// 마이페이지 일정출력
-	public List<ScheduleDTO> selectMySchedule(ScheduleDTO dto){
+	public List<ScheduleDTO> selectMySchedule(String email){
+		ScheduleDTO dto = new ScheduleDTO();
+		dto.setMember_email(email);
 		List<ScheduleDTO> list = dao.selectMySchedule(dto);
 		for(ScheduleDTO l : list) {
 			String name = memberDao.selectMemberName(l.getMember_email());

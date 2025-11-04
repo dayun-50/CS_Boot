@@ -24,7 +24,8 @@ public class Chat_roomService {
 	}
 	
 	// 채팅방 on/ off
-	public int updateProjectOnOff(Chat_roomDTO dto) {
+	public int updateProjectOnOff(Chat_roomDTO dto, String email) {
+		dto.setManager_email(email);
 		return dao.updateProjectOnOff(dto);
 	}
 	

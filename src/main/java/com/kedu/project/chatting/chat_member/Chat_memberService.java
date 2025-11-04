@@ -39,7 +39,9 @@ public class Chat_memberService {
 	private ContactDAO ContactDAO;
 
 	// 팀원간 개인 메세지 목록 출력 및 생성(없을시)
-	public List<Map<String, Object>> privatChatSearch(MemberDTO dto){
+	public List<Map<String, Object>> privatChatSearch(String email){
+		MemberDTO dto = new MemberDTO();
+		dto.setEmail(email);
 		// 같은 부서의 팀 정보 출력
 		List<MemberDTO> memberList = memberDao.memberSearch(dto);
 		String department = memberDao.selectDepartment(dto);
@@ -92,7 +94,9 @@ public class Chat_memberService {
 	}
 
 	// 부서 단체 톡방 생성 및 단체 톡방 출력
-	public List<Map<String, Object>> chatRoomList(MemberDTO dto){
+	public List<Map<String, Object>> chatRoomList(String email){
+		MemberDTO dto = new MemberDTO();
+		dto.setEmail(email);
 		// 내 부서명 출력
 		String department = memberDao.selectDepartment(dto);
 		List<Map<String, Object>> list = new ArrayList<>();
@@ -169,7 +173,9 @@ public class Chat_memberService {
 	}
 
 	// 종료된 프로젝트 채팅방 출력
-	public List<Map<String, Object>> completedList(MemberDTO dto){
+	public List<Map<String, Object>> completedList(String email){
+		MemberDTO dto = new MemberDTO();
+		dto.setEmail(email);
 		List<Chat_roomDTO> chatList = roomDao.completedList(dto);
 		List<Map<String, Object>> list = new ArrayList<>();
 		for(Chat_roomDTO chatroom : chatList) {
@@ -200,9 +206,8 @@ public class Chat_memberService {
 	}
 
 	// 채널 추가 주소록 출력 
-	public List<ContactDTO> contactList(Chat_memberDTO dto){
-		String eamil = dto.getMember_email();
-		List<ContactDTO> list = ContactDAO.contactList(eamil);
+	public List<ContactDTO> contactList(String email){
+		List<ContactDTO> list = ContactDAO.contactList(email);
 		list.removeIf(l -> memberDao.checkMember(l.getEmail()) == 0);
 		return list;
 	}

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kedu.project.chatting.chat_member.Chat_memberDTO;
 import com.kedu.project.members.member.MemberDTO;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 /*
 먼슬리 ( 일정 테이블 ) 기능 구현 controller
  */
@@ -26,25 +28,28 @@ public class ScheduleController {
 
 	// 같은 채팅방 멤버 목록 출력
 	@PostMapping("/selectMember")
-	public ResponseEntity<List<MemberDTO>> selectMember(@RequestBody Chat_memberDTO dto){
-		List<MemberDTO> list = ScheduleService.selectMember(dto);
+	public ResponseEntity<List<MemberDTO>> selectMember(@RequestBody Chat_memberDTO dto, HttpServletRequest request){
+		String email = (String) request.getAttribute("email");
+		List<MemberDTO> list = ScheduleService.selectMember(dto, email);
 		System.out.println(list);
 		return ResponseEntity.ok(list);
 	}
 
 	// 새로운 이벤트 DB 저장
 	@PostMapping("/sevaEvent")
-	public ResponseEntity<?> sevaEvent(@RequestBody ScheduleDTO dto){
-		ScheduleService.sevaEvent(dto);
+	public ResponseEntity<?> sevaEvent(@RequestBody ScheduleDTO dto, HttpServletRequest request){
+		String email = (String) request.getAttribute("email");
+		ScheduleService.sevaEvent(dto, email);
 		return ResponseEntity.ok(null);
 	}
 
 	// 일정 목록 뽑아서 전달
-	@PostMapping("eventsList")
+	@PostMapping("/eventsList")
 	public ResponseEntity<List<Map<String, Object>>> eventsList(@RequestBody ScheduleDTO dto,
-			@RequestParam(required = false) List<String> selectedEmails) {
-		System.out.println(selectedEmails);
-		List<Map<String, Object>> result = ScheduleService.eventsList(dto, selectedEmails);
+			@RequestParam(required = false) List<String> selectedEmails,
+			HttpServletRequest request) {
+		String email = (String) request.getAttribute("email");
+		List<Map<String, Object>> result = ScheduleService.eventsList(dto, selectedEmails, email);
 		return ResponseEntity.ok(result);
 	}
 	
@@ -57,9 +62,9 @@ public class ScheduleController {
 	
 	// 마이페이지 일정출력
 	@PostMapping("/myschedule")
-	public ResponseEntity<List<ScheduleDTO>> selectMySchedule(@RequestBody ScheduleDTO dto){
-		List<ScheduleDTO> list = ScheduleService.selectMySchedule(dto);
-		System.out.println(dto.getMember_email());
+	public ResponseEntity<List<ScheduleDTO>> selectMySchedule(HttpServletRequest request){
+		String email = (String) request.getAttribute("email");
+		List<ScheduleDTO> list = ScheduleService.selectMySchedule(email);
 		return ResponseEntity.ok(list);
 	}
 }

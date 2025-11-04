@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kedu.project.chatting.chat_member.Chat_memberDTO;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 
 
 /*
@@ -29,14 +31,17 @@ public class Chat_roomController {
 
 	// 채팅방 on /off 
 	@PostMapping("/projectOnOff")
-	public ResponseEntity<?> updateProjectOnOff(@RequestBody Chat_roomDTO dto){
-		int result = Chat_roomService.updateProjectOnOff(dto);
+	public ResponseEntity<?> updateProjectOnOff(@RequestBody Chat_roomDTO dto, HttpServletRequest request){
+		String email = (String) request.getAttribute("email");
+		int result = Chat_roomService.updateProjectOnOff(dto, email);
 		return ResponseEntity.ok(result);
 	}
 	
 	// 채팅방 나가기
 	@PostMapping("/outChat")
-	public ResponseEntity<?> outChat(@RequestBody Chat_memberDTO dto){
+	public ResponseEntity<?> outChat(@RequestBody Chat_memberDTO dto, HttpServletRequest request){
+		String email = (String) request.getAttribute("email");
+		dto.setMember_email(email);
 		Chat_roomService.outChat(dto);
 		return ResponseEntity.ok("성공");
 	}
