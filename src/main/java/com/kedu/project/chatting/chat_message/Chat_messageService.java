@@ -131,5 +131,10 @@ public class Chat_messageService {
 		
 		return finalResult;
 	}
+	
+	// 채팅방 멤버 이름 서칭
+	public String memberNameSerch(String email) {
+		return memberDao.selectMemberName(email);
+	}
 
 }

@@ -92,6 +92,8 @@ public class ChatEndpoint {
 
 			for (int i = 0; i < messages.size(); i++) {
 				Map<String, Object> entry = new HashMap<>();
+				String memberName = cServ.memberNameSerch(messages.get(i).getMember_email());
+				entry.put("name", memberName);
 				entry.put("data", messages.get(i));
 				entry.put("fdata", files.get(i) != null ? files.get(i) : null);
 				mergedList.add(entry);
@@ -144,7 +146,8 @@ public class ChatEndpoint {
 				Map<String, Object> sendMap = new HashMap<>();
 				sendMap.put("type", "chat");
 				sendMap.put("data", dto);
-
+			    String memberName = cServ.memberNameSerch(dto.getMember_email());
+			    sendMap.put("name", memberName);
 				synchronized (clients) {
 					for (Session client : clients) {
 						client.getBasicRemote().sendText(mapper.writeValueAsString(sendMap));

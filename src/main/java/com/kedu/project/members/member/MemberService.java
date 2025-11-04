@@ -74,6 +74,7 @@ public class MemberService {
 
 
 
+
         // 1. 원본 비밀번호 확보 (IMAP/SMTP 사용을 위해 필요)
         String rawPassword = dto.getPw();
        
@@ -125,6 +126,8 @@ public class MemberService {
         list.get(0).setPhone("010" + "-" + phone1 + "-" + phone2);
         return list;
     }
+    
+    
 
    
 	// 마이페이지 수정
