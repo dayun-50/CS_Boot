@@ -6,7 +6,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.kedu.project.chatting.chat_member.Chat_memberDTO;
+
 
 /*
  * 		사원 회원가입 및 마이페이지 구현 DAO

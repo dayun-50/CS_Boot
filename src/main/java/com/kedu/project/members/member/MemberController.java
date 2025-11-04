@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kedu.project.external.james.JamesAccountService;
+
 import com.kedu.project.security.JwtUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -79,7 +79,7 @@ public class MemberController {
 
    
 
-   // 비밀번호 변경
+   // 비밀번호 변경	
    @PostMapping("/gnewpw")
    public ResponseEntity<String> gnewpw(@RequestBody MemberDTO dto) {
       int result = memberService.gnewpw(dto);

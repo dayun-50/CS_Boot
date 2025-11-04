@@ -72,9 +72,6 @@ public class MemberService {
     public int login(MemberDTO dto) {
 
 
-
-
-
         // 1. 원본 비밀번호 확보 (IMAP/SMTP 사용을 위해 필요)
         String rawPassword = dto.getPw();
        
@@ -113,9 +110,26 @@ public class MemberService {
 
     // 비밀번호 변경
     public int gnewpw(MemberDTO dto) {
-        dao.gnewpw(dto);
+    	String email = dto.getEmail();
+        String rawPassword = dto.getPw();
+    	
+    	
         dto.setPw(Encryptor.encrypt(dto.getPw())); // 암호화
-        return dao.gnewpw(dto);
+        
+        int result = dao.gnewpw(dto);
+        if (result > 0) {
+            try {
+                jamesAccountService.changePassword(email, rawPassword);
+                
+            } catch (Exception e) {
+               
+                e.printStackTrace();
+                throw new RuntimeException("James 서버 비밀번호 변경 실패", e);
+            }
+        }
+        
+        
+        return result;
     }
 
     // 마이페이지 출력
