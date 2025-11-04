@@ -50,7 +50,7 @@ public class ContactDAO {
 
 	// 팀원용 - y
 	public List<ContactDTO> selectTeamContact(Map<String, Object> params) { // <- 메서드 이름 단수형으로 통일
-		// 💡 XML에 정의된 ID: selectTeamContact (단수)
+		// XML에 정의된 ID: selectTeamContact (단수)
 		return mybatis.selectList("Contact.selectTeamContact", params);
 	}
 

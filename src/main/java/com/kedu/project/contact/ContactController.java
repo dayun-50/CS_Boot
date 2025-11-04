@@ -35,8 +35,8 @@ public class ContactController {
 
 		// 로그인한 사용자 company_code 자동 세팅
 		String companyCode = contactService.getCompanyCodeByEmail(dto.getOwner_email());
+
 		dto.setCompany_code(companyCode);
-		System.out.println(dto);
 
 		int rowsInserted = contactService.insertContact(dto);
 		if (rowsInserted > 0) {
@@ -77,8 +77,8 @@ public class ContactController {
 	// 팀원용
 	// 팀 전체 연락처 조회 (공유 여부 상관없이)
 	@GetMapping("/team/{owner_email}")
-	public ResponseEntity<List<ContactDTO>> getTeamContacts(@PathVariable("owner_email") String ownerEmail) { // ownerEmail만
-																												// 받습니다.
+	public ResponseEntity<List<ContactDTO>> getTeamContacts(@PathVariable("owner_email") String ownerEmail) { 
+		// ownerEmail만
 
 		// 💡 1. MemberService를 사용하여 현재 사용자의 부서 코드(dept_code)를 조회합니다.
 		String deptCode = contactService.getDeptCodeByEmail(ownerEmail);
@@ -88,7 +88,7 @@ public class ContactController {
 			return ResponseEntity.ok(List.of());
 		}
 
-		// 💡 2. Map에 dept_code와 ownerEmail을 담아 DAO로 전달합니다.
+		// 2. Map에 dept_code와 ownerEmail을 담아 DAO로 전달합니다.
 		// teamService가 아닌 ContactService를 사용하므로 Map을 만듭니다.
 		Map<String, Object> params = Map.of("dept_code", deptCode, "owner_email", ownerEmail);
 

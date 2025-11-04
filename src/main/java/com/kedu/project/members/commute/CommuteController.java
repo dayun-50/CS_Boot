@@ -22,10 +22,14 @@ public class CommuteController {
 	@Autowired
 	private CommuteService commuteService;
 	
+	
 	//페이지 들어갔을때 데이터 가져오기
-	@GetMapping()
+	@GetMapping
 	public ResponseEntity<CommuteDTO> getTodayData(){
 		String member_email = "test@test.com";// 토큰으로 변경되면 토큰에서 꺼낸 작성자로 가져와야함
+		//String member_email=(String)session.getAttribute("loginId");
+		
+		
 		LocalDate today = LocalDate.now();// 현재 날짜 가져오기
 		CommuteDTO todayRecord = commuteService.getCommuteByDate(member_email, today);// 이메일과 현재 날짜 보내서 dto 꺼내오기
 		
@@ -47,6 +51,7 @@ public class CommuteController {
 	@PostMapping("/start")
 	public ResponseEntity<Void> inputStart(@RequestBody Map<String, String> param) {
 	    String member_email = "test@test.com"; // 추후 토큰에서 추출 예정
+	    //String member_email=(String)session.getAttribute("loginId");
 	    String workAtStr = param.get("work_at");
 
 	    if (workAtStr == null) {
@@ -61,6 +66,7 @@ public class CommuteController {
 	@PostMapping("/end")
 	public ResponseEntity<Void> inputEnd(@RequestBody Map<String, String> param){
 	    String member_email = "test@test.com";// 토큰으로 변경되면 토큰에서 꺼낸 작성자로 가져와야함
+	  //String member_email=(String)session.getAttribute("loginId");
 	    String workAtStr = param.get("work_at");
 	    String leavAtStr = param.get("leave_at");
 
@@ -76,6 +82,7 @@ public class CommuteController {
 	@GetMapping("/weekly")
 	public ResponseEntity<Integer> getWeeklyTotalMin(){
 		String member_email = "test@test.com"; // 추후 토큰에서 추출 예정
+		//String member_email=(String)session.getAttribute("loginId");
 		LocalDate today = LocalDate.now(); // 오늘 날짜
 		// LocalDate today = LocalDate.of(2025, 10, 17);임의 날짜 설정: 2025년 10월 17일
 	    LocalDate monday = today.minusDays(today.getDayOfWeek().getValue() - 1); // 이번 주 월요일		
@@ -88,6 +95,7 @@ public class CommuteController {
 	@GetMapping("/issue")
 	public ResponseEntity<Map<String, Object>> getMonthlyIssue(){
 		String member_email = "test@test.com"; // 추후 토큰에서 추출 예정
+		//String member_email=(String)session.getAttribute("loginId");
 		LocalDate today = LocalDate.now(); // 오늘 날짜
 		LocalDate startOfMonth = today.withDayOfMonth(1);
 		

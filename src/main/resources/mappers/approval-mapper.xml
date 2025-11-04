@@ -50,8 +50,18 @@
   	</select>
   	
   	<select id="getDetailBySeq" resultType="com.kedu.project.approval.ApprovalDTO">
-  		select * from approval where member_email =#{member_email} and approval_seq =#{seq} 
-  	</select>
+	  SELECT 
+	    a.approval_seq,
+	    m.name AS member_email,        <!-- ✅ 이메일 대신 이름을 이 필드로 -->
+	    a.approval_title,
+	    a.approval_content,
+	    TO_CHAR(a.approval_at, 'YYYY-MM-DD HH24:MI:SS') AS approval_at,
+	    a.approval_status
+	  FROM approval a
+	  JOIN member m ON a.member_email = m.email
+	  WHERE a.approval_seq = #{seq}
+	    AND a.member_email = #{member_email}
+	</select>
   
   	<update id="updateDetailBoard">
   		update approval set approval_title = #{approval_title}, approval_content = #{approval_content} where approval_seq = #{approval_seq} and member_email = #{member_email}
