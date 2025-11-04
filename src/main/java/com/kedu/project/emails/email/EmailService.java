@@ -65,15 +65,15 @@ public class EmailService {
 	 */
 	public void sendEmail(String fromEmail, String rawPassword, Collection<String> toEmails, 
 			String subject, String content) throws Exception {
-		System.out.println("sendemail 들어옴");
+		
 		// 1. 메시지 객체 생성 (전송과 저장을 위해 필요)
 		
 		Session smtpSession = getSmtpsSession(fromEmail, rawPassword);
 		MimeMessage message = createMimeMessage(smtpSession, fromEmail, toEmails, subject, content);
-		System.out.println("sendemail 객체 생성함");
+		
 		// 2. SMTPS를 통한 메일 발송
 		sendSmtpMessage(message, fromEmail, rawPassword);
-		System.out.println("메일발송하고 난 후");
+		
 		// 3. IMAPS를 통한 'Sent' 폴더 저장 + Oracle 동기화
 		saveToSentFolder(message, fromEmail, rawPassword, toEmails);
 	}
@@ -82,7 +82,7 @@ public class EmailService {
 
 	//  SMTPS 세션 획득
 	private Session getSmtpsSession(String username, String password) {
-		System.out.println("왜 안떠요!?!?!?!?!??!");
+		
 		Properties props = new Properties();
 		props.put("mail.transport.protocol", "smtps");
 		props.put("mail.smtps.host", mailHost);
@@ -130,7 +130,7 @@ public class EmailService {
 
 	    // 수신자가 없으면 발송 안 함
 	    if (filteredTo.isEmpty()) {
-	        System.out.println("메일 수신자가 없습니다. 발송을 건너뜁니다.");
+	        
 	        return null; // 또는 필요에 따라 예외 처리
 	    }
 
@@ -176,7 +176,7 @@ public class EmailService {
 
 
 			// james DB 에서 Sent 폴더 ID 찾기 
-			System.out.println(username);
+			
 			Integer mailboxId = jamesDao.getEmailboxSeq(username, "Sent");
 
 			if (mailboxId != null) {
@@ -350,17 +350,6 @@ public class EmailService {
 
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
 	//3. 메일 상세조회 메서드
 
@@ -377,7 +366,7 @@ public class EmailService {
 			if (!folder.exists()) {
 				throw new RuntimeException("메일 폴더를 찾을 수 없습니다: " + folderName);
 			}
-			folder.open(Folder.READ_WRITE); // 💡 읽음 처리를 위해 READ_WRITE
+			folder.open(Folder.READ_WRITE); //  읽음 처리를 위해 READ_WRITE
 
 			UIDFolder uf = (UIDFolder) folder;
 			Message message = uf.getMessageByUID(uid); 
@@ -448,12 +437,5 @@ public class EmailService {
 		return Session.getDefaultInstance(props, null);
 	}
 
-	// ----------------------------------------------------
-	// 4. 메일 삭제 기능 (IMAPS) - 기존 구현체
-	// ----------------------------------------------------
-
-	public void deleteAllEmails(String userEmail, String rawPassword) throws Exception {
-		// ... (deleteAllEmails 로직은 getMailboxMessages 로직을 활용하여 구현 가능) ...
-		// (Folder.READ_WRITE, message.setFlag(Flags.Flag.DELETED, true), inbox.expunge() 사용)
-	}
+	
 }

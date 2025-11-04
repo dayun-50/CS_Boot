@@ -11,7 +11,7 @@ public class EmailSendRequestDTO {
     
 	public EmailSendRequestDTO() {
 		super();
-		// TODO Auto-generated constructor stub
+	
 	}
 	public EmailSendRequestDTO(String subject, String content, String receiverEmails) {
 		super();

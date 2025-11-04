@@ -12,9 +12,10 @@ import org.springframework.stereotype.Repository;
 public class JamesEmailDAO {
     //  [핵심] MySQL DB 전용 통로만 주입
     @Autowired 
+    @Qualifier("mysqlSqlSessionTemplate")
     private SqlSession mybatis; 
     
-    private static final String NAMESPACE = "JamesMailbox"; // Mapper namespace와 일치
+    private static final String NAMESPACE = "james"; // Mapper namespace와 일치
 
     // 1. 메일함 ID 조회 (MySQL 쿼리)
     public Integer getEmailboxSeq(String memberEmail, String emailboxType) {

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class OracleEmailDAO {
-	@Autowired @Qualifier("mysqlSqlSessionTemplate")
+	@Autowired @Qualifier("oracleSqlSessionTemplate")
 	private SqlSession mybatis;
 	
 	

@@ -75,12 +75,12 @@ public class EmailController {
         @RequestBody EmailSendRequestDTO mailSendRequestDTO 
     ) {
         try {
-        	System.out.println("sendemail 토큰분리전");
+    
             // 1.  토큰 분리: General Token과 James Access Token 획득
             String[] tokenParts = splitAuthorizationToken(request);
             String generalToken = tokenParts[0]; 
             String jamesAccessToken = tokenParts[1];
-            System.out.println("sendemail 토큰분리완료");
+         
             // 2.  ID 및 비밀번호 획득 (JwtUtil 사용)
             // (a) 일반 토큰으로 DB ID 획득
             String senderDbId = jwtUtil.verifyToken(generalToken).getSubject(); 
@@ -89,29 +89,25 @@ public class EmailController {
             
             // 3. James 계정 아이디로 전환
             String senderJamesId = jamesAccountService.getJamesUsername(senderDbId); 
-            System.out.println("sendemail 계정 아이디 전환완료");
             // 4. 수신자 목록 파싱
-            System.out.println("sendemail 수신자 목록 파싱 대기");
             String receiverStr = mailSendRequestDTO.getReceiverEmails();
-            System.out.println("sendemail 수신자 목록 파싱중");
+      
             List<String> recipients = Arrays.stream((receiverStr != null ? receiverStr : "").split(","))
                                             .map(String::trim)
                                             .filter(email -> !email.isEmpty()) // 공백/빈 문자열 제거
                                             .toList();
-            System.out.println("sendemail 수신자 목록 파싱 된건가?");
-            System.out.println("수신자 목록: " + recipients);
+        
             // 수신자가 없으면 발송 건너뛰기
             if (recipients.isEmpty()) {
                 return ResponseEntity.ok(Map.of("message", "수신자가 없어서 발송을 건너뜀"));
             }
-            System.out.println("발송 서비스 호출 전");
+            
             // 5. 발송 서비스 호출
             emailService.sendEmail(
                 senderJamesId, senderRawPassword, recipients, 
                 mailSendRequestDTO.getSubject(), mailSendRequestDTO.getContent()
             );
-            System.out.println("이전에 다 가던디? ");
-            System.out.println("수신자 목록: " + recipients);
+          
             return ResponseEntity.ok(Map.of("message", "메일 발송에 성공했습니다.", 
                                            "recipients", recipients.size() + "명"));
             
@@ -193,33 +189,7 @@ public class EmailController {
     }
     
     
-
+  
     
-    // ---  /delete-all-emails (메일 삭제) ---------------------------------------------
-    
-    @DeleteMapping("/delete-all-emails") 
-    public ResponseEntity<Map<String, Object>> deleteAllEmailsApi(HttpServletRequest request) {
-        try {
-            // 1.  토큰 분리
-            String[] tokenParts = splitAuthorizationToken(request);
-            String generalToken = tokenParts[0]; 
-            String jamesAccessToken = tokenParts[1];
-
-            // 2.  ID 및 비밀번호 획득
-            String deleterDbId = jwtUtil.verifyToken(generalToken).getSubject();
-            String deleterRawPassword = jwtUtil.getRawJamesPassword(jamesAccessToken);
-            
-            
-            // 3. James 계정 ID로 전환
-            String deleterJamesId = jamesAccountService.getJamesUsername(deleterDbId);
-            
-            // 4. 삭제 서비스 호출
-            emailService.deleteAllEmails(deleterJamesId, deleterRawPassword);
-            
-            return ResponseEntity.ok(Map.of("message", "메일함 정리가 완료되었습니다.", "status", "SUCCESS"));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "메일 삭제 중 오류 발생: " + e.getMessage()));
-        }
-    }
 
 }
