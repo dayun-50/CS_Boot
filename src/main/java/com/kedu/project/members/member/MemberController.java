@@ -56,15 +56,15 @@ public class MemberController {
 	        session.setAttribute("id", dto.getEmail());
 	        //웹 인증 토큰
 			String generalToken = jwt.createToken(dto.getEmail());
-			//james 서버 인증 토큰
-			String jamesAccessToken = jwt.createJamesToken(
-		             dto.getEmail(),    
-		             rawPassword // DTO에서 평문 비밀번호를 사용하여 토큰 B 생성
-		         );
-			// 3.  [핵심 수정] 두 토큰을 특정 구분자("|||")로 결합하여 하나의 String으로 반환
-	         String combinedToken = generalToken + "|||" + jamesAccessToken;
+//			//james 서버 인증 토큰
+//			String jamesAccessToken = jwt.createJamesToken(
+//		             dto.getEmail(),    
+//		             rawPassword // DTO에서 평문 비밀번호를 사용하여 토큰 B 생성
+//		         );
+//			// 3.  [핵심 수정] 두 토큰을 특정 구분자("|||")로 결합하여 하나의 String으로 반환
+//	         String combinedToken = generalToken + "|||" + jamesAccessToken;
 			
-			return ResponseEntity.ok(combinedToken);
+			return ResponseEntity.ok(generalToken);
 		} else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("실패");
 		}
